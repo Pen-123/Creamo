@@ -1,7 +1,7 @@
 /* script.js — Advanced UI: searchable custom dropdown, typewriter effect, PBKDF2 AES option, more ciphers.
-   Fixed typing glitch: Aggressive textarea focus on load, click, dropdown blur, and button actions.
-   Prevented dropdown/inputs from stealing focus or blocking textarea. Polished and robust: PBKDF2/AES blob
-   format (salt:iv:cipher), safer defaults, error handling, keyboard navigation.
+   Fixed typing glitch: Prevented dropdown (selectControl/cipherFilter) from stealing textarea focus.
+   Aggressive textarea focus on load, click, and after dropdown/key interactions. Polished and robust:
+   PBKDF2/AES blob format (salt:iv:cipher), safer defaults, error handling, keyboard navigation.
 */
 
 const PBKDF2_ITERATIONS = 10000; // reasonable default
@@ -52,10 +52,10 @@ const typewriterToggle = document.getElementById('typewriterToggle');
 const typeSpeed = document.getElementById('typeSpeed');
 const themeToggle = document.getElementById('themeToggle');
 
-// Force textarea focus aggressively to fix typing glitch
+// Force textarea focus to prevent dropdown stealing clicks
 document.addEventListener('DOMContentLoaded', () => {
     inputText.focus();
-    inputText.select(); // Highlight textarea on load
+    inputText.select();
 });
 inputText.addEventListener('click', (e) => {
     e.preventDefault();
@@ -64,10 +64,10 @@ inputText.addEventListener('click', (e) => {
     inputText.select();
 });
 inputText.addEventListener('keydown', (e) => {
-    e.stopPropagation(); // Prevent key events from bubbling to dropdown
+    e.stopPropagation(); // Stop key events from reaching dropdown
 });
 
-// Prevent dropdown and other inputs from stealing focus
+// Prevent dropdown and inputs from stealing focus
 cipherFilter.addEventListener('blur', () => {
     inputText.focus();
 });
@@ -77,8 +77,9 @@ keyInput.addEventListener('blur', () => {
 saltInput.addEventListener('blur', () => {
     inputText.focus();
 });
-document.addEventListener('click', (e) => {
-    if (!customSelect.contains(e.target) && e.target !== inputText) {
+customSelect.addEventListener('click', (e) => {
+    e.stopPropagation();
+    if (!cipherList.classList.contains('hidden')) {
         closeDropdown();
         inputText.focus();
     }
@@ -115,7 +116,8 @@ function closeDropdown() {
 }
 selectControl.addEventListener('click', (e) => {
     e.stopPropagation();
-    if (cipherList.classList.contains('hidden')) openDropdown(); else closeDropdown();
+    if (cipherList.classList.contains('hidden')) openDropdown();
+    else closeDropdown();
 });
 selectControl.addEventListener('keydown', (e) => {
     if (e.key === 'ArrowDown' || e.key === 'Enter' || e.key === ' ') {
@@ -176,6 +178,11 @@ function initSelection() {
 initSelection();
 
 // Close dropdown on outside click or escape
+document.addEventListener('click', (e) => {
+    if (!customSelect.contains(e.target) && e.target !== inputText) {
+        closeDropdown();
+    }
+});
 document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape') {
         closeDropdown();
@@ -534,8 +541,7 @@ function decrypt() {
             default: throw new Error('Unknown cipher');
         }
         setOutput(out, false);
-    } script.js
-} catch (e) {
+    } catch (e) {
         setOutput('Error: ' + (e && e.message ? e.message : String(e)), true);
     }
     inputText.focus();
