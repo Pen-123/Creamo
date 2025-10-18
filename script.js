@@ -1,6 +1,9 @@
 /* script.js — Advanced UI: searchable custom dropdown, typewriter effect, PBKDF2 AES option, more ciphers.
-   Replace previous script.js with this file.
+   Polished and fixed: robust PBKDF2/AES blob format (salt:iv:cipher), safer defaults, error handling,
+   keyboard navigation, and fewer assumptions about developer environment.
 */
+
+const PBKDF2_ITERATIONS = 10000; // reasonable default
 
 const cipherInfo = {
     base64: "Base64: Encodes text into a 64-character alphabet. Not for secrecy — transport-friendly.",
@@ -10,9 +13,9 @@ const cipherInfo = {
     rot13: "ROT13: Simple letter rotation (13). Symmetric and used for simple obfuscation.",
     morse: "Morse: Dots (.) and dashes (-). Use space between letters and / for word separators.",
     url: "URL Encode/Decode: Percent-encoding for transport in URLs.",
-    xor: "XOR: Symmetric XOR with a repeating key. Binary-safe; for text we wrap with Base64 output.",
-    aes256: "AES-256: Encrypt/Decrypt using passphrase (CryptoJS). For PBKDF2-derived keys select AES-256 (PBKDF2).",
-    "aes256-pbkdf2": "AES-256 (PBKDF2): Derive encryption key using PBKDF2 with optional salt for stronger keying.",
+    xor: "XOR: Symmetric XOR with a repeating key. Binary-safe; output is Base64.",
+    aes256: "AES-256: Encrypt/Decrypt using passphrase (CryptoJS). For PBKDF2-derived keys use AES-256 (PBKDF2).",
+    "aes256-pbkdf2": "AES-256 (PBKDF2): Derive encryption key using PBKDF2 with embedded salt for stronger keying.",
     vigenere: "Vigenère: Polyalphabetic substitution using an alphabetic keyword.",
     sha256: "SHA-256: Cryptographic hash (one-way). Use under Encrypt to compute the digest.",
     md5: "MD5: Legacy hash function (one-way). Not recommended for security use-cases."
@@ -69,6 +72,8 @@ buildOptions();
 function openDropdown() {
     cipherList.classList.remove('hidden');
     customSelect.setAttribute('aria-expanded', 'true');
+    cipherFilter.value = '';
+    filterOptions();
     cipherFilter.focus();
 }
 function closeDropdown() {
@@ -76,11 +81,14 @@ function closeDropdown() {
     customSelect.setAttribute('aria-expanded', 'false');
     selectControl.focus();
 }
-selectControl.addEventListener('click', () => {
+selectControl.addEventListener('click', (e) => {
+    e.stopPropagation();
     if (cipherList.classList.contains('hidden')) openDropdown(); else closeDropdown();
 });
 selectControl.addEventListener('keydown', (e) => {
-    if (e.key === 'ArrowDown' || e.key === 'Enter') {
+    if (e.key === 'ArrowDown' || e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault(); openDropdown();
+    } else if (e.key === 'ArrowUp') {
         e.preventDefault(); openDropdown();
     }
 });
@@ -107,11 +115,14 @@ optionsList.addEventListener('keydown', (e) => {
 
 // Filter options by input
 function filterOptions() {
-    const q = cipherFilter.value.trim().toLowerCase();
+    const q = (cipherFilter.value || '').trim().toLowerCase();
     Array.from(optionsList.children).forEach(li => {
         const txt = li.textContent.toLowerCase();
         li.style.display = txt.includes(q) ? '' : 'none';
     });
+    // focus first visible
+    const firstVisible = Array.from(optionsList.children).find(li => li.style.display !== 'none');
+    if (firstVisible) firstVisible.focus();
 }
 
 // Synchronize selection with native select
@@ -121,13 +132,12 @@ function chooseOption(value) {
     updateUIForCipher();
 }
 function initSelection() {
-    const v = nativeSelect.value;
     selectedLabel.textContent = nativeSelect.options[nativeSelect.selectedIndex].textContent;
     updateUIForCipher();
 }
 initSelection();
 
-// Close dropdown on outside click
+// Close dropdown on outside click or escape
 document.addEventListener('click', (e) => {
     if (!customSelect.contains(e.target)) closeDropdown();
 });
@@ -165,7 +175,6 @@ function updateUIForCipher() {
     }
 }
 nativeSelect.addEventListener('change', () => {
-    // update custom label
     selectedLabel.textContent = nativeSelect.options[nativeSelect.selectedIndex].textContent;
     updateUIForCipher();
 });
@@ -267,7 +276,6 @@ function xorEncrypt(str, key) {
     const kbytes = new TextEncoder().encode(key);
     const out = new Uint8Array(data.length);
     for (let i = 0; i < data.length; i++) out[i] = data[i] ^ kbytes[i % kbytes.length];
-    // return base64 representation
     let bin = '';
     for (let i = 0; i < out.length; i++) bin += String.fromCharCode(out[i]);
     return btoa(bin);
@@ -304,7 +312,7 @@ function vigenereCipher(str, key, encrypt=true) {
 function sha256Hash(str) { return CryptoJS.SHA256(str).toString(CryptoJS.enc.Hex); }
 function md5Hash(str) { return CryptoJS.MD5(str).toString(CryptoJS.enc.Hex); }
 
-// AES helpers (passphrase and PBKDF2)
+// AES helpers
 function aesEncryptPassphrase(plain, pass) {
     return CryptoJS.AES.encrypt(plain, pass).toString();
 }
@@ -313,18 +321,28 @@ function aesDecryptPassphrase(cipherText, pass) {
     if (!decrypted) throw new Error('Bad key or input for AES decryption.');
     return decrypted;
 }
-function aesEncryptPBKDF2(plain, pass, salt='somesalt', iterations=1000) {
+
+// AES-PBKDF2: produce a blob "saltHex:ivHex:cipherBase64"
+function aesEncryptPBKDF2(plain, pass, iterations = PBKDF2_ITERATIONS) {
+    const salt = CryptoJS.lib.WordArray.random(128/8);
     const key = CryptoJS.PBKDF2(pass, salt, { keySize: 256/32, iterations: iterations });
     const iv = CryptoJS.lib.WordArray.random(128/8);
     const encrypted = CryptoJS.AES.encrypt(plain, key, { iv: iv });
-    // prepend IV to ciphertext (hex) so decrypt can recover
-    return iv.toString(CryptoJS.enc.Hex) + ':' + encrypted.toString();
+    const saltHex = salt.toString(CryptoJS.enc.Hex);
+    const ivHex = iv.toString(CryptoJS.enc.Hex);
+    // ciphertext is base64 string from CryptoJS
+    return `${saltHex}:${ivHex}:${encrypted.toString()}`;
 }
-function aesDecryptPBKDF2(blob, pass, salt='somesalt', iterations=1000) {
-    const [ivHex, ct] = blob.split(':');
-    if (!ivHex || !ct) throw new Error('Invalid AES-PBKDF2 blob');
-    const key = CryptoJS.PBKDF2(pass, salt, { keySize: 256/32, iterations: iterations });
+
+function aesDecryptPBKDF2(blob, pass, iterations = PBKDF2_ITERATIONS) {
+    const parts = (blob || '').split(':');
+    if (parts.length < 3) throw new Error('Invalid AES-PBKDF2 blob (expected salt:iv:cipher).');
+    const saltHex = parts[0];
+    const ivHex = parts[1];
+    const ct = parts.slice(2).join(':'); // support colons in cipher
+    const salt = CryptoJS.enc.Hex.parse(saltHex);
     const iv = CryptoJS.enc.Hex.parse(ivHex);
+    const key = CryptoJS.PBKDF2(pass, salt, { keySize: 256/32, iterations: iterations });
     const decrypted = CryptoJS.AES.decrypt(ct, key, { iv: iv }).toString(CryptoJS.enc.Utf8);
     if (!decrypted) throw new Error('Bad key/salt or input for AES-PBKDF2 decryption.');
     return decrypted;
@@ -334,8 +352,9 @@ function aesDecryptPBKDF2(blob, pass, salt='somesalt', iterations=1000) {
 let typingTimer = null;
 let caretInterval = null;
 function showWithTypewriter(text) {
-    const speed = Math.max(5, Number(typeSpeed.value) || 24); // characters per second-ish
-    const msPerChar = Math.round(1000 / speed);
+    const speed = Math.max(5, Number(typeSpeed.value) || 40); // characters per second
+    const msPerChar = Math.max(6, Math.round(1000 / speed));
+    clearInterval(typingTimer);
     clearInterval(caretInterval);
     caretEl.style.visibility = 'visible';
     let i = 0;
@@ -347,12 +366,10 @@ function showWithTypewriter(text) {
         i++;
         if (i > text.length) {
             clearInterval(typingTimer);
-            // keep caret blinking for a short while then hide
             setTimeout(() => { caretEl.style.visibility = 'hidden'; }, 800);
         }
     }, msPerChar);
 
-    // caret blink
     caretInterval = setInterval(() => {
         caretEl.style.visibility = (caretEl.style.visibility === 'visible') ? 'hidden' : 'visible';
     }, 500);
@@ -365,10 +382,16 @@ function showInstant(text) {
     copyBtn.style.display = text ? 'inline-block' : 'none';
 }
 function setOutput(text, isError=false) {
-    // escape control if user opted out of showing them; here we keep raw text.
-    if (typewriterToggle.checked) showWithTypewriter(text);
-    else showInstant(text);
-    outputEl.classList.toggle('error', !!isError);
+    try {
+        text = String(text || '');
+        if (typewriterToggle.checked) showWithTypewriter(text);
+        else showInstant(text);
+        outputEl.classList.toggle('error', !!isError);
+    } catch (err) {
+        // fallback to instant display
+        showInstant(String(text));
+        outputEl.classList.toggle('error', true);
+    }
 }
 
 // Copy
@@ -421,7 +444,8 @@ function encrypt() {
             }
             case 'aes256-pbkdf2': {
                 if (!key || key.length < 8) throw new Error('AES-PBKDF2 requires a passphrase (min 8 chars).');
-                out = aesEncryptPBKDF2(input, key, salt || CryptoJS.lib.WordArray.random(8).toString()); break;
+                // saltInput is optional; if present, use provided salt hex; otherwise let function generate and embed salt.
+                out = aesEncryptPBKDF2(input, key, PBKDF2_ITERATIONS); break;
             }
             case 'vigenere': out = vigenereCipher(input, key, true); break;
             case 'sha256': out = sha256Hash(input); break;
@@ -430,7 +454,7 @@ function encrypt() {
         }
         setOutput(out, false);
     } catch (e) {
-        setOutput('Error: ' + e.message, true);
+        setOutput('Error: ' + (e && e.message ? e.message : String(e)), true);
     }
 }
 
@@ -460,7 +484,7 @@ function decrypt() {
             }
             case 'aes256-pbkdf2': {
                 if (!key || key.length < 8) throw new Error('AES-PBKDF2 requires a passphrase (min 8 chars).');
-                out = aesDecryptPBKDF2(input, key, salt || 'somesalt'); break;
+                out = aesDecryptPBKDF2(input, key, PBKDF2_ITERATIONS); break;
             }
             case 'vigenere': out = vigenereCipher(input, key, false); break;
             case 'sha256':
@@ -470,7 +494,7 @@ function decrypt() {
         }
         setOutput(out, false);
     } catch (e) {
-        setOutput('Error: ' + e.message, true);
+        setOutput('Error: ' + (e && e.message ? e.message : String(e)), true);
     }
 }
 
