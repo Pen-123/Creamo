@@ -1,7 +1,7 @@
 /* script.js — Advanced UI: searchable custom dropdown, typewriter effect, PBKDF2 AES option, more ciphers.
-   Fixed typing glitch: Prevented dropdown (selectControl/cipherFilter) from stealing textarea focus.
-   Aggressive textarea focus on load, click, and after dropdown/key interactions. Polished and robust:
-   PBKDF2/AES blob format (salt:iv:cipher), safer defaults, error handling, keyboard navigation.
+   Fixed passphrase glitch: Removed keyInput blur listener to prevent textarea focus theft.
+   Smarter focus logic: Only force textarea focus on outside clicks, not keyInput/saltInput.
+   Polished and robust: PBKDF2/AES blob format (salt:iv:cipher), safer defaults, error handling, keyboard navigation.
 */
 
 const PBKDF2_ITERATIONS = 10000; // reasonable default
@@ -52,7 +52,7 @@ const typewriterToggle = document.getElementById('typewriterToggle');
 const typeSpeed = document.getElementById('typeSpeed');
 const themeToggle = document.getElementById('themeToggle');
 
-// Force textarea focus to prevent dropdown stealing clicks
+// Force textarea focus on load, but allow other inputs
 document.addEventListener('DOMContentLoaded', () => {
     inputText.focus();
     inputText.select();
@@ -67,22 +67,31 @@ inputText.addEventListener('keydown', (e) => {
     e.stopPropagation(); // Stop key events from reaching dropdown
 });
 
-// Prevent dropdown and inputs from stealing focus
+// Allow keyInput and saltInput to keep focus, only force textarea on outside clicks
+document.addEventListener('click', (e) => {
+    if (!customSelect.contains(e.target) && e.target !== inputText && e.target !== keyInput && e.target !== saltInput) {
+        closeDropdown();
+        inputText.focus();
+    }
+});
+
+// Prevent dropdown from stealing focus
 cipherFilter.addEventListener('blur', () => {
-    inputText.focus();
-});
-keyInput.addEventListener('blur', () => {
-    inputText.focus();
-});
-saltInput.addEventListener('blur', () => {
-    inputText.focus();
+    if (document.activeElement !== keyInput && document.activeElement !== saltInput) {
+        inputText.focus();
+    }
 });
 customSelect.addEventListener('click', (e) => {
     e.stopPropagation();
     if (!cipherList.classList.contains('hidden')) {
         closeDropdown();
-        inputText.focus();
+        if (document.activeElement !== keyInput && document.activeElement !== saltInput) {
+            inputText.focus();
+        }
     }
+});
+selectControl.addEventListener('mousedown', (e) => {
+    e.preventDefault(); // Prevent dropdown from stealing focus
 });
 
 // Build options list from native select
@@ -112,7 +121,9 @@ function openDropdown() {
 function closeDropdown() {
     cipherList.classList.add('hidden');
     customSelect.setAttribute('aria-expanded', 'false');
-    inputText.focus(); // Always return to textarea
+    if (document.activeElement !== keyInput && document.activeElement !== saltInput) {
+        inputText.focus();
+    }
 }
 selectControl.addEventListener('click', (e) => {
     e.stopPropagation();
@@ -169,7 +180,6 @@ function chooseOption(value) {
     nativeSelect.value = value;
     selectedLabel.textContent = nativeSelect.options[nativeSelect.selectedIndex].textContent;
     updateUIForCipher();
-    inputText.focus();
 }
 function initSelection() {
     selectedLabel.textContent = nativeSelect.options[nativeSelect.selectedIndex].textContent;
@@ -177,16 +187,10 @@ function initSelection() {
 }
 initSelection();
 
-// Close dropdown on outside click or escape
-document.addEventListener('click', (e) => {
-    if (!customSelect.contains(e.target) && e.target !== inputText) {
-        closeDropdown();
-    }
-});
+// Close dropdown on escape
 document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape') {
         closeDropdown();
-        inputText.focus();
     }
 });
 
@@ -219,7 +223,6 @@ function updateUIForCipher() {
         keyInput.placeholder = 'Key / Not used';
         keyLabel.textContent = 'Key';
     }
-    inputText.focus();
 }
 nativeSelect.addEventListener('change', () => {
     selectedLabel.textContent = nativeSelect.options[nativeSelect.selectedIndex].textContent;
@@ -437,7 +440,6 @@ function setOutput(text, isError=false) {
         showInstant(String(text));
         outputEl.classList.toggle('error', true);
     }
-    inputText.focus();
 }
 
 // Copy
@@ -450,7 +452,6 @@ copyBtn.addEventListener('click', () => {
     }).catch(() => {
         alert('Copy failed — select & copy manually.');
     });
-    inputText.focus();
 });
 
 // Clear
@@ -503,7 +504,6 @@ function encrypt() {
     } catch (e) {
         setOutput('Error: ' + (e && e.message ? e.message : String(e)), true);
     }
-    inputText.focus();
 }
 
 function decrypt() {
@@ -544,7 +544,6 @@ function decrypt() {
     } catch (e) {
         setOutput('Error: ' + (e && e.message ? e.message : String(e)), true);
     }
-    inputText.focus();
 }
 
 // Toggle theme
@@ -553,7 +552,6 @@ themeToggle.addEventListener('click', () => {
     const pressed = document.documentElement.classList.contains('light');
     themeToggle.setAttribute('aria-pressed', pressed.toString());
     themeToggle.textContent = pressed ? 'Dark Theme' : 'Light Theme';
-    inputText.focus();
 });
 
 // Initial state
