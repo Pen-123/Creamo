@@ -1,6 +1,6 @@
 /* script.js — Advanced UI: searchable custom dropdown, typewriter effect, PBKDF2 AES option, more ciphers.
-   Fixed passphrase glitch: Removed keyInput blur listener to prevent textarea focus theft.
-   Smarter focus logic: Only force textarea focus on outside clicks, not keyInput/saltInput.
+   Fixed highlighting errors: Smarter global click listener only focuses textarea on non-input/button clicks.
+   Added explicit focus listeners for keyInput, saltInput, and buttons to prevent focus theft.
    Polished and robust: PBKDF2/AES blob format (salt:iv:cipher), safer defaults, error handling, keyboard navigation.
 */
 
@@ -52,24 +52,62 @@ const typewriterToggle = document.getElementById('typewriterToggle');
 const typeSpeed = document.getElementById('typeSpeed');
 const themeToggle = document.getElementById('themeToggle');
 
-// Force textarea focus on load, but allow other inputs
+// Force textarea focus on load
 document.addEventListener('DOMContentLoaded', () => {
     inputText.focus();
     inputText.select();
 });
+
+// Explicit focus for inputs and buttons
 inputText.addEventListener('click', (e) => {
     e.preventDefault();
     e.stopPropagation();
     inputText.focus();
     inputText.select();
 });
+keyInput.addEventListener('click', (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    keyInput.focus();
+});
+saltInput.addEventListener('click', (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    saltInput.focus();
+});
+encryptBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    encrypt();
+});
+decryptBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    decrypt();
+});
+clearBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    inputText.value = '';
+    keyInput.value = '';
+    saltInput.value = '';
+    setOutput('No output yet.');
+    inputText.focus();
+});
 inputText.addEventListener('keydown', (e) => {
-    e.stopPropagation(); // Stop key events from reaching dropdown
+    e.stopPropagation();
 });
 
-// Allow keyInput and saltInput to keep focus, only force textarea on outside clicks
+// Smarter global click: only focus textarea on non-input/button clicks
 document.addEventListener('click', (e) => {
-    if (!customSelect.contains(e.target) && e.target !== inputText && e.target !== keyInput && e.target !== saltInput) {
+    if (!customSelect.contains(e.target) && 
+        e.target !== inputText && 
+        e.target !== keyInput && 
+        e.target !== saltInput && 
+        e.target !== encryptBtn && 
+        e.target !== decryptBtn && 
+        e.target !== clearBtn && 
+        e.target !== copyBtn && 
+        e.target !== themeToggle && 
+        e.target !== typeSpeed && 
+        e.target !== typewriterToggle) {
         closeDropdown();
         inputText.focus();
     }
@@ -77,7 +115,9 @@ document.addEventListener('click', (e) => {
 
 // Prevent dropdown from stealing focus
 cipherFilter.addEventListener('blur', () => {
-    if (document.activeElement !== keyInput && document.activeElement !== saltInput) {
+    if (document.activeElement !== inputText && 
+        document.activeElement !== keyInput && 
+        document.activeElement !== saltInput) {
         inputText.focus();
     }
 });
@@ -85,13 +125,10 @@ customSelect.addEventListener('click', (e) => {
     e.stopPropagation();
     if (!cipherList.classList.contains('hidden')) {
         closeDropdown();
-        if (document.activeElement !== keyInput && document.activeElement !== saltInput) {
-            inputText.focus();
-        }
     }
 });
 selectControl.addEventListener('mousedown', (e) => {
-    e.preventDefault(); // Prevent dropdown from stealing focus
+    e.preventDefault();
 });
 
 // Build options list from native select
@@ -121,7 +158,9 @@ function openDropdown() {
 function closeDropdown() {
     cipherList.classList.add('hidden');
     customSelect.setAttribute('aria-expanded', 'false');
-    if (document.activeElement !== keyInput && document.activeElement !== saltInput) {
+    if (document.activeElement !== inputText && 
+        document.activeElement !== keyInput && 
+        document.activeElement !== saltInput) {
         inputText.focus();
     }
 }
