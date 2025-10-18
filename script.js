@@ -1,6 +1,7 @@
 /* script.js — Advanced UI: searchable custom dropdown, typewriter effect, PBKDF2 AES option, more ciphers.
-   Polished and fixed: robust PBKDF2/AES blob format (salt:iv:cipher), safer defaults, error handling,
-   keyboard navigation, and fewer assumptions about developer environment.
+   Fixed typing glitch: Force textarea focus on load, click, and dropdown blur to prevent input lockout.
+   Polished and robust: PBKDF2/AES blob format (salt:iv:cipher), safer defaults, error handling,
+   keyboard navigation, no assumptions about developer environment.
 */
 
 const PBKDF2_ITERATIONS = 10000; // reasonable default
@@ -49,8 +50,26 @@ const clearBtn = document.getElementById('clearBtn');
 
 const typewriterToggle = document.getElementById('typewriterToggle');
 const typeSpeed = document.getElementById('typeSpeed');
-
 const themeToggle = document.getElementById('themeToggle');
+
+// Force textarea focus on load and click to fix typing glitch
+document.addEventListener('DOMContentLoaded', () => {
+    inputText.focus();
+});
+inputText.addEventListener('click', () => {
+    inputText.focus();
+});
+
+// Prevent dropdown from stealing focus
+cipherFilter.addEventListener('blur', () => {
+    inputText.focus();
+});
+document.addEventListener('click', (e) => {
+    if (!customSelect.contains(e.target)) {
+        closeDropdown();
+        inputText.focus();
+    }
+});
 
 // Build options list from native select
 function buildOptions() {
@@ -80,6 +99,7 @@ function closeDropdown() {
     cipherList.classList.add('hidden');
     customSelect.setAttribute('aria-expanded', 'false');
     selectControl.focus();
+    inputText.focus(); // Ensure textarea regains focus after dropdown closes
 }
 selectControl.addEventListener('click', (e) => {
     e.stopPropagation();
@@ -130,6 +150,7 @@ function chooseOption(value) {
     nativeSelect.value = value;
     selectedLabel.textContent = nativeSelect.options[nativeSelect.selectedIndex].textContent;
     updateUIForCipher();
+    inputText.focus(); // Return focus to textarea after selection
 }
 function initSelection() {
     selectedLabel.textContent = nativeSelect.options[nativeSelect.selectedIndex].textContent;
@@ -139,9 +160,16 @@ initSelection();
 
 // Close dropdown on outside click or escape
 document.addEventListener('click', (e) => {
-    if (!customSelect.contains(e.target)) closeDropdown();
+    if (!customSelect.contains(e.target)) {
+        closeDropdown();
+    }
 });
-document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeDropdown(); });
+document.addEventListener('keydown', (e) => { 
+    if (e.key === 'Escape') {
+        closeDropdown();
+        inputText.focus();
+    }
+});
 
 // Update UI when cipher changes
 function updateUIForCipher() {
@@ -173,6 +201,7 @@ function updateUIForCipher() {
         keyInput.placeholder = 'Key / Not used';
         keyLabel.textContent = 'Key';
     }
+    inputText.focus(); // Ensure textarea focus after UI update
 }
 nativeSelect.addEventListener('change', () => {
     selectedLabel.textContent = nativeSelect.options[nativeSelect.selectedIndex].textContent;
@@ -330,7 +359,6 @@ function aesEncryptPBKDF2(plain, pass, iterations = PBKDF2_ITERATIONS) {
     const encrypted = CryptoJS.AES.encrypt(plain, key, { iv: iv });
     const saltHex = salt.toString(CryptoJS.enc.Hex);
     const ivHex = iv.toString(CryptoJS.enc.Hex);
-    // ciphertext is base64 string from CryptoJS
     return `${saltHex}:${ivHex}:${encrypted.toString()}`;
 }
 
@@ -398,10 +426,10 @@ function setOutput(text, isError=false) {
 copyBtn.addEventListener('click', () => {
     const text = typedContent.textContent || '';
     if (!text) return;
-    navigator.clipboard.writeText(text).then(()=> {
+    navigator.clipboard.writeText(text).then(() => {
         copyBtn.textContent = 'Copied';
-        setTimeout(()=> copyBtn.textContent = 'Copy', 1200);
-    }).catch(()=> {
+        setTimeout(() => copyBtn.textContent = 'Copy', 1200);
+    }).catch(() => {
         alert('Copy failed — select & copy manually.');
     });
 });
@@ -412,6 +440,7 @@ clearBtn.addEventListener('click', () => {
     keyInput.value = '';
     saltInput.value = '';
     setOutput('No output yet.');
+    inputText.focus(); // Focus textarea after clear
 });
 
 // Encrypt / Decrypt
@@ -444,7 +473,6 @@ function encrypt() {
             }
             case 'aes256-pbkdf2': {
                 if (!key || key.length < 8) throw new Error('AES-PBKDF2 requires a passphrase (min 8 chars).');
-                // saltInput is optional; if present, use provided salt hex; otherwise let function generate and embed salt.
                 out = aesEncryptPBKDF2(input, key, PBKDF2_ITERATIONS); break;
             }
             case 'vigenere': out = vigenereCipher(input, key, true); break;
@@ -453,8 +481,10 @@ function encrypt() {
             default: throw new Error('Unknown cipher');
         }
         setOutput(out, false);
+        inputText.focus(); // Return focus to textarea after encrypt
     } catch (e) {
         setOutput('Error: ' + (e && e.message ? e.message : String(e)), true);
+        inputText.focus();
     }
 }
 
@@ -493,8 +523,10 @@ function decrypt() {
             default: throw new Error('Unknown cipher');
         }
         setOutput(out, false);
+        inputText.focus(); // Return focus to textarea after decrypt
     } catch (e) {
         setOutput('Error: ' + (e && e.message ? e.message : String(e)), true);
+        inputText.focus();
     }
 }
 
@@ -504,6 +536,7 @@ themeToggle.addEventListener('click', () => {
     const pressed = document.documentElement.classList.contains('light');
     themeToggle.setAttribute('aria-pressed', pressed.toString());
     themeToggle.textContent = pressed ? 'Dark Theme' : 'Light Theme';
+    inputText.focus(); // Keep textarea focused after theme toggle
 });
 
 // Initial state
