@@ -6,7 +6,7 @@
     <title>Creamocrypt — Advanced Cipher Suite</title>
     <link rel="stylesheet" href="style.css">
     <!-- CryptoJS for AES, PBKDF2, SHA, MD5 -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js" integrity="" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 </head>
 <body>
     <div class="page">
@@ -81,7 +81,7 @@
 
                 <div class="form-row salt-row hidden" id="saltRow">
                     <label for="saltInput">PBKDF2 Salt (optional)</label>
-                    <input type="text" id="saltInput" placeholder="Use a unique salt (recommended for PBKDF2)" />
+                    <input type="text" id="saltInput" placeholder="Optional custom salt — normally generated automatically" />
                 </div>
 
                 <div class="form-row options-row">
@@ -92,7 +92,7 @@
                         </label>
                         <label class="inline small">
                             Speed
-                            <input type="range" id="typeSpeed" min="5" max="60" value="24" />
+                            <input type="range" id="typeSpeed" min="5" max="120" value="40" />
                         </label>
                         <label class="inline small">
                             <input type="checkbox" id="showNonPrintable" /> Show control chars
