@@ -28,7 +28,7 @@ html,body{height:100%;margin:0;font-family:Inter, 'Courier New', monospace;backg
 .tool-card h2{margin:0 0 8px 0}
 .form-row{display:flex;flex-direction:column;margin-bottom:12px}
 .form-row label{font-size:0.85rem;color:var(--muted);margin-bottom:6px}
-select, input[type="text"], input[type="password"], textarea{background:transparent;border:1px solid rgba(255,255,255,0.06);padding:10px;border-radius:8px;color:var(--text);resize:vertical}
+select, input[type="text"], input[type="password"], input[type="number"], textarea{background:transparent;border:1px solid rgba(255,255,255,0.06);padding:10px;border-radius:8px;color:var(--text);resize:vertical}
 select:focus, input:focus, textarea:focus{outline:none;box-shadow:0 6px 18px rgba(91,134,229,0.12);border-color:rgba(91,134,229,0.28)}
 
 .key-row{transition:all 220ms ease}
