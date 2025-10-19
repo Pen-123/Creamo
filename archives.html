@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Creamo — RAW PEN LOGS</title>
+    <base href="/">
+    <link rel="stylesheet" href="style.css">
+    <!-- CryptoJS included for consistency, though not used on archives page -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+</head>
+<body>
+    <div class="page">
+        <header class="site-header">
+            <div class="logo">
+                <img src="logo.png" alt="Creamocrypt Logo" class="logo-svg">
+                <div class="title">
+                    <h1>Creamo</h1>
+                    <p class="tagline">Encode your truth — the ink dries slow.</p>
+                </div>
+            </div>
+            <nav aria-label="main">
+                <a href="index.html" class="btn primary">Back to Home</a>
+                <button class="btn ghost" id="themeToggle" aria-pressed="false">Light Theme</button>
+            </nav>
+        </header>
+        <main class="container">
+            <section class="card tool-card" aria-labelledby="archives-title">
+                <h2 id="archives-title">RAW PEN LOGS</h2>
+                <p>Unearthed from the ruins of the War of the Pen, these archives hold the secrets of Agent Pen, NSCW, Ink Co., and USPR. Decrypt the truth with Creamocrypt’s ciphers.</p>
+                <div id="archivesContent" class="info-content">Loading archives...</div>
+                <div class="button-group">
+                    <a href="encoder.html" class="btn primary">Decode with Creamocrypt</a>
+                </div>
+            </section>
+            <aside class="card info-card" aria-labelledby="archive-info-title">
+                <h2 id="archive-info-title">About the Archives</h2>
+                <div class="info-content">
+                    <ul>
+                        <li><strong>Pen War Lore:</strong> Chronicles of espionage, betrayal, and coded treaties.</li>
+                        <li><strong>Agent Pen:</strong> A protocol, not a person, vanished but never gone.</li>
+                        <li><strong>Fragments Replicate:</strong> Hidden messages await your ciphers.</li>
+                        <li><strong>Directive 001:</strong> Dig up the bones. The Pen writes again.</li>
+                    </ul>
+                </div>
+                <div class="hint">Tip: Use the encoder to decrypt hidden messages in the archives!</div>
+            </aside>
+        </main>
+        <footer class="site-footer">
+            <p>Directive 001: The Pen Writes Again. © 2025 Yappinghood</p>
+        </footer>
+    </div>
+    <script>
+        // Theme toggle for archives page
+        const themeToggle = document.getElementById('themeToggle');
+        themeToggle.addEventListener('click', () => {
+            document.documentElement.classList.toggle('light');
+            const pressed = document.documentElement.classList.contains('light');
+            themeToggle.setAttribute('aria-pressed', pressed.toString());
+            themeToggle.textContent = pressed ? 'Dark Theme' : 'Light Theme';
+        });
+
+        // Load archives.txt
+        const archivesContent = document.getElementById('archivesContent');
+        fetch('archives.txt')
+            .then(response => {
+                if (!response.ok) throw new Error('Archives not found');
+                return response.text();
+            })
+            .then(text => {
+                archivesContent.textContent = text;
+            })
+            .catch(error => {
+                archivesContent.textContent = 'Error: Could not load archives. Check if archives.txt exists.';
+                archivesContent.classList.add('error');
+            });
+    </script>
+</body>
+</html>
