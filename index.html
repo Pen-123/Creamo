@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Creamocrypt - Encode Your Truth</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+</head>
+<body>
+    <header class="header">
+        <div class="logo-container">
+            <img src="logo.png" alt="Creamocrypt Logo" class="logo">
+            <!-- If no image, use Font Awesome: <i class="fas fa-pen-nib logo-icon"></i> -->
+            <h1>Creamocrypt</h1>
+        </div>
+        <nav>
+            <a href="encoder.html" class="button">Go to Encoder</a>
+            <button id="themeToggle" aria-pressed="false">Light Theme</button>
+        </nav>
+    </header>
+    <main class="container">
+        <section class="hero">
+            <h2>Welcome to Creamocrypt</h2>
+            <p>Encode your secrets with the power of ciphers like AES-256, Vigenère, and Base64. Inspired by the Pen Protocol, this tool lets you encrypt your truth like a rizzler! 😎</p>
+            <p>Ready to hide your messages from the USPR spies? Click below to start!</p>
+            <a href="encoder.html" class="button primary">Start Encoding</a>
+        </section>
+        <section class="features">
+            <h3>Why Creamocrypt?</h3>
+            <ul>
+                <li>🔒 Secure ciphers: AES-256, PBKDF2, XOR, and more.</li>
+                <li>🖌️ Polished UI: Typewriter effects and searchable dropdowns.</li>
+                <li>🚀 Fast & Free: No skibidi stalls, just pure cipher drip.</li>
+                <li>🖊️ Pen Vibes: Channel the spirit of Agent Pen’s rebellion.</li>
+            </ul>
+        </section>
+    </main>
+    <footer>
+        <p>© 2025 Creamocrypt. Powered by the Pen Protocol. 🖊️💥</p>
+    </footer>
+    <script>
+        // Theme toggle for home page
+        const themeToggle = document.getElementById('themeToggle');
+        themeToggle.addEventListener('click', () => {
+            document.documentElement.classList.toggle('light');
+            const pressed = document.documentElement.classList.contains('light');
+            themeToggle.setAttribute('aria-pressed', pressed.toString());
+            themeToggle.textContent = pressed ? 'Dark Theme' : 'Light Theme';
+        });
+    </script>
+</body>
+</html>
