@@ -3,13 +3,13 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <title>Creamocrypt — Advanced Cipher Suite</title>
+    <title>Creamocrypt — Encoder</title>
     <base href="/">
     <link rel="stylesheet" href="style.css">
-    <!-- CryptoJS for AES, PBKDF2, SHA, MD5 -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 </head>
 <body>
+    <canvas id="hackerCanvas"></canvas>
     <div class="page">
         <header class="site-header">
             <div class="logo">
@@ -20,87 +20,53 @@
                 </div>
             </div>
             <nav aria-label="main">
+                <a href="index.html" class="btn primary">Back to Home</a>
                 <button class="btn ghost" id="themeToggle" aria-pressed="false">Light Theme</button>
             </nav>
         </header>
         <main class="container">
-            <section class="card tool-card" aria-labelledby="cipher-title">
-                <h2 id="cipher-title">Cipher Tool — Advanced</h2>
-                <!-- Hidden native select kept for semantics; custom UI layered on top -->
-                <select id="cipherSelect" class="native-select" aria-hidden="true" tabindex="-1">
-                    <option value="base64">Base64</option>
-                    <option value="base32">Base32</option>
-                    <option value="hex">Hex Encode</option>
-                    <option value="caesar">Caesar (shift)</option>
-                    <option value="rot13">ROT13</option>
-                    <option value="morse">Morse Code</option>
-                    <option value="url">URL Encode</option>
-                    <option value="xor">XOR (repeating key)</option>
-                    <option value="aes256">AES-256 (passphrase)</option>
-                    <option value="aes256-pbkdf2">AES-256 (PBKDF2-derived key)</option>
-                    <option value="vigenere">Vigenère</option>
-                    <option value="sha256">SHA-256 (hash)</option>
-                    <option value="md5">MD5 (hash)</option>
-                </select>
-                <div class="form-row">
-                    <label for="cipherSearch">Choose cipher</label>
-                    <div id="customSelect" class="custom-select" role="combobox" aria-haspopup="listbox" aria-expanded="false">
-                        <div class="select-control" tabindex="0" id="selectControl" aria-controls="cipherList" aria-label="Cipher selector">
-                            <span id="selectedLabel">Base64</span>
-                            <svg class="chev" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M7 10l5 5 5-5z" fill="currentColor"/></svg>
-                        </div>
-                        <div class="select-dropdown hidden" id="cipherList" role="listbox" tabindex="-1">
-                            <input id="cipherFilter" class="select-filter" placeholder="Search ciphers..." aria-label="Search ciphers" />
-                            <ul class="options" role="presentation" id="optionsList"></ul>
-                        </div>
-                    </div>
+            <section class="card tool-card" aria-labelledby="encoder-title">
+                <h2 id="encoder-title">Creamocrypt Encoder</h2>
+                <div class="input-group">
+                    <label for="cipherSelect">Select Cipher:</label>
+                    <select id="cipherSelect">
+                        <option value="aes">AES-256</option>
+                        <option value="base64">Base64</option>
+                        <option value="morse">Morse Code</option>
+                    </select>
                 </div>
-                <div class="form-row">
-                    <label for="inputText">Input</label>
-                    <textarea id="inputText" placeholder="Enter your message..." rows="4"></textarea>
+                <div class="input-group">
+                    <label for="inputText">Input Text:</label>
+                    <textarea id="inputText" placeholder="Enter text to encode/decode"></textarea>
                 </div>
-                <div class="form-row key-row hidden" id="keyRow">
-                    <label for="keyInput" id="keyLabel">Key</label>
-                    <input type="text" id="keyInput" placeholder="Key / Shift / Passphrase" />
+                <div class="input-group">
+                    <label for="keyInput">Key (for AES):</label>
+                    <input type="text" id="keyInput" placeholder="Enter key (optional)">
                 </div>
-                <div class="form-row salt-row hidden" id="saltRow">
-                    <label for="saltInput">PBKDF2 Salt (optional)</label>
-                    <input type="text" id="saltInput" placeholder="Optional custom salt — normally generated automatically" />
-                </div>
-                <div class="form-row options-row">
-                    <label>Options</label>
-                    <div class="options-inline">
-                        <label class="inline">
-                            <input type="checkbox" id="typewriterToggle" checked /> Typewriter animation
-                        </label>
-                        <label class="inline small">
-                            Speed
-                            <input type="range" id="typeSpeed" min="5" max="120" value="40" />
-                        </label>
-                        <label class="inline small">
-                            <input type="checkbox" id="showNonPrintable" /> Show control chars
-                        </label>
-                    </div>
+                <div class="input-group">
+                    <label for="saltInput">Salt (optional):</label>
+                    <input type="text" id="saltInput" placeholder="Enter salt (optional)">
                 </div>
                 <div class="button-group">
-                    <button class="btn primary" id="encryptBtn">Encrypt</button>
-                    <button class="btn" id="decryptBtn">Decrypt</button>
-                    <button class="btn outline" id="clearBtn" title="Clear fields">Clear</button>
+                    <button id="encodeButton" class="btn primary">Encode</button>
+                    <button id="decodeButton" class="btn primary">Decode</button>
                 </div>
-                <div class="output-wrap">
-                    <div class="output-header">
-                        <strong>Result</strong>
-                        <div>
-                            <button class="btn tiny" id="copyBtn" title="Copy result">Copy</button>
-                        </div>
-                    </div>
-                    <pre id="output" aria-live="polite" class="output"><span id="typedContent">No output yet.</span><span id="caret" class="caret" aria-hidden="true">▌</span></pre>
+                <div class="input-group">
+                    <label for="outputText">Output:</label>
+                    <textarea id="outputText" readonly></textarea>
                 </div>
             </section>
-            <aside class="card info-card" aria-labelledby="protocol-title">
-                <h2 id="protocol-title">Cipher Logs & Protocols</h2>
-                <div id="info-content" class="info-content">Select a cipher to view its protocol.</div>
-                <div class="hint">Tip: Hashes (SHA-256/MD5) are one-way — they cannot be reversed by decrypt.</div>
+            <aside class="card info-card" aria-labelledby="cipher-info-title">
+                <h2 id="cipher-info-title">Cipher Info</h2>
+                <div class="info-content">
+                    <ul>
+                        <li><strong>AES-256:</strong> Secure encryption with a key. Use a strong passphrase.</li>
+                        <li><strong>Base64:</strong> Encode/decode text to a safe format.</li>
+                        <li><strong>Morse Code:</strong> Classic dot-dash encoding. No key needed.</li>
+                        <li><strong>Tip:</strong> Test with "PEN LIVES" and key "InkCo2025"!</li>
+                    </ul>
+                </div>
+                <div class="hint">Tip: Decode archive secrets with the right cipher!</div>
             </aside>
         </main>
         <footer class="site-footer">
@@ -108,5 +74,47 @@
         </footer>
     </div>
     <script src="script.js"></script>
+    <script>
+        // Hacker animation
+        const canvas = document.getElementById('hackerCanvas');
+        const ctx = canvas.getContext('2d');
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+        const chars = '01010101';
+        const fontSize = 14;
+        const columns = canvas.width / fontSize;
+        const drops = Array(Math.floor(columns)).fill(1);
+        ctx.font = `${fontSize}px monospace`;
+        ctx.fillStyle = '#0f0';
+
+        function draw() {
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = '#0f0';
+            for (let i = 0; i < drops.length; i++) {
+                const text = chars.charAt(Math.floor(Math.random() * chars.length));
+                ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+                if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
+                    drops[i] = 0;
+                }
+                drops[i]++;
+            }
+        }
+
+        const animation = setInterval(draw, 33);
+        setTimeout(() => {
+            clearInterval(animation);
+            canvas.classList.add('hidden');
+        }, 3000);
+
+        // Theme toggle
+        const themeToggle = document.getElementById('themeToggle');
+        themeToggle.addEventListener('click', () => {
+            document.documentElement.classList.toggle('light');
+            const pressed = document.documentElement.classList.contains('light');
+            themeToggle.setAttribute('aria-pressed', pressed.toString());
+            themeToggle.textContent = pressed ? 'Dark Theme' : 'Light Theme';
+        });
+    </script>
 </body>
 </html>
