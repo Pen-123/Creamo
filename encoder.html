@@ -73,39 +73,52 @@
             <p>Directive 001: The Pen Writes Again. © 2025 Yappinghood</p>
         </footer>
     </div>
-    <script src="script.js"></script>
     <script>
         // Hacker animation
-        const canvas = document.getElementById('hackerCanvas');
-        const ctx = canvas.getContext('2d');
-        canvas.width = window.innerWidth;
-        canvas.height = window.innerHeight;
-        const chars = '01010101';
-        const fontSize = 14;
-        const columns = canvas.width / fontSize;
-        const drops = Array(Math.floor(columns)).fill(1);
-        ctx.font = `${fontSize}px monospace`;
-        ctx.fillStyle = '#0f0';
-
-        function draw() {
-            ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
-            ctx.fillStyle = '#0f0';
-            for (let i = 0; i < drops.length; i++) {
-                const text = chars.charAt(Math.floor(Math.random() * chars.length));
-                ctx.fillText(text, i * fontSize, drops[i] * fontSize);
-                if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
-                    drops[i] = 0;
-                }
-                drops[i]++;
+        window.addEventListener('load', () => {
+            const canvas = document.getElementById('hackerCanvas');
+            const ctx = canvas.getContext('2d');
+            if (!canvas || !ctx) {
+                console.error('Hacker animation failed: Canvas or context not found');
+                return;
             }
-        }
+            console.log('Hacker animation initializing...');
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            const chars = '01010101';
+            const fontSize = 14;
+            const columns = Math.floor(canvas.width / fontSize);
+            const drops = Array(columns).fill(1);
+            ctx.font = `${fontSize}px monospace`;
+            ctx.fillStyle = '#0f0';
 
-        const animation = setInterval(draw, 33);
-        setTimeout(() => {
-            clearInterval(animation);
-            canvas.classList.add('hidden');
-        }, 3000);
+            function draw() {
+                ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                ctx.fillStyle = '#0f0';
+                for (let i = 0; i < drops.length; i++) {
+                    const text = chars.charAt(Math.floor(Math.random() * chars.length));
+                    ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+                    if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
+                        drops[i] = 0;
+                    }
+                    drops[i]++;
+                }
+            }
+
+            const animation = setInterval(draw, 33);
+            setTimeout(() => {
+                console.log('Hacker animation stopping...');
+                clearInterval(animation);
+                canvas.classList.add('hidden');
+            }, 3000);
+
+            // Resize canvas on window resize
+            window.addEventListener('resize', () => {
+                canvas.width = window.innerWidth;
+                canvas.height = window.innerHeight;
+            });
+        });
 
         // Theme toggle
         const themeToggle = document.getElementById('themeToggle');
@@ -116,5 +129,6 @@
             themeToggle.textContent = pressed ? 'Dark Theme' : 'Light Theme';
         });
     </script>
+    <script src="script.js"></script>
 </body>
 </html>
