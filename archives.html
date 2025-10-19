@@ -27,8 +27,11 @@
         <main class="container">
             <section class="card tool-card" aria-labelledby="archives-title">
                 <h2 id="archives-title">RAW PEN LOGS</h2>
-                <p>Unearthed from the ruins of the War of the Pen, these archives hold the secrets of Agent Pen, NSCW, Ink Co., and USPR. Decrypt the truth with Creamocrypt’s ciphers.</p>
-                <pre id="archivesContent" class="info-content">Loading archives...</pre>
+                <div class="button-group">
+                    <button id="loadArchives" class="btn primary">Load Archives</button>
+                    <button id="closeArchives" class="btn primary">Close Archives</button>
+                </div>
+                <pre id="archivesContent" class="info-content">Click "Load Archives" to view the RAW PEN LOGS.</pre>
                 <div class="button-group">
                     <a href="encoder.html" class="btn primary">Decode with Creamocrypt</a>
                 </div>
@@ -60,20 +63,31 @@
             themeToggle.textContent = pressed ? 'Dark Theme' : 'Light Theme';
         });
 
-        // Load archives.txt
+        // Load and close archives
+        const loadArchivesButton = document.getElementById('loadArchives');
+        const closeArchivesButton = document.getElementById('closeArchives');
         const archivesContent = document.getElementById('archivesContent');
-        fetch('archives.txt')
-            .then(response => {
-                if (!response.ok) throw new Error('Archives not found');
-                return response.text();
-            })
-            .then(text => {
-                archivesContent.textContent = text;
-            })
-            .catch(error => {
-                archivesContent.textContent = 'Error: Could not load archives. Check if archives.txt exists.';
-                archivesContent.classList.add('error');
-            });
+
+        loadArchivesButton.addEventListener('click', () => {
+            fetch('archives.txt')
+                .then(response => {
+                    if (!response.ok) throw new Error('Archives not found');
+                    return response.text();
+                })
+                .then(text => {
+                    archivesContent.textContent = text;
+                    archivesContent.classList.remove('error');
+                })
+                .catch(error => {
+                    archivesContent.textContent = 'Error: Could not load archives. Check if archives.txt exists.';
+                    archivesContent.classList.add('error');
+                });
+        });
+
+        closeArchivesButton.addEventListener('click', () => {
+            archivesContent.textContent = 'Click "Load Archives" to view the RAW PEN LOGS.';
+            archivesContent.classList.remove('error');
+        });
     </script>
 </body>
 </html>
