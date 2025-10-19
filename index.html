@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <title>Creamo — Encode the Truth.</title>
+    <title>Creamocrypt — Encode Your Truth</title>
     <base href="/">
     <link rel="stylesheet" href="style.css">
     <!-- CryptoJS included for consistency, though not used on home page -->
@@ -15,8 +15,8 @@
             <div class="logo">
                 <img src="logo.png" alt="Creamocrypt Logo" class="logo-svg">
                 <div class="title">
-                    <h1>Creamo</h1>
-                    <p class="tagline">Encode the truth — the ink dries slow.</p>
+                    <h1>Creamocrypt</h1>
+                    <p class="tagline">Encode your truth — the ink dries slow.</p>
                 </div>
             </div>
             <nav aria-label="main">
@@ -30,7 +30,9 @@
                 <p>Unleash your inner Agent Pen with our advanced cipher suite. Encode your secrets with AES-256, Vigenère, Base64, and more. Built for rizzlers who vibe with the Pen Protocol’s rebellion. Ready to hide your truth from USPR spies?</p>
                 <div class="button-group">
                     <a href="encoder.html" class="btn primary">Start Encoding</a>
+                    <a href="#" class="btn outline" id="archivesLink">Enter the Archives</a>
                 </div>
+                <div id="archivesContent" class="info-content hidden"></div>
             </section>
             <aside class="card info-card" aria-labelledby="features-title">
                 <h2 id="features-title">Why Creamocrypt?</h2>
@@ -57,6 +59,27 @@
             const pressed = document.documentElement.classList.contains('light');
             themeToggle.setAttribute('aria-pressed', pressed.toString());
             themeToggle.textContent = pressed ? 'Dark Theme' : 'Light Theme';
+        });
+
+        // Load archives.txt when "Enter the Archives" is clicked
+        const archivesLink = document.getElementById('archivesLink');
+        const archivesContent = document.getElementById('archivesContent');
+        archivesLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            fetch('archives.txt')
+                .then(response => {
+                    if (!response.ok) throw new Error('Archives not found');
+                    return response.text();
+                })
+                .then(text => {
+                    archivesContent.textContent = text;
+                    archivesContent.classList.remove('hidden');
+                })
+                .catch(error => {
+                    archivesContent.textContent = 'Error: Could not load archives. Check if archives.txt exists.';
+                    archivesContent.classList.add('error');
+                    archivesContent.classList.remove('hidden');
+                });
         });
     </script>
 </body>
