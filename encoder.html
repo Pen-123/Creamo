@@ -30,9 +30,19 @@
                 <div class="input-group">
                     <label for="cipherSelect">Select Cipher:</label>
                     <select id="cipherSelect">
-                        <option value="aes">AES-256</option>
                         <option value="base64">Base64</option>
+                        <option value="base32">Base32</option>
+                        <option value="hex">Hex</option>
+                        <option value="caesar">Caesar</option>
+                        <option value="rot13">ROT13</option>
                         <option value="morse">Morse Code</option>
+                        <option value="url">URL Encode/Decode</option>
+                        <option value="xor">XOR</option>
+                        <option value="aes256">AES-256</option>
+                        <option value="aes256-pbkdf2">AES-256 (PBKDF2)</option>
+                        <option value="vigenere">Vigenère</option>
+                        <option value="sha256">SHA-256</option>
+                        <option value="md5">MD5</option>
                     </select>
                 </div>
                 <div class="input-group">
@@ -40,12 +50,12 @@
                     <textarea id="inputText" placeholder="Enter text to encode/decode"></textarea>
                 </div>
                 <div class="input-group">
-                    <label for="keyInput">Key (for AES):</label>
-                    <input type="text" id="keyInput" placeholder="Enter key (optional)">
+                    <label for="keyInput">Key (for AES, Vigenère, XOR, Caesar):</label>
+                    <input type="text" id="keyInput" placeholder="Enter key (optional for Base64/Base32/Hex/Morse/URL, required for others)">
                 </div>
                 <div class="input-group">
-                    <label for="saltInput">Salt (optional):</label>
-                    <input type="text" id="saltInput" placeholder="Enter salt (optional)">
+                    <label for="saltInput">Salt (optional for AES-256, required for AES-256 PBKDF2):</label>
+                    <input type="text" id="saltInput" placeholder="Enter salt (optional for AES-256, required for AES-256 PBKDF2)">
                 </div>
                 <div class="button-group">
                     <button id="encodeButton" class="btn primary">Encode</button>
@@ -59,10 +69,20 @@
             <aside class="card info-card" aria-labelledby="cipher-info-title">
                 <h2 id="cipher-info-title">Cipher Info</h2>
                 <div class="info-content">
-                    <ul>
-                        <li><strong>AES-256:</strong> Secure encryption with a key. Use a strong passphrase.</li>
-                        <li><strong>Base64:</strong> Encode/decode text to a safe format.</li>
-                        <li><strong>Morse Code:</strong> Classic dot-dash encoding. No key needed.</li>
+                    <ul id="cipherInfoList">
+                        <li><strong>Base64:</strong> Encodes text into a 64-character alphabet. Not for secrecy — transport-friendly.</li>
+                        <li><strong>Base32:</strong> Encodes bytes into a 32-character alphabet (RFC4648). Useful for case-insensitive tokens.</li>
+                        <li><strong>Hex:</strong> Encodes bytes to hexadecimal pairs. Common for binary/text interchange.</li>
+                        <li><strong>Caesar:</strong> Shift letters by a numeric shift (1-25). Enter number in the key input.</li>
+                        <li><strong>ROT13:</strong> Simple letter rotation (13). Symmetric and used for simple obfuscation.</li>
+                        <li><strong>Morse Code:</strong> Dots (.) and dashes (-). Use space between letters and / for word separators.</li>
+                        <li><strong>URL Encode/Decode:</strong> Percent-encoding for transport in URLs.</li>
+                        <li><strong>XOR:</strong> Symmetric XOR with a repeating key. Binary-safe; output is Base64.</li>
+                        <li><strong>AES-256:</strong> Encrypt/Decrypt using passphrase (CryptoJS). For PBKDF2-derived keys use AES-256 (PBKDF2).</li>
+                        <li><strong>AES-256 (PBKDF2):</strong> Derive encryption key using PBKDF2 with embedded salt for stronger keying.</li>
+                        <li><strong>Vigenère:</strong> Polyalphabetic substitution using an alphabetic keyword.</li>
+                        <li><strong>SHA-256:</strong> Cryptographic hash (one-way). Use under Encrypt to compute the digest.</li>
+                        <li><strong>MD5:</strong> Legacy hash function (one-way). Not recommended for security use-cases.</li>
                         <li><strong>Tip:</strong> Test with "PEN LIVES" and key "InkCo2025"!</li>
                     </ul>
                 </div>
@@ -86,14 +106,15 @@
             canvas.width = window.innerWidth;
             canvas.height = window.innerHeight;
             const chars = '01010101';
-            const fontSize = 14;
-            const columns = Math.floor(canvas.width / fontSize);
+            const fontSize = 12;
+            const columns = Math.floor(canvas.width / fontSize * 1.5);
+            console.log(`Columns: ${columns}`);
             const drops = Array(columns).fill(1);
             ctx.font = `${fontSize}px monospace`;
             ctx.fillStyle = '#0f0';
 
             function draw() {
-                ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
+                ctx.fillStyle = 'rgba(0, 0, 0, 0.1)';
                 ctx.fillRect(0, 0, canvas.width, canvas.height);
                 ctx.fillStyle = '#0f0';
                 for (let i = 0; i < drops.length; i++) {
@@ -106,14 +127,13 @@
                 }
             }
 
-            const animation = setInterval(draw, 33);
+            const animation = setInterval(draw, 20);
             setTimeout(() => {
                 console.log('Hacker animation stopping...');
                 clearInterval(animation);
                 canvas.classList.add('hidden');
             }, 3000);
 
-            // Resize canvas on window resize
             window.addEventListener('resize', () => {
                 canvas.width = window.innerWidth;
                 canvas.height = window.innerHeight;
