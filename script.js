@@ -1,10 +1,8 @@
-/* script.js — Advanced UI: searchable custom dropdown, typewriter effect, PBKDF2 AES option, more ciphers.
-   Fixed highlighting errors: Smarter global click listener only focuses textarea on non-input/button clicks.
-   Added explicit focus listeners for keyInput, saltInput, and buttons to prevent focus theft.
-   Polished and robust: PBKDF2/AES blob format (salt:iv:cipher), safer defaults, error handling, keyboard navigation.
+/* script.js — Creamocrypt Encoder: Searchable dropdown, typewriter effect, all ciphers.
+   Built for Pen Renewed (2025-2026). Robust, accessible, and error-handled. © 2025 Yappinghood, AGPL-3.0 or proprietary.
 */
 
-const PBKDF2_ITERATIONS = 10000; // reasonable default
+const PBKDF2_ITERATIONS = 10000;
 
 const cipherInfo = {
     base64: "Base64: Encodes text into a 64-character alphabet. Not for secrecy — transport-friendly.",
@@ -27,63 +25,61 @@ const nativeSelect = document.getElementById('cipherSelect');
 const customSelect = document.getElementById('customSelect');
 const selectControl = document.getElementById('selectControl');
 const cipherList = document.getElementById('cipherList');
-const optionsList = document.getElementById('optionsList');
 const cipherFilter = document.getElementById('cipherFilter');
 const selectedLabel = document.getElementById('selectedLabel');
-
 const infoContent = document.getElementById('info-content');
 const keyRow = document.getElementById('keyRow');
 const keyInput = document.getElementById('keyInput');
 const keyLabel = document.getElementById('keyLabel');
 const saltRow = document.getElementById('saltRow');
 const saltInput = document.getElementById('saltInput');
-
 const inputText = document.getElementById('inputText');
 const outputEl = document.getElementById('output');
 const typedContent = document.getElementById('typedContent');
 const caretEl = document.getElementById('caret');
 const copyBtn = document.getElementById('copyBtn');
-
 const encryptBtn = document.getElementById('encryptBtn');
 const decryptBtn = document.getElementById('decryptBtn');
 const clearBtn = document.getElementById('clearBtn');
-
 const typewriterToggle = document.getElementById('typewriterToggle');
 const typeSpeed = document.getElementById('typeSpeed');
-const themeToggle = document.getElementById('themeToggle');
 
-// Force textarea focus on load
+// Initialize on DOM load
 document.addEventListener('DOMContentLoaded', () => {
+    console.log('DOM loaded, initializing encoder...');
     inputText.focus();
     inputText.select();
+    buildOptions();
+    initSelection();
+    setOutput('No output yet.');
 });
 
-// Explicit focus for inputs and buttons
-inputText.addEventListener('click', (e) => {
+// Focus handlers
+inputText.addEventListener('click', e => {
     e.preventDefault();
     e.stopPropagation();
     inputText.focus();
     inputText.select();
 });
-keyInput.addEventListener('click', (e) => {
+keyInput.addEventListener('click', e => {
     e.preventDefault();
     e.stopPropagation();
     keyInput.focus();
 });
-saltInput.addEventListener('click', (e) => {
+saltInput.addEventListener('click', e => {
     e.preventDefault();
     e.stopPropagation();
     saltInput.focus();
 });
-encryptBtn.addEventListener('click', (e) => {
+encryptBtn.addEventListener('click', e => {
     e.stopPropagation();
     encrypt();
 });
-decryptBtn.addEventListener('click', (e) => {
+decryptBtn.addEventListener('click', e => {
     e.stopPropagation();
     decrypt();
 });
-clearBtn.addEventListener('click', (e) => {
+clearBtn.addEventListener('click', e => {
     e.stopPropagation();
     inputText.value = '';
     keyInput.value = '';
@@ -91,12 +87,9 @@ clearBtn.addEventListener('click', (e) => {
     setOutput('No output yet.');
     inputText.focus();
 });
-inputText.addEventListener('keydown', (e) => {
-    e.stopPropagation();
-});
 
-// Smarter global click: only focus textarea on non-input/button clicks
-document.addEventListener('click', (e) => {
+// Smart global click
+document.addEventListener('click', e => {
     if (!customSelect.contains(e.target) && 
         e.target !== inputText && 
         e.target !== keyInput && 
@@ -105,7 +98,6 @@ document.addEventListener('click', (e) => {
         e.target !== decryptBtn && 
         e.target !== clearBtn && 
         e.target !== copyBtn && 
-        e.target !== themeToggle && 
         e.target !== typeSpeed && 
         e.target !== typewriterToggle) {
         closeDropdown();
@@ -113,27 +105,10 @@ document.addEventListener('click', (e) => {
     }
 });
 
-// Prevent dropdown from stealing focus
-cipherFilter.addEventListener('blur', () => {
-    if (document.activeElement !== inputText && 
-        document.activeElement !== keyInput && 
-        document.activeElement !== saltInput) {
-        inputText.focus();
-    }
-});
-customSelect.addEventListener('click', (e) => {
-    e.stopPropagation();
-    if (!cipherList.classList.contains('hidden')) {
-        closeDropdown();
-    }
-});
-selectControl.addEventListener('mousedown', (e) => {
-    e.preventDefault();
-});
-
-// Build options list from native select
+// Custom dropdown
 function buildOptions() {
-    optionsList.innerHTML = '';
+    console.log('Building cipher options...');
+    cipherList.innerHTML = '';
     for (let i = 0; i < nativeSelect.options.length; i++) {
         const opt = nativeSelect.options[i];
         const li = document.createElement('li');
@@ -142,52 +117,48 @@ function buildOptions() {
         li.dataset.value = opt.value;
         li.tabIndex = 0;
         li.innerHTML = `<strong>${opt.textContent}</strong><small>${cipherInfo[opt.value] || ''}</small>`;
-        optionsList.appendChild(li);
+        cipherList.appendChild(li);
     }
 }
-buildOptions();
 
-// Custom dropdown behaviors (searchable + keyboard)
 function openDropdown() {
+    console.log('Opening dropdown...');
     cipherList.classList.remove('hidden');
     customSelect.setAttribute('aria-expanded', 'true');
     cipherFilter.value = '';
     filterOptions();
     cipherFilter.focus();
 }
+
 function closeDropdown() {
+    console.log('Closing dropdown...');
     cipherList.classList.add('hidden');
     customSelect.setAttribute('aria-expanded', 'false');
-    if (document.activeElement !== inputText && 
-        document.activeElement !== keyInput && 
-        document.activeElement !== saltInput) {
-        inputText.focus();
-    }
+    inputText.focus();
 }
-selectControl.addEventListener('click', (e) => {
+
+selectControl.addEventListener('click', e => {
     e.stopPropagation();
-    if (cipherList.classList.contains('hidden')) openDropdown();
-    else closeDropdown();
+    cipherList.classList.contains('hidden') ? openDropdown() : closeDropdown();
 });
-selectControl.addEventListener('keydown', (e) => {
+
+selectControl.addEventListener('keydown', e => {
     if (e.key === 'ArrowDown' || e.key === 'Enter' || e.key === ' ') {
         e.preventDefault();
         openDropdown();
-    } else if (e.key === 'ArrowUp') {
-        e.preventDefault();
-        openDropdown();
     }
 });
+
 cipherFilter.addEventListener('input', filterOptions);
 
-optionsList.addEventListener('click', (e) => {
+optionsList.addEventListener('click', e => {
     const li = e.target.closest('.option');
     if (!li) return;
     chooseOption(li.dataset.value);
     closeDropdown();
 });
 
-optionsList.addEventListener('keydown', (e) => {
+optionsList.addEventListener('keydown', e => {
     const focused = document.activeElement;
     if (!focused || !focused.classList.contains('option')) return;
     if (e.key === 'ArrowDown') {
@@ -203,51 +174,51 @@ optionsList.addEventListener('keydown', (e) => {
     }
 });
 
-// Filter options by input
 function filterOptions() {
+    console.log('Filtering cipher options...');
     const q = (cipherFilter.value || '').trim().toLowerCase();
-    Array.from(optionsList.children).forEach(li => {
+    Array.from(cipherList.children).forEach(li => {
         const txt = li.textContent.toLowerCase();
         li.style.display = txt.includes(q) ? '' : 'none';
     });
-    const firstVisible = Array.from(optionsList.children).find(li => li.style.display !== 'none');
+    const firstVisible = Array.from(cipherList.children).find(li => li.style.display !== 'none');
     if (firstVisible) firstVisible.focus();
 }
 
-// Synchronize selection with native select
 function chooseOption(value) {
+    console.log(`Selecting cipher: ${value}`);
     nativeSelect.value = value;
     selectedLabel.textContent = nativeSelect.options[nativeSelect.selectedIndex].textContent;
     updateUIForCipher();
 }
+
 function initSelection() {
+    console.log('Initializing cipher selection...');
     selectedLabel.textContent = nativeSelect.options[nativeSelect.selectedIndex].textContent;
     updateUIForCipher();
 }
-initSelection();
 
-// Close dropdown on escape
-document.addEventListener('keydown', (e) => {
+document.addEventListener('keydown', e => {
     if (e.key === 'Escape') {
         closeDropdown();
     }
 });
 
-// Update UI when cipher changes
+// UI updates
 function updateUIForCipher() {
     const cipher = nativeSelect.value;
-    infoContent.textContent = cipherInfo[cipher] || '';
+    console.log(`Updating UI for cipher: ${cipher}`);
+    infoContent.textContent = cipherInfo[cipher] || 'Select a cipher, rizzler! 😜';
     const needsKey = ['caesar', 'xor', 'aes256', 'aes256-pbkdf2', 'vigenere'].includes(cipher);
     keyRow.classList.toggle('hidden', !needsKey);
     saltRow.classList.toggle('hidden', cipher !== 'aes256-pbkdf2');
-
     if (cipher === 'caesar') {
         keyInput.type = 'number';
         keyInput.placeholder = 'Shift (numeric, default 3)';
         keyLabel.textContent = 'Shift';
     } else if (cipher === 'aes256' || cipher === 'aes256-pbkdf2') {
         keyInput.type = 'password';
-        keyInput.placeholder = 'Passphrase (min 8 chars recommended)';
+        keyInput.placeholder = 'Passphrase (min 8 chars)';
         keyLabel.textContent = 'Passphrase';
     } else if (cipher === 'xor') {
         keyInput.type = 'text';
@@ -259,73 +230,67 @@ function updateUIForCipher() {
         keyLabel.textContent = 'Keyword';
     } else {
         keyInput.type = 'text';
-        keyInput.placeholder = 'Key / Not used';
+        keyInput.placeholder = 'Key (not used)';
         keyLabel.textContent = 'Key';
     }
 }
-nativeSelect.addEventListener('change', () => {
-    selectedLabel.textContent = nativeSelect.options[nativeSelect.selectedIndex].textContent;
-    updateUIForCipher();
-});
+nativeSelect.addEventListener('change', chooseOption);
 
-// -- Utilities: encoding and cipher implementations --
-
-// Unicode-safe Base64
+// Cipher implementations
 function base64EncodeUnicode(str) {
-    const bytes = new TextEncoder().encode(str);
-    let binary = '';
-    for (let i = 0; i < bytes.byteLength; i++) binary += String.fromCharCode(bytes[i]);
-    return btoa(binary);
+    try {
+        const bytes = new TextEncoder().encode(str);
+        let binary = '';
+        for (let i = 0; i < bytes.byteLength; i++) binary += String.fromCharCode(bytes[i]);
+        return btoa(binary);
+    } catch (e) {
+        throw new Error('Base64 encode failed, bro! 😭');
+    }
 }
+
 function base64DecodeUnicode(b64) {
-    const binary = atob(b64);
-    const bytes = new Uint8Array(binary.length);
-    for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
-    return new TextDecoder().decode(bytes);
+    try {
+        const binary = atob(b64);
+        const bytes = new Uint8Array(binary.length);
+        for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
+        return new TextDecoder().decode(bytes);
+    } catch (e) {
+        throw new Error('Base64 decode failed, check your input! 😡');
+    }
 }
 
-// Hex
 function hexEncode(str) {
-    const bytes = new TextEncoder().encode(str);
-    return Array.from(bytes).map(b => b.toString(16).padStart(2,'0')).join('');
+    try {
+        return CryptoJS.enc.Hex.stringify(CryptoJS.enc.Utf8.parse(str));
+    } catch (e) {
+        throw new Error('Hex encode failed, bro! 😭');
+    }
 }
+
 function hexDecode(hex) {
-    hex = hex.replace(/\s+/g,'');
-    if (hex.length % 2 !== 0) throw new Error('Invalid hex string');
-    const bytes = new Uint8Array(hex.length/2);
-    for (let i=0;i<bytes.length;i++) bytes[i] = parseInt(hex.substr(i*2,2),16);
-    return new TextDecoder().decode(bytes);
+    try {
+        return CryptoJS.enc.Hex.parse(hex).toString(CryptoJS.enc.Utf8);
+    } catch (e) {
+        throw new Error('Invalid hex string, Agent Pen would rage! 😡');
+    }
 }
 
-// Base32 (simple, padded)
-const base32Alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567';
-function base32Encode(input) {
-    const bytes = new TextEncoder().encode(input);
-    let bits = '';
-    for (let i = 0; i < bytes.length; i++) bits += bytes[i].toString(2).padStart(8,'0');
-    while (bits.length % 5 !== 0) bits += '0';
-    let output = '';
-    for (let i = 0; i < bits.length; i += 5) {
-        const chunk = bits.slice(i, i+5);
-        output += base32Alphabet[parseInt(chunk,2)];
+function base32Encode(str) {
+    try {
+        return CryptoJS.enc.Base32.stringify(CryptoJS.enc.Utf8.parse(str));
+    } catch (e) {
+        throw new Error('Base32 encode failed, check your input! 😭');
     }
-    while (output.length % 8 !== 0) output += '=';
-    return output;
-}
-function base32Decode(input) {
-    input = input.replace(/=+$/,'').toUpperCase();
-    let bits = '';
-    for (let i = 0; i < input.length; i++) {
-        const idx = base32Alphabet.indexOf(input[i]);
-        if (idx === -1) throw new Error('Invalid Base32 input');
-        bits += idx.toString(2).padStart(5,'0');
-    }
-    const bytes = [];
-    for (let i = 0; i + 8 <= bits.length; i += 8) bytes.push(parseInt(bits.slice(i, i+8),2));
-    return new TextDecoder().decode(new Uint8Array(bytes));
 }
 
-// Caesar / ROT13
+function base32Decode(str) {
+    try {
+        return CryptoJS.enc.Base32.parse(str).toString(CryptoJS.enc.Utf8);
+    } catch (e) {
+        throw new Error('Invalid Base32 input, rizzler! 😡');
+    }
+}
+
 function caesarCipher(str, shift) {
     if (!Number.isFinite(shift)) shift = 3;
     return str.replace(/[a-zA-Z]/g, c => {
@@ -333,9 +298,11 @@ function caesarCipher(str, shift) {
         return String.fromCharCode((c.charCodeAt(0) - base + shift + 26) % 26 + base);
     });
 }
-function rot13(str) { return caesarCipher(str, 13); }
 
-// Morse
+function rot13(str) {
+    return caesarCipher(str, 13);
+}
+
 const morseCode = {
     'A': '.-', 'B': '-...', 'C': '-.-.', 'D': '-..', 'E': '.', 'F': '..-.', 'G': '--.', 'H': '....',
     'I': '..', 'J': '.---', 'K': '-.-', 'L': '.-..', 'M': '--', 'N': '-.', 'O': '---', 'P': '.--.',
@@ -346,7 +313,7 @@ const morseCode = {
     ')': '-.--.-', '&': '.-...', ';': '-.-.-.', '=': '-...-', '+': '.-.-.', '-': '-....-', '_': '..--.-',
     '@': '.--.-.', ' ': '/'
 };
-const reverseMorse = Object.fromEntries(Object.entries(morseCode).map(([k,v])=>[v,k]));
+const reverseMorse = Object.fromEntries(Object.entries(morseCode).map(([k, v]) => [v, k]));
 function toMorse(str) {
     return str.toUpperCase().split('').map(c => morseCode[c] || c).join(' ');
 }
@@ -354,92 +321,145 @@ function fromMorse(str) {
     return str.split(' ').map(code => reverseMorse[code] || code).join('');
 }
 
-// URL encode
-function urlEncode(str) { return encodeURIComponent(str); }
-function urlDecode(str) { return decodeURIComponent(str.replace(/\+/g,' ')); }
-
-// XOR (repeating key) -> base64 output for binary-safety
-function xorEncrypt(str, key) {
-    if (!key) throw new Error('XOR requires a key');
-    const data = new TextEncoder().encode(str);
-    const kbytes = new TextEncoder().encode(key);
-    const out = new Uint8Array(data.length);
-    for (let i = 0; i < data.length; i++) out[i] = data[i] ^ kbytes[i % kbytes.length];
-    let bin = '';
-    for (let i = 0; i < out.length; i++) bin += String.fromCharCode(out[i]);
-    return btoa(bin);
-}
-function xorDecrypt(b64, key) {
-    if (!key) throw new Error('XOR requires a key');
-    const binary = atob(b64);
-    const out = new Uint8Array(binary.length);
-    const kbytes = new TextEncoder().encode(key);
-    for (let i = 0; i < binary.length; i++) out[i] = binary.charCodeAt(i) ^ kbytes[i % kbytes.length];
-    return new TextDecoder().decode(out);
-}
-
-// Vigenere
-function vigenereCipher(str, key, encrypt=true) {
-    if (!key) throw new Error('Missing keyword');
-    key = key.toUpperCase().replace(/[^A-Z]/g,'');
-    if (!key) throw new Error('Keyword must contain letters A-Z');
-    let out = '';
-    for (let i=0,j=0;i<str.length;i++) {
-        const c = str[i];
-        if (/[a-zA-Z]/.test(c)) {
-            const base = c < 'a' ? 65 : 97;
-            const k = key[j % key.length].charCodeAt(0) - 65;
-            const shift = encrypt ? k : -k;
-            out += String.fromCharCode((c.charCodeAt(0) - base + shift + 26) % 26 + base);
-            j++;
-        } else out += c;
+function urlEncode(str) {
+    try {
+        return encodeURIComponent(str);
+    } catch (e) {
+        throw new Error('URL encode failed, bro! 😭');
     }
-    return out;
 }
 
-// Hash helpers (CryptoJS)
-function sha256Hash(str) { return CryptoJS.SHA256(str).toString(CryptoJS.enc.Hex); }
-function md5Hash(str) { return CryptoJS.MD5(str).toString(CryptoJS.enc.Hex); }
+function urlDecode(str) {
+    try {
+        return decodeURIComponent(str.replace(/\+/g, ' '));
+    } catch (e) {
+        throw new Error('Invalid URL-encoded input, rizzler! 😡');
+    }
+}
 
-// AES helpers
+function xorEncrypt(str, key) {
+    if (!key) throw new Error('XOR needs a key, bro! 😜');
+    try {
+        const data = new TextEncoder().encode(str);
+        const kbytes = new TextEncoder().encode(key);
+        const out = new Uint8Array(data.length);
+        for (let i = 0; i < data.length; i++) out[i] = data[i] ^ kbytes[i % kbytes.length];
+        let bin = '';
+        for (let i = 0; i < out.length; i++) bin += String.fromCharCode(out[i]);
+        return btoa(bin);
+    } catch (e) {
+        throw new Error('XOR encrypt failed, check your input! 😭');
+    }
+}
+
+function xorDecrypt(b64, key) {
+    if (!key) throw new Error('XOR needs a key, bro! 😜');
+    try {
+        const binary = atob(b64);
+        const out = new Uint8Array(binary.length);
+        const kbytes = new TextEncoder().encode(key);
+        for (let i = 0; i < binary.length; i++) out[i] = binary.charCodeAt(i) ^ kbytes[i % kbytes.length];
+        return new TextDecoder().decode(out);
+    } catch (e) {
+        throw new Error('XOR decrypt failed, bad key or input! 😡');
+    }
+}
+
 function aesEncryptPassphrase(plain, pass) {
-    return CryptoJS.AES.encrypt(plain, pass).toString();
-}
-function aesDecryptPassphrase(cipherText, pass) {
-    const decrypted = CryptoJS.AES.decrypt(cipherText, pass).toString(CryptoJS.enc.Utf8);
-    if (!decrypted) throw new Error('Bad key or input for AES decryption.');
-    return decrypted;
+    try {
+        return CryptoJS.AES.encrypt(plain, pass).toString();
+    } catch (e) {
+        throw new Error('AES encrypt failed, check your key! 😭');
+    }
 }
 
-// AES-PBKDF2: produce a blob "saltHex:ivHex:cipherBase64"
+function aesDecryptPassphrase(cipherText, pass) {
+    try {
+        const decrypted = CryptoJS.AES.decrypt(cipherText, pass).toString(CryptoJS.enc.Utf8);
+        if (!decrypted) throw new Error('Bad key or input for AES decryption! 😡');
+        return decrypted;
+    } catch (e) {
+        throw new Error('AES decrypt failed, bad key or input! 😡');
+    }
+}
+
 function aesEncryptPBKDF2(plain, pass, iterations = PBKDF2_ITERATIONS) {
-    const salt = CryptoJS.lib.WordArray.random(128/8);
-    const key = CryptoJS.PBKDF2(pass, salt, { keySize: 256/32, iterations: iterations });
-    const iv = CryptoJS.lib.WordArray.random(128/8);
-    const encrypted = CryptoJS.AES.encrypt(plain, key, { iv: iv });
-    const saltHex = salt.toString(CryptoJS.enc.Hex);
-    const ivHex = iv.toString(CryptoJS.enc.Hex);
-    return `${saltHex}:${ivHex}:${encrypted.toString()}`;
+    try {
+        const salt = CryptoJS.lib.WordArray.random(128/8);
+        const key = CryptoJS.PBKDF2(pass, salt, { keySize: 256/32, iterations });
+        const iv = CryptoJS.lib.WordArray.random(128/8);
+        const encrypted = CryptoJS.AES.encrypt(plain, key, { iv });
+        const saltHex = salt.toString(CryptoJS.enc.Hex);
+        const ivHex = iv.toString(CryptoJS.enc.Hex);
+        return `${saltHex}:${ivHex}:${encrypted.toString()}`;
+    } catch (e) {
+        throw new Error('AES-PBKDF2 encrypt failed, check your key! 😭');
+    }
 }
 
 function aesDecryptPBKDF2(blob, pass, iterations = PBKDF2_ITERATIONS) {
-    const parts = (blob || '').split(':');
-    if (parts.length < 3) throw new Error('Invalid AES-PBKDF2 blob (expected salt:iv:cipher).');
-    const saltHex = parts[0];
-    const ivHex = parts[1];
-    const ct = parts.slice(2).join(':');
-    const salt = CryptoJS.enc.Hex.parse(saltHex);
-    const iv = CryptoJS.enc.Hex.parse(ivHex);
-    const key = CryptoJS.PBKDF2(pass, salt, { keySize: 256/32, iterations: iterations });
-    const decrypted = CryptoJS.AES.decrypt(ct, key, { iv: iv }).toString(CryptoJS.enc.Utf8);
-    if (!decrypted) throw new Error('Bad key/salt or input for AES-PBKDF2 decryption.');
-    return decrypted;
+    try {
+        const parts = (blob || '').split(':');
+        if (parts.length < 3) throw new Error('Invalid AES-PBKDF2 blob (expected salt:iv:cipher)! 😡');
+        const saltHex = parts[0];
+        const ivHex = parts[1];
+        const ct = parts.slice(2).join(':');
+        const salt = CryptoJS.enc.Hex.parse(saltHex);
+        const iv = CryptoJS.enc.Hex.parse(ivHex);
+        const key = CryptoJS.PBKDF2(pass, salt, { keySize: 256/32, iterations });
+        const decrypted = CryptoJS.AES.decrypt(ct, key, { iv }).toString(CryptoJS.enc.Utf8);
+        if (!decrypted) throw new Error('Bad key/salt or input for AES-PBKDF2 decryption! 😡');
+        return decrypted;
+    } catch (e) {
+        throw new Error('AES-PBKDF2 decrypt failed, bad key or input! 😡');
+    }
+}
+
+function vigenereCipher(str, key, encrypt = true) {
+    if (!key) throw new Error('Vigenère needs a keyword, rizzler! 😜');
+    try {
+        key = key.toUpperCase().replace(/[^A-Z]/g, '');
+        if (!key) throw new Error('Keyword must contain letters A-Z! 😡');
+        let out = '';
+        for (let i = 0, j = 0; i < str.length; i++) {
+            const c = str[i];
+            if (/[a-zA-Z]/.test(c)) {
+                const base = c < 'a' ? 65 : 97;
+                const k = key[j % key.length].charCodeAt(0) - 65;
+                const shift = encrypt ? k : -k;
+                out += String.fromCharCode((c.charCodeAt(0) - base + shift + 26) % 26 + base);
+                j++;
+            } else {
+                out += c;
+            }
+        }
+        return out;
+    } catch (e) {
+        throw new Error('Vigenère cipher failed, check your input! 😭');
+    }
+}
+
+function sha256Hash(str) {
+    try {
+        return CryptoJS.SHA256(str).toString(CryptoJS.enc.Hex);
+    } catch (e) {
+        throw new Error('SHA-256 hash failed, bro! 😭');
+    }
+}
+
+function md5Hash(str) {
+    try {
+        return CryptoJS.MD5(str).toString(CryptoJS.enc.Hex);
+    } catch (e) {
+        throw new Error('MD5 hash failed, bro! 😭');
+    }
 }
 
 // Typewriter effect
 let typingTimer = null;
 let caretInterval = null;
 function showWithTypewriter(text) {
+    console.log('Starting typewriter effect...');
     const speed = Math.max(5, Number(typeSpeed.value) || 40);
     const msPerChar = Math.max(6, Math.round(1000 / speed));
     clearInterval(typingTimer);
@@ -448,7 +468,6 @@ function showWithTypewriter(text) {
     let i = 0;
     typedContent.textContent = '';
     copyBtn.style.display = text ? 'inline-block' : 'none';
-
     typingTimer = setInterval(() => {
         typedContent.textContent += text.charAt(i) || '';
         i++;
@@ -457,142 +476,122 @@ function showWithTypewriter(text) {
             setTimeout(() => { caretEl.style.visibility = 'hidden'; }, 800);
         }
     }, msPerChar);
-
     caretInterval = setInterval(() => {
-        caretEl.style.visibility = (caretEl.style.visibility === 'visible') ? 'hidden' : 'visible';
+        caretEl.style.visibility = caretEl.style.visibility === 'visible' ? 'hidden' : 'visible';
     }, 500);
 }
+
 function showInstant(text) {
+    console.log('Showing output instantly...');
     clearInterval(typingTimer);
     clearInterval(caretInterval);
     typedContent.textContent = text;
     caretEl.style.visibility = 'hidden';
     copyBtn.style.display = text ? 'inline-block' : 'none';
 }
-function setOutput(text, isError=false) {
+
+function setOutput(text, isError = false) {
     try {
         text = String(text || '');
         if (typewriterToggle.checked) showWithTypewriter(text);
         else showInstant(text);
-        outputEl.classList.toggle('error', !!isError);
-    } catch (err) {
-        showInstant(String(text));
-        outputEl.classList.toggle('error', true);
+        outputEl.classList.toggle('error', isError);
+    } catch (e) {
+        showInstant('Error: Output failed, skibidi toilet vibes! 💀');
+        outputEl.classList.add('error');
     }
 }
 
-// Copy
+// Copy output
 copyBtn.addEventListener('click', () => {
+    console.log('Copying output...');
     const text = typedContent.textContent || '';
     if (!text) return;
     navigator.clipboard.writeText(text).then(() => {
         copyBtn.textContent = 'Copied';
-        setTimeout(() => copyBtn.textContent = 'Copy', 1200);
+        setTimeout(() => { copyBtn.textContent = 'Copy'; }, 1200);
     }).catch(() => {
-        alert('Copy failed — select & copy manually.');
+        console.error('Copy failed, manual vibes only!');
+        alert('Copy failed — select & copy manually, rizzler! 😭');
     });
 });
 
-// Clear
-clearBtn.addEventListener('click', () => {
-    inputText.value = '';
-    keyInput.value = '';
-    saltInput.value = '';
-    setOutput('No output yet.');
-    inputText.focus();
-});
-
-// Encrypt / Decrypt
-encryptBtn.addEventListener('click', encrypt);
-decryptBtn.addEventListener('click', decrypt);
-
+// Encrypt/Decrypt
 function encrypt() {
+    console.log('Encrypting...');
     const cipher = nativeSelect.value;
     const input = inputText.value || '';
     const key = keyInput.value || '';
     const salt = saltInput.value || '';
     try {
-        if (!input) throw new Error('Please provide input text.');
+        if (!input) throw new Error('No input text, bro! 😜');
         let out = '';
         switch (cipher) {
             case 'base64': out = base64EncodeUnicode(input); break;
             case 'base32': out = base32Encode(input); break;
             case 'hex': out = hexEncode(input); break;
-            case 'caesar': {
-                const s = Number(key);
-                out = caesarCipher(input, Number.isFinite(s) ? s : 3); break;
-            }
+            case 'caesar':
+                const shift = Number(key);
+                if (!Number.isFinite(shift) || shift < 1 || shift > 25) throw new Error('Caesar needs a shift (1-25), rizzler! 😡');
+                out = caesarCipher(input, shift); break;
             case 'rot13': out = rot13(input); break;
             case 'morse': out = toMorse(input); break;
             case 'url': out = urlEncode(input); break;
             case 'xor': out = xorEncrypt(input, key); break;
-            case 'aes256': {
-                if (!key || key.length < 8) throw new Error('AES requires a passphrase (min 8 chars).');
+            case 'aes256':
+                if (!key || key.length < 8) throw new Error('AES-256 needs a passphrase (8+ chars)! 😭');
                 out = aesEncryptPassphrase(input, key); break;
-            }
-            case 'aes256-pbkdf2': {
-                if (!key || key.length < 8) throw new Error('AES-PBKDF2 requires a passphrase (min 8 chars).');
-                out = aesEncryptPBKDF2(input, key, PBKDF2_ITERATIONS); break;
-            }
+            case 'aes256-pbkdf2':
+                if (!key || key.length < 8) throw new Error('AES-256 PBKDF2 needs a passphrase (8+ chars)! 😭');
+                if (!salt) throw new Error('AES-256 PBKDF2 needs a salt, bro! 😡');
+                out = aesEncryptPBKDF2(input, key); break;
             case 'vigenere': out = vigenereCipher(input, key, true); break;
             case 'sha256': out = sha256Hash(input); break;
             case 'md5': out = md5Hash(input); break;
-            default: throw new Error('Unknown cipher');
+            default: throw new Error('Unknown cipher, skibidi vibes! 💀');
         }
         setOutput(out, false);
     } catch (e) {
-        setOutput('Error: ' + (e && e.message ? e.message : String(e)), true);
+        setOutput(`Error: ${e.message}`, true);
     }
 }
 
 function decrypt() {
+    console.log('Decrypting...');
     const cipher = nativeSelect.value;
     const input = inputText.value || '';
     const key = keyInput.value || '';
     const salt = saltInput.value || '';
     try {
-        if (!input) throw new Error('Please provide input text.');
+        if (!input) throw new Error('No input text, bro! 😜');
         let out = '';
         switch (cipher) {
             case 'base64': out = base64DecodeUnicode(input); break;
             case 'base32': out = base32Decode(input); break;
             case 'hex': out = hexDecode(input); break;
-            case 'caesar': {
-                const s = Number(key);
-                out = caesarCipher(input, Number.isFinite(s) ? -s : -3); break;
-            }
+            case 'caesar':
+                const shift = Number(key);
+                if (!Number.isFinite(shift) || shift < 1 || shift > 25) throw new Error('Caesar needs a shift (1-25), rizzler! 😡');
+                out = caesarCipher(input, -shift); break;
             case 'rot13': out = rot13(input); break;
             case 'morse': out = fromMorse(input); break;
             case 'url': out = urlDecode(input); break;
             case 'xor': out = xorDecrypt(input, key); break;
-            case 'aes256': {
-                if (!key || key.length < 8) throw new Error('AES requires a passphrase (min 8 chars).');
+            case 'aes256':
+                if (!key || key.length < 8) throw new Error('AES-256 needs a passphrase (8+ chars)! 😭');
                 out = aesDecryptPassphrase(input, key); break;
-            }
-            case 'aes256-pbkdf2': {
-                if (!key || key.length < 8) throw new Error('AES-PBKDF2 requires a passphrase (min 8 chars).');
-                out = aesDecryptPBKDF2(input, key, PBKDF2_ITERATIONS); break;
-            }
+            case 'aes256-pbkdf2':
+                if (!key || key.length < 8) throw new Error('AES-256 PBKDF2 needs a passphrase (8+ chars)! 😭');
+                if (!salt) throw new Error('AES-256 PBKDF2 needs a salt, bro! 😡');
+                out = aesDecryptPBKDF2(input, key); break;
             case 'vigenere': out = vigenereCipher(input, key, false); break;
             case 'sha256':
             case 'md5':
-                throw new Error('Hashes are one-way and cannot be decrypted.');
-            default: throw new Error('Unknown cipher');
+                throw new Error('SHA-256 and MD5 are one-way hashes, can’t decrypt, rizzler! 😡');
+            default: throw new Error('Unknown cipher, skibidi vibes! 💀');
         }
         setOutput(out, false);
     } catch (e) {
-        setOutput('Error: ' + (e && e.message ? e.message : String(e)), true);
+        setOutput(`Error: ${e.message}`, true);
     }
 }
-
-// Toggle theme
-themeToggle.addEventListener('click', () => {
-    document.documentElement.classList.toggle('light');
-    const pressed = document.documentElement.classList.contains('light');
-    themeToggle.setAttribute('aria-pressed', pressed.toString());
-    themeToggle.textContent = pressed ? 'Dark Theme' : 'Light Theme';
-});
-
-// Initial state
-setOutput('No output yet.');
-updateUIForCipher();
