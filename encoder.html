@@ -29,7 +29,16 @@
                 <h2 id="encoder-title">Creamocrypt Encoder</h2>
                 <div class="input-group">
                     <label for="cipherSelect">Select Cipher:</label>
-                    <select id="cipherSelect">
+                    <div id="customSelect" class="custom-select" aria-expanded="false">
+                        <div id="selectControl" tabindex="0" role="combobox" aria-haspopup="listbox">
+                            <span id="selectedLabel">Base64</span>
+                            <input id="cipherFilter" type="text" placeholder="Search ciphers..." aria-label="Filter ciphers">
+                        </div>
+                        <ul id="cipherList" class="cipher-list hidden" role="listbox">
+                            <!-- Populated by JS -->
+                        </ul>
+                    </div>
+                    <select id="cipherSelect" class="hidden">
                         <option value="base64">Base64</option>
                         <option value="base32">Base32</option>
                         <option value="hex">Hex</option>
@@ -49,44 +58,39 @@
                     <label for="inputText">Input Text:</label>
                     <textarea id="inputText" placeholder="Enter text to encode/decode"></textarea>
                 </div>
-                <div class="input-group">
-                    <label for="keyInput">Key (for AES, Vigenère, XOR, Caesar):</label>
+                <div class="input-group" id="keyRow">
+                    <label id="keyLabel" for="keyInput">Key (for AES, Vigenère, XOR, Caesar):</label>
                     <input type="text" id="keyInput" placeholder="Enter key (optional for Base64/Base32/Hex/Morse/URL, required for others)">
                 </div>
-                <div class="input-group">
+                <div class="input-group hidden" id="saltRow">
                     <label for="saltInput">Salt (optional for AES-256, required for AES-256 PBKDF2):</label>
                     <input type="text" id="saltInput" placeholder="Enter salt (optional for AES-256, required for AES-256 PBKDF2)">
                 </div>
+                <div class="input-group">
+                    <label for="typeSpeed">Typing Speed:</label>
+                    <input type="range" id="typeSpeed" min="10" max="100" value="40">
+                    <label for="typewriterToggle">Typewriter Effect:</label>
+                    <input type="checkbox" id="typewriterToggle" checked>
+                </div>
                 <div class="button-group">
-                    <button id="encodeButton" class="btn primary">Encode</button>
-                    <button id="decodeButton" class="btn primary">Decode</button>
+                    <button id="encryptBtn" class="btn primary">Encode</button>
+                    <button id="decryptBtn" class="btn primary">Decode</button>
+                    <button id="clearBtn" class="btn ghost">Clear</button>
                 </div>
                 <div class="input-group">
-                    <label for="outputText">Output:</label>
-                    <textarea id="outputText" readonly></textarea>
+                    <label for="output">Output:</label>
+                    <div id="output" class="output-text" role="region" aria-live="polite">
+                        <span id="typedContent"></span><span id="caret" class="caret">|</span>
+                    </div>
+                    <button id="copyBtn" class="btn ghost hidden">Copy</button>
                 </div>
             </section>
             <aside class="card info-card" aria-labelledby="cipher-info-title">
                 <h2 id="cipher-info-title">Cipher Info</h2>
-                <div class="info-content">
-                    <ul id="cipherInfoList">
-                        <li><strong>Base64:</strong> Encodes text into a 64-character alphabet. Not for secrecy — transport-friendly.</li>
-                        <li><strong>Base32:</strong> Encodes bytes into a 32-character alphabet (RFC4648). Useful for case-insensitive tokens.</li>
-                        <li><strong>Hex:</strong> Encodes bytes to hexadecimal pairs. Common for binary/text interchange.</li>
-                        <li><strong>Caesar:</strong> Shift letters by a numeric shift (1-25). Enter number in the key input.</li>
-                        <li><strong>ROT13:</strong> Simple letter rotation (13). Symmetric and used for simple obfuscation.</li>
-                        <li><strong>Morse Code:</strong> Dots (.) and dashes (-). Use space between letters and / for word separators.</li>
-                        <li><strong>URL Encode/Decode:</strong> Percent-encoding for transport in URLs.</li>
-                        <li><strong>XOR:</strong> Symmetric XOR with a repeating key. Binary-safe; output is Base64.</li>
-                        <li><strong>AES-256:</strong> Encrypt/Decrypt using passphrase (CryptoJS). For PBKDF2-derived keys use AES-256 (PBKDF2).</li>
-                        <li><strong>AES-256 (PBKDF2):</strong> Derive encryption key using PBKDF2 with embedded salt for stronger keying.</li>
-                        <li><strong>Vigenère:</strong> Polyalphabetic substitution using an alphabetic keyword.</li>
-                        <li><strong>SHA-256:</strong> Cryptographic hash (one-way). Use under Encrypt to compute the digest.</li>
-                        <li><strong>MD5:</strong> Legacy hash function (one-way). Not recommended for security use-cases.</li>
-                        <li><strong>Tip:</strong> Test with "PEN LIVES" and key "InkCo2025"!</li>
-                    </ul>
+                <div class="info-content" id="info-content">
+                    Base64: Encodes text into a 64-character alphabet. Not for secrecy — transport-friendly.
                 </div>
-                <div class="hint">Tip: Decode archive secrets with the right cipher!</div>
+                <div class="hint">Tip: Try "PEN LIVES" with key "InkCo2025" to decode archive secrets!</div>
             </aside>
         </main>
         <footer class="site-footer">
@@ -96,23 +100,22 @@
     <script>
         // Hacker animation
         window.addEventListener('load', () => {
+            console.log('Initializing hacker animation...');
             const canvas = document.getElementById('hackerCanvas');
             const ctx = canvas.getContext('2d');
             if (!canvas || !ctx) {
                 console.error('Hacker animation failed: Canvas or context not found');
                 return;
             }
-            console.log('Hacker animation initializing...');
             canvas.width = window.innerWidth;
             canvas.height = window.innerHeight;
             const chars = '01010101';
             const fontSize = 12;
             const columns = Math.floor(canvas.width / fontSize * 1.5);
-            console.log(`Columns: ${columns}`);
+            console.log(`Animation columns: ${columns}`);
             const drops = Array(columns).fill(1);
             ctx.font = `${fontSize}px monospace`;
             ctx.fillStyle = '#0f0';
-
             function draw() {
                 ctx.fillStyle = 'rgba(0, 0, 0, 0.1)';
                 ctx.fillRect(0, 0, canvas.width, canvas.height);
@@ -126,14 +129,12 @@
                     drops[i]++;
                 }
             }
-
             const animation = setInterval(draw, 20);
             setTimeout(() => {
-                console.log('Hacker animation stopping...');
+                console.log('Stopping hacker animation...');
                 clearInterval(animation);
                 canvas.classList.add('hidden');
             }, 3000);
-
             window.addEventListener('resize', () => {
                 canvas.width = window.innerWidth;
                 canvas.height = window.innerHeight;
@@ -143,6 +144,7 @@
         // Theme toggle
         const themeToggle = document.getElementById('themeToggle');
         themeToggle.addEventListener('click', () => {
+            console.log('Toggling theme...');
             document.documentElement.classList.toggle('light');
             const pressed = document.documentElement.classList.contains('light');
             themeToggle.setAttribute('aria-pressed', pressed.toString());
