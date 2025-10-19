@@ -3,13 +3,12 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <title>Creamo — Encode Your Truth</title>
+    <title>Creamo</title>
     <base href="/">
     <link rel="stylesheet" href="style.css">
-    <!-- CryptoJS included for consistency, though not used on home page -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 </head>
 <body>
+    <canvas id="hackerCanvas"></canvas>
     <div class="page">
         <header class="site-header">
             <div class="logo">
@@ -20,42 +19,71 @@
                 </div>
             </div>
             <nav aria-label="main">
-                <a href="encoder.html" class="btn primary">Go to Encoder</a>
+                <a href="encoder.html" class="btn primary">Start Encoding</a>
+                <a href="archives.html" class="btn primary">Enter the Archives</a>
                 <button class="btn ghost" id="themeToggle" aria-pressed="false">Light Theme</button>
             </nav>
         </header>
         <main class="container">
             <section class="card tool-card" aria-labelledby="welcome-title">
                 <h2 id="welcome-title">Welcome to Creamo</h2>
-                <p>Unleash your inner Agent Pen with our advanced cipher suite and the raw pen archives. Encode and decode your secrets with AES-256, Vigenère, Base64, and more. Built for soldiers who remember the Pen Protocol. Ready to hide your truth from USPR spies?</p>
+                <p>Unleash the power of ciphers to encode your secrets or decode the mysteries of the Pen War. Inspired by Agent Pen, this tool is your key to the rebellion of memory.</p>
                 <div class="button-group">
                     <a href="encoder.html" class="btn primary">Start Encoding</a>
                     <a href="archives.html" class="btn primary">Enter the Archives</a>
                 </div>
-                <div class="info-content">
-                    <h3>About the Archives</h3>
-                    <p>Dive into the RAW PEN LOGS, where the War of the Pen’s secrets are buried. Discover the chaos of NSCW, Ink Co., and USPR, and uncover Agent Pen’s lost transmissions. Tip: The archives are plain text—perfect for decoding with Creamocrypt’s ciphers!</p>
-                </div>
             </section>
-            <aside class="card info-card" aria-labelledby="features-title">
-                <h2 id="features-title">Why Creamocrypt?</h2>
+            <aside class="card info-card" aria-labelledby="info-title">
+                <h2 id="info-title">Pen War Archives</h2>
                 <div class="info-content">
                     <ul>
-                        <li><strong>Secure Ciphers:</strong> Lock it down with AES-256, PBKDF2, XOR, and more.</li>
-                        <li><strong>Slick UI:</strong> Typewriter effects and searchable dropdowns for max drip.</li>
-                        <li><strong>Fast & Free:</strong> No skibidi stalls, just pure cipher speed.</li>
-                        <li><strong>Pen logs and pen encryption:</strong> Channel the spirit of the Pen Protocol in every encode.</li>
+                        <li><strong>Archive 001:</strong> The War of the Pen — Espionage and betrayal.</li>
+                        <li><strong>Agent Pen:</strong> A protocol that vanished, yet fragments remain.</li>
+                        <li><strong>Ciphers:</strong> Use AES-256, Base64, or Morse to decode secrets.</li>
+                        <li><strong>Directive 001:</strong> Dig up the bones. The Pen writes again.</li>
                     </ul>
                 </div>
-                <div class="hint">Tip: Click “Start Encoding” to dive into the cipher action or “Enter the Archives” for Pen War lore!</div>
+                <div class="hint">Tip: Check the archives for hidden messages!</div>
             </aside>
         </main>
         <footer class="site-footer">
-            <p>Directive 001: The Pen Writes Again. © 2025-26 Yappinghood-Creamo</p>
+            <p>Directive 001: The Pen Writes Again. © 2025 Yappinghood</p>
         </footer>
     </div>
     <script>
-        // Theme toggle for home page
+        // Hacker animation
+        const canvas = document.getElementById('hackerCanvas');
+        const ctx = canvas.getContext('2d');
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+        const chars = '01010101';
+        const fontSize = 14;
+        const columns = canvas.width / fontSize;
+        const drops = Array(Math.floor(columns)).fill(1);
+        ctx.font = `${fontSize}px monospace`;
+        ctx.fillStyle = '#0f0';
+
+        function draw() {
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = '#0f0';
+            for (let i = 0; i < drops.length; i++) {
+                const text = chars.charAt(Math.floor(Math.random() * chars.length));
+                ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+                if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
+                    drops[i] = 0;
+                }
+                drops[i]++;
+            }
+        }
+
+        const animation = setInterval(draw, 33);
+        setTimeout(() => {
+            clearInterval(animation);
+            canvas.classList.add('hidden');
+        }, 3000);
+
+        // Theme toggle
         const themeToggle = document.getElementById('themeToggle');
         themeToggle.addEventListener('click', () => {
             document.documentElement.classList.toggle('light');
