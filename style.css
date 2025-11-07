@@ -1,18 +1,19 @@
 :root{
-    --bg: #060610;
-    --card: #0f1724;
-    --accent-a: #36D1DC;
-    --accent-b: #5B86E5;
-    --text: #cfefff;
-    --muted: #94a3b8;
+    --bg: #0a0a1a;
+    --card: #0f1424;
+    --accent-a: #1a3c8b;
+    --accent-b: #2d4b8f;
+    --accent-c: #3a5fc8;
+    --text: #e0e8ff;
+    --muted: #8a9bb8;
     --danger: #ff6b6b;
 }
 
 html,body{
     height:100%;
     margin:0;
-    font-family:Inter, 'Courier New', monospace;
-    background:linear-gradient(180deg,#02020a 0%,#071028 100%);
+    font-family: 'SF Mono', 'Monaco', 'Cascadia Code', 'Roboto Mono', 'Consolas', 'Courier New', monospace;
+    background:linear-gradient(180deg,#050515 0%,#0a1528 100%);
     color:var(--text);
     -webkit-font-smoothing:antialiased; 
     -moz-osx-font-smoothing:grayscale;
@@ -65,11 +66,14 @@ html,body{
     font-size:1.25rem;
     margin:0;
     animation: textGlow 3s ease-in-out infinite alternate;
+    font-family: 'SF Mono', 'Courier New', monospace;
+    font-weight: 600;
+    letter-spacing: -0.5px;
 }
 
 @keyframes textGlow {
-    from { text-shadow: 0 0 10px rgba(54, 209, 220, 0.5); }
-    to { text-shadow: 0 0 20px rgba(91, 134, 229, 0.8); }
+    from { text-shadow: 0 0 10px rgba(26, 60, 139, 0.5); }
+    to { text-shadow: 0 0 20px rgba(58, 95, 200, 0.8); }
 }
 
 .tagline{
@@ -77,6 +81,7 @@ html,body{
     color:var(--muted);
     font-size:0.9rem;
     animation: fadeInOut 4s ease-in-out infinite;
+    font-family: 'SF Mono', 'Courier New', monospace;
 }
 
 @keyframes fadeInOut {
@@ -115,22 +120,25 @@ html,body{
 
 .giant-text {
     font-size: clamp(4rem, 15vw, 8rem);
-    font-weight: 900;
-    background: linear-gradient(135deg, var(--accent-a), var(--accent-b));
+    font-weight: 700;
+    background: linear-gradient(135deg, var(--accent-a), var(--accent-c));
     -webkit-background-clip: text;
     background-clip: text;
     color: transparent;
     margin: 0;
     animation: giantTextGlow 2s ease-in-out infinite alternate;
+    font-family: 'SF Mono', 'Courier New', monospace;
+    letter-spacing: -2px;
+    text-transform: uppercase;
 }
 
 @keyframes giantTextGlow {
     from {
-        text-shadow: 0 0 20px rgba(54, 209, 220, 0.3);
+        text-shadow: 0 0 20px rgba(26, 60, 139, 0.3);
     }
     to {
-        text-shadow: 0 0 40px rgba(91, 134, 229, 0.6),
-                     0 0 60px rgba(91, 134, 229, 0.4);
+        text-shadow: 0 0 40px rgba(58, 95, 200, 0.6),
+                     0 0 60px rgba(58, 95, 200, 0.4);
     }
 }
 
@@ -139,6 +147,7 @@ html,body{
     color: var(--muted);
     margin-top: 20px;
     animation: fadeIn 2s ease-out 0.5s both;
+    font-family: 'SF Mono', 'Courier New', monospace;
 }
 
 @keyframes fadeIn {
@@ -159,7 +168,7 @@ html,body{
     position: relative;
     padding: 25px 40px;
     border: none;
-    border-radius: 16px;
+    border-radius: 12px;
     font-size: 1.3rem;
     font-weight: 600;
     cursor: pointer;
@@ -167,6 +176,11 @@ html,body{
     transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
     transform-style: preserve-3d;
     perspective: 1000px;
+    font-family: 'SF Mono', 'Courier New', monospace;
+    letter-spacing: -0.5px;
+    text-transform: uppercase;
+    border: 2px solid transparent;
+    background: linear-gradient(135deg, var(--card), var(--bg));
 }
 
 .home-btn::before {
@@ -176,7 +190,7 @@ html,body{
     left: -100%;
     width: 100%;
     height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+    background: linear-gradient(90deg, transparent, rgba(58, 95, 200, 0.3), transparent);
     transition: left 0.6s ease;
 }
 
@@ -186,7 +200,9 @@ html,body{
 
 .home-btn:hover {
     transform: translateY(-8px) scale(1.05);
-    box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+    box-shadow: 0 20px 40px rgba(0,0,0,0.6);
+    border: 2px solid var(--accent-c);
+    background: linear-gradient(135deg, var(--card), #151f38);
 }
 
 .home-btn:active {
@@ -204,10 +220,10 @@ html,body{
     left: 0;
     right: 0;
     bottom: 0;
-    border-radius: 16px;
+    border-radius: 12px;
     opacity: 0;
     transition: opacity 0.3s ease;
-    background: radial-gradient(circle at center, rgba(255,255,255,0.1) 0%, transparent 70%);
+    background: radial-gradient(circle at center, rgba(58, 95, 200, 0.1) 0%, transparent 70%);
 }
 
 .home-btn:hover .btn-glow {
@@ -215,21 +231,24 @@ html,body{
 }
 
 .creamocrypt-btn {
-    background: linear-gradient(135deg, var(--accent-a), var(--accent-b));
-    color: #021025;
-    box-shadow: 0 10px 30px rgba(54, 209, 220, 0.3);
+    background: linear-gradient(135deg, var(--accent-a), var(--accent-c));
+    color: #e0e8ff;
+    box-shadow: 0 10px 30px rgba(26, 60, 139, 0.4);
+    border: 2px solid var(--accent-b);
 }
 
 .archives-btn {
-    background: linear-gradient(135deg, #667eea, #764ba2);
-    color: white;
-    box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
+    background: linear-gradient(135deg, #1a2c5e, #2d4b8f);
+    color: #e0e8ff;
+    box-shadow: 0 10px 30px rgba(26, 60, 139, 0.4);
+    border: 2px solid var(--accent-b);
 }
 
 .deluxtable-btn {
-    background: linear-gradient(135deg, #f093fb, #f5576c);
-    color: white;
-    box-shadow: 0 10px 30px rgba(245, 87, 108, 0.3);
+    background: linear-gradient(135deg, #0f1a3a, #1a3c8b);
+    color: #e0e8ff;
+    box-shadow: 0 10px 30px rgba(26, 60, 139, 0.4);
+    border: 2px solid var(--accent-b);
 }
 
 /* Binary Code Animation */
@@ -246,13 +265,14 @@ html,body{
 
 .binary-code {
     position: absolute;
-    font-family: 'Courier New', monospace;
-    font-size: 18px;
-    color: var(--accent-a);
+    font-family: 'SF Mono', 'Courier New', monospace;
+    font-size: 16px;
+    color: var(--accent-c);
     white-space: nowrap;
     opacity: 0;
     text-shadow: 0 0 10px currentColor;
     animation: binaryRise 2s ease-in-out forwards;
+    font-weight: 600;
 }
 
 @keyframes binaryRise {
@@ -281,7 +301,7 @@ html,body{
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(6, 6, 16, 0.9);
+    background: rgba(10, 10, 26, 0.95);
     backdrop-filter: blur(10px);
     z-index: 1000;
     animation: modalFadeIn 0.3s ease-out;
@@ -297,13 +317,14 @@ html,body{
     background: var(--card);
     margin: 5% auto;
     padding: 0;
-    border-radius: 16px;
+    border-radius: 12px;
     width: 90%;
     max-width: 800px;
     max-height: 80vh;
     overflow: hidden;
-    box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+    box-shadow: 0 20px 60px rgba(0,0,0,0.7);
     animation: modalSlideUp 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    border: 2px solid var(--accent-b);
 }
 
 @keyframes modalSlideUp {
@@ -322,16 +343,19 @@ html,body{
     justify-content: space-between;
     align-items: center;
     padding: 25px 30px;
-    border-bottom: 1px solid rgba(255,255,255,0.1);
-    background: linear-gradient(135deg, rgba(54, 209, 220, 0.1), rgba(91, 134, 229, 0.1));
+    border-bottom: 1px solid rgba(58, 95, 200, 0.3);
+    background: linear-gradient(135deg, rgba(26, 60, 139, 0.2), rgba(58, 95, 200, 0.1));
 }
 
 .modal-header h2 {
     margin: 0;
-    background: linear-gradient(135deg, var(--accent-a), var(--accent-b));
+    background: linear-gradient(135deg, var(--accent-a), var(--accent-c));
     -webkit-background-clip: text;
     background-clip: text;
     color: transparent;
+    font-family: 'SF Mono', 'Courier New', monospace;
+    font-weight: 600;
+    text-transform: uppercase;
 }
 
 .close-btn {
@@ -348,6 +372,7 @@ html,body{
     justify-content: center;
     border-radius: 8px;
     transition: all 0.3s ease;
+    font-family: 'SF Mono', 'Courier New', monospace;
 }
 
 .close-btn:hover {
@@ -363,7 +388,7 @@ html,body{
 }
 
 .archives-content {
-    font-family: 'Courier New', monospace;
+    font-family: 'SF Mono', 'Courier New', monospace;
     line-height: 1.6;
     color: var(--text);
 }
@@ -372,6 +397,9 @@ html,body{
     white-space: pre-wrap;
     word-wrap: break-word;
     margin: 0;
+    font-family: 'SF Mono', 'Courier New', monospace;
+    font-size: 0.9rem;
+    color: var(--muted);
 }
 
 .loading {
@@ -379,6 +407,7 @@ html,body{
     color: var(--muted);
     font-style: italic;
     animation: pulse 1.5s ease-in-out infinite;
+    font-family: 'SF Mono', 'Courier New', monospace;
 }
 
 @keyframes pulse {
@@ -389,10 +418,11 @@ html,body{
 .site-footer{
     text-align:center;
     padding:14px;
-    border-top:1px solid rgba(255,255,255,0.02);
+    border-top:1px solid rgba(58, 95, 200, 0.1);
     color:var(--muted);
     font-size:0.9rem;
     animation: fadeIn 2s ease-out 1s both;
+    font-family: 'SF Mono', 'Courier New', monospace;
 }
 
 /* Responsive Design */
@@ -433,4 +463,15 @@ html,body{
     .modal-body {
         padding: 20px;
     }
+}
+
+/* Terminal-like cursor effect */
+@keyframes blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0; }
+}
+
+.terminal-cursor {
+    animation: blink 1s infinite;
+    color: var(--accent-c);
 }
