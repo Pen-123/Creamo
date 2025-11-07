@@ -13,8 +13,8 @@
                 <svg viewBox="0 0 100 100" class="logo-svg" aria-hidden="true">
                     <defs>
                         <linearGradient id="g" x1="0" x2="1" y1="0" y2="1">
-                            <stop offset="0" stop-color="#36D1DC"/>
-                            <stop offset="1" stop-color="#5B86E5"/>
+                            <stop offset="0" stop-color="#1a3c8b"/>
+                            <stop offset="1" stop-color="#3a5fc8"/>
                         </linearGradient>
                     </defs>
                     <rect x="0" y="0" width="100" height="100" rx="16" fill="url(#g)"></rect>
@@ -70,11 +70,94 @@
             </div>
         </div>
 
+        <!-- CreamoCrypt Cipher Tool (Hidden by default) -->
+        <div id="creamocryptTool" class="creamocrypt-container" style="display: none;">
+            <div class="cipher-header">
+                <button class="back-btn" id="backToHome">&larr; Back to Home</button>
+                <h1>CreamoCrypt — Advanced Cipher Suite</h1>
+            </div>
+
+            <div class="cipher-main">
+                <section class="card tool-card" aria-labelledby="cipher-title">
+                    <h2 id="cipher-title">Cipher Tool — Advanced</h2>
+
+                    <select id="cipherSelect" class="native-select" aria-hidden="true" tabindex="-1">
+                        <option value="base64">Base64</option>
+                        <option value="base32">Base32</option>
+                        <option value="hex">Hex Encode</option>
+                        <option value="caesar">Caesar (shift)</option>
+                        <option value="rot13">ROT13</option>
+                        <option value="morse">Morse Code</option>
+                        <option value="url">URL Encode</option>
+                        <option value="xor">XOR (repeating key)</option>
+                        <option value="aes256">AES-256 (passphrase)</option>
+                        <option value="aes256-pbkdf2">AES-256 (PBKDF2-derived key)</option>
+                        <option value="vigenere">Vigenère</option>
+                        <option value="sha256">SHA-256 (hash)</option>
+                        <option value="md5">MD5 (hash)</option>
+                    </select>
+
+                    <div class="form-row">
+                        <label for="cipherSearch">Choose cipher</label>
+                        <div id="customSelect" class="custom-select" role="combobox" aria-haspopup="listbox" aria-expanded="false">
+                            <div class="select-control" tabindex="0" id="selectControl" aria-controls="cipherList" aria-label="Cipher selector">
+                                <span id="selectedLabel">Base64</span>
+                                <svg class="chev" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M7 10l5 5 5-5z" fill="currentColor"/></svg>
+                            </div>
+                            <div class="select-dropdown hidden" id="cipherList" role="listbox" tabindex="-1">
+                                <input id="cipherFilter" class="select-filter" placeholder="Search ciphers..." aria-label="Search ciphers" />
+                                <ul class="options" role="presentation" id="optionsList"></ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <label for="inputText">Input</label>
+                        <textarea id="inputText" placeholder="Enter your message..." rows="4"></textarea>
+                    </div>
+
+                    <div class="form-row key-row hidden" id="keyRow">
+                        <label for="keyInput" id="keyLabel">Key</label>
+                        <input type="text" id="keyInput" placeholder="Key / Shift / Passphrase" />
+                    </div>
+
+                    <div class="form-row salt-row hidden" id="saltRow">
+                        <label for="saltInput">PBKDF2 Salt (optional)</label>
+                        <input type="text" id="saltInput" placeholder="Optional custom salt — normally generated automatically" />
+                    </div>
+
+                    <div class="button-group">
+                        <button class="btn primary" id="encryptBtn">Encrypt</button>
+                        <button class="btn" id="decryptBtn">Decrypt</button>
+                        <button class="btn outline" id="clearBtn" title="Clear fields">Clear</button>
+                    </div>
+
+                    <div class="output-wrap">
+                        <div class="output-header">
+                            <strong>Result</strong>
+                            <div>
+                                <button class="btn tiny" id="copyBtn" title="Copy result">Copy</button>
+                            </div>
+                        </div>
+                        <pre id="output" aria-live="polite" class="output"><span id="typedContent">No output yet.</span><span id="caret" class="caret" aria-hidden="true">▌</span></pre>
+                    </div>
+                </section>
+
+                <aside class="card info-card" aria-labelledby="protocol-title">
+                    <h2 id="protocol-title">Cipher Logs & Protocols</h2>
+                    <div id="infoContent" class="info-content">Select a cipher to view its protocol.</div>
+                    <div class="hint">Tip: Hashes (SHA-256/MD5) are one-way — they cannot be reversed by decrypt.</div>
+                </aside>
+            </div>
+        </div>
+
         <footer class="site-footer">
             <p>Directive 001: The Pen Writes Again. © 2025 Yappinghood</p>
         </footer>
     </div>
 
-    <script src="home-script.js"></script>
+    <!-- Include CryptoJS from CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+    <script src="script.js"></script>
 </body>
 </html>
