@@ -26,10 +26,10 @@ class CreamoApp {
             }, 800);
         });
 
-        // Pen Archives button - show modal
+        // Pen Archives button - load Archives.txt
         document.getElementById('archivesBtn').addEventListener('click', (e) => {
             this.triggerBinaryAnimation(e);
-            this.showArchivesModal();
+            this.loadArchivesFile();
         });
 
         // Deluxtable button - navigate to external site
@@ -38,25 +38,6 @@ class CreamoApp {
             setTimeout(() => {
                 window.open('https://deluxtable.pages.dev', '_blank');
             }, 800);
-        });
-
-        // Close archives modal
-        document.getElementById('closeArchives').addEventListener('click', () => {
-            this.hideArchivesModal();
-        });
-
-        // Close modal when clicking outside
-        this.archivesModal.addEventListener('click', (e) => {
-            if (e.target === this.archivesModal) {
-                this.hideArchivesModal();
-            }
-        });
-
-        // Close modal with Escape key
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape' && this.archivesModal.style.display === 'block') {
-                this.hideArchivesModal();
-            }
         });
 
         // Setup button animations
@@ -213,94 +194,56 @@ class CreamoApp {
         }, 50);
     }
 
-    async showArchivesModal() {
+    async loadArchivesFile() {
+        try {
+            // Show loading state
+            this.showArchivesModal();
+            this.archivesContent.innerHTML = '<div class="loading">Loading Archives.txt...</div>';
+            
+            // Fetch the Archives.txt file
+            const response = await fetch('Archives.txt');
+            
+            if (!response.ok) {
+                throw new Error(`Failed to load Archives.txt: ${response.status} ${response.statusText}`);
+            }
+            
+            const archivesData = await response.text();
+            
+            // Display the content
+            this.archivesContent.innerHTML = `
+                <pre>${this.escapeHtml(archivesData)}</pre>
+            `;
+            
+        } catch (error) {
+            console.error('Error loading Archives.txt:', error);
+            this.archivesContent.innerHTML = `
+                <div class="error">
+                    [ERROR] Failed to load Archives.txt<br>
+                    ${error.message}<br>
+                    Please ensure Archives.txt exists in the same directory.
+                </div>
+            `;
+        }
+    }
+
+    escapeHtml(text) {
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+    }
+
+    showArchivesModal() {
         this.archivesModal.style.display = 'block';
         document.body.style.overflow = 'hidden';
-        
-        // Load archives content
-        await this.loadArchivesContent();
     }
 
     hideArchivesModal() {
         this.archivesModal.style.display = 'none';
         document.body.style.overflow = 'auto';
     }
-
-    async loadArchivesContent() {
-        try {
-            // Simulate loading delay
-            await new Promise(resolve => setTimeout(resolve, 500));
-            
-            const archivesData = this.getArchiveContent();
-            
-            this.archivesContent.innerHTML = `
-                <pre>${archivesData}</pre>
-            `;
-            
-        } catch (error) {
-            this.archivesContent.innerHTML = `
-                <div class="error">
-                    [ERROR] Failed to load archives. Connection timeout.
-                    Please try again later.
-                </div>
-            `;
-        }
-    }
-
-    getArchiveContent() {
-        return `// PEN ARCHIVES - DIRECTIVE 001
-// Last Updated: 2025-01-25 14:32:17 UTC
-
-[SYSTEM BOOT]
-> Initializing Creamo Protocol...
-> Loading cipher modules...
-> Establishing secure connection...
-
-[PROJECT LOGS]
-[2025-01-15] CREAMOCRYPTH v1.0 DEPLOYED
-    - Advanced cipher suite: 13 encryption methods
-    - AES-256 with PBKDF2 key derivation
-    - Real-time typewriter output
-    - Secure encryption protocols
-
-[2025-01-20] DELUXTABLE INTEGRATION
-    - 7B class timetable system
-    - Live countdown timers
-    - Cloudflare-inspired UI
-    - Mobile-responsive design
-
-[2025-01-25] HOMEPAGE ARCHITECTURE
-    - Binary animation engine
-    - Modal interface system
-    - Dark blue color scheme
-    - Code-like typography
-
-[ACTIVE MODULES]
-✓ Encryption Engine
-✓ Animation System  
-✓ UI Framework
-✓ Security Protocols
-
-[DIRECTIVES]
-1. The pen writes again
-2. Code with purpose
-3. Encrypt everything
-4. Animate the interface
-
-[TECHNICAL SPECS]
-- Frontend: HTML5, CSS3, ES6+
-- Encryption: CryptoJS Integration
-- Animations: CSS3 + JavaScript
-- Typography: Monospace Stack
-
-[STATUS: OPERATIONAL]
-All systems nominal. Ready for encryption tasks.
-
-// END OF TRANSMISSION`;
-    }
 }
 
-// Cipher Tool Implementation
+// Cipher Tool Implementation (unchanged)
 class CipherTool {
     constructor() {
         this.PBKDF2_ITERATIONS = 10000;
