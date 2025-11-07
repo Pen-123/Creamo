@@ -1,5 +1,4 @@
-// Homepage JavaScript with animations and binary effects
-
+// Homepage JavaScript with fixed button functionality
 class CreamoHomepage {
     constructor() {
         this.binaryContainer = document.getElementById('binaryContainer');
@@ -12,6 +11,7 @@ class CreamoHomepage {
         this.setupButtonAnimations();
         this.setupEventListeners();
         this.animateGiantText();
+        this.createBackgroundBinary();
     }
 
     setupButtonAnimations() {
@@ -24,35 +24,40 @@ class CreamoHomepage {
                 this.triggerBinaryAnimation(e);
             });
 
-            // Add hover sound effect (simulated)
-            btn.addEventListener('mouseenter', () => {
-                btn.style.transform = 'translateY(-8px) scale(1.05)';
-            });
-
-            btn.addEventListener('mouseleave', () => {
-                btn.style.transform = 'translateY(0) scale(1)';
+            // Add keyboard accessibility
+            btn.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    btn.click();
+                }
             });
         });
     }
 
     setupEventListeners() {
         // CreamoCrypt button - navigate to cipher suite
-        document.getElementById('creamocryptBtn').addEventListener('click', () => {
+        document.getElementById('creamocryptBtn').addEventListener('click', (e) => {
+            console.log('CreamoCrypt clicked');
+            this.triggerBinaryAnimation(e);
             setTimeout(() => {
-                window.location.href = 'creamocrypt.html';
-            }, 1200);
+                window.location.href = 'cipher-suite.html'; // Updated path
+            }, 800);
         });
 
         // Pen Archives button - show modal
-        document.getElementById('archivesBtn').addEventListener('click', () => {
+        document.getElementById('archivesBtn').addEventListener('click', (e) => {
+            console.log('Archives clicked');
+            this.triggerBinaryAnimation(e);
             this.showArchivesModal();
         });
 
         // Deluxtable button - navigate to external site
-        document.getElementById('deluxtableBtn').addEventListener('click', () => {
+        document.getElementById('deluxtableBtn').addEventListener('click', (e) => {
+            console.log('Deluxtable clicked');
+            this.triggerBinaryAnimation(e);
             setTimeout(() => {
                 window.open('https://deluxtable.pages.dev', '_blank');
-            }, 1200);
+            }, 800);
         });
 
         // Close archives modal
@@ -69,7 +74,7 @@ class CreamoHomepage {
 
         // Close modal with Escape key
         document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape' && !this.archivesModal.classList.contains('hidden')) {
+            if (e.key === 'Escape' && this.archivesModal.style.display === 'block') {
                 this.hideArchivesModal();
             }
         });
@@ -85,7 +90,7 @@ class CreamoHomepage {
         ripple.style.cssText = `
             position: absolute;
             border-radius: 50%;
-            background: rgba(255, 255, 255, 0.6);
+            background: rgba(58, 95, 200, 0.6);
             transform: scale(0);
             animation: ripple 0.6s linear;
             width: ${size}px;
@@ -93,6 +98,7 @@ class CreamoHomepage {
             left: ${x}px;
             top: ${y}px;
             pointer-events: none;
+            z-index: 1;
         `;
 
         button.appendChild(ripple);
@@ -112,19 +118,23 @@ class CreamoHomepage {
             document.head.appendChild(style);
         }
 
-        setTimeout(() => ripple.remove(), 600);
+        setTimeout(() => {
+            if (ripple.parentNode) {
+                ripple.parentNode.removeChild(ripple);
+            }
+        }, 600);
     }
 
     triggerBinaryAnimation(event) {
-        const rect = event.target.getBoundingClientRect();
-        const startX = rect.left;
+        const rect = event.currentTarget.getBoundingClientRect();
+        const startX = rect.left + (rect.width / 2);
         const startY = rect.bottom;
         
         // Create multiple binary streams
-        for (let i = 0; i < 8; i++) {
+        for (let i = 0; i < 12; i++) {
             setTimeout(() => {
                 this.createBinaryStream(startX, startY, i);
-            }, i * 100);
+            }, i * 80);
         }
     }
 
@@ -132,18 +142,20 @@ class CreamoHomepage {
         const binaryElement = document.createElement('div');
         binaryElement.className = 'binary-code';
         
-        // Generate random binary string
+        // Generate random binary string with more 1s and 0s
         let binaryString = '';
-        for (let i = 0; i < 20; i++) {
+        const length = 15 + Math.floor(Math.random() * 10);
+        for (let i = 0; i < length; i++) {
             binaryString += Math.random() > 0.5 ? '1' : '0';
         }
         
         binaryElement.textContent = binaryString;
         
         // Randomize animation properties
-        const duration = 2 + Math.random() * 1;
-        const delay = index * 0.1;
-        const rotation = -15 + Math.random() * 30;
+        const duration = 1.5 + Math.random() * 1;
+        const delay = index * 0.08;
+        const rotation = -20 + Math.random() * 40;
+        const endX = (Math.random() * 200) - 100;
         
         binaryElement.style.cssText = `
             left: ${startX}px;
@@ -151,8 +163,9 @@ class CreamoHomepage {
             animation-duration: ${duration}s;
             animation-delay: ${delay}s;
             transform: rotate(${rotation}deg);
-            color: ${this.getRandomBinaryColor()};
-            font-size: ${14 + Math.random() * 10}px;
+            color: ${this.getRandomBlueColor()};
+            font-size: ${12 + Math.random() * 8}px;
+            opacity: ${0.7 + Math.random() * 0.3};
         `;
         
         this.binaryContainer.appendChild(binaryElement);
@@ -165,11 +178,24 @@ class CreamoHomepage {
         }, (duration + delay) * 1000);
     }
 
-    getRandomBinaryColor() {
+    getRandomBlueColor() {
         const colors = [
-            '#36D1DC', '#5B86E5', '#667eea', '#764ba2', '#f093fb', '#f5576c'
+            '#1a3c8b', '#2d4b8f', '#3a5fc8', '#4a6fc9', '#5b7fd0'
         ];
         return colors[Math.floor(Math.random() * colors.length)];
+    }
+
+    createBackgroundBinary() {
+        // Create occasional background binary effects
+        setInterval(() => {
+            if (Math.random() > 0.7) {
+                this.createBinaryStream(
+                    Math.random() * window.innerWidth,
+                    window.innerHeight + 50,
+                    Math.floor(Math.random() * 3)
+                );
+            }
+        }, 2000);
     }
 
     animateGiantText() {
@@ -179,11 +205,11 @@ class CreamoHomepage {
         
         setInterval(() => {
             if (growing) {
-                scale += 0.002;
-                if (scale >= 1.02) growing = false;
+                scale += 0.001;
+                if (scale >= 1.015) growing = false;
             } else {
-                scale -= 0.002;
-                if (scale <= 0.98) growing = true;
+                scale -= 0.001;
+                if (scale <= 0.985) growing = true;
             }
             giantText.style.transform = `scale(${scale})`;
         }, 50);
@@ -195,23 +221,18 @@ class CreamoHomepage {
         
         // Load archives content
         await this.loadArchivesContent();
-        
-        // Add entrance animation
-        this.archivesModal.classList.add('active');
     }
 
     hideArchivesModal() {
-        this.archivesModal.classList.remove('active');
-        setTimeout(() => {
-            this.archivesModal.style.display = 'none';
-            document.body.style.overflow = 'auto';
-        }, 300);
+        this.archivesModal.style.display = 'none';
+        document.body.style.overflow = 'auto';
     }
 
     async loadArchivesContent() {
         try {
-            // This would normally fetch from GitHub
-            // For now, we'll use placeholder content
+            // Simulate loading delay
+            await new Promise(resolve => setTimeout(resolve, 500));
+            
             const archivesData = this.getPlaceholderArchives();
             
             this.archivesContent.innerHTML = `
@@ -221,64 +242,79 @@ class CreamoHomepage {
         } catch (error) {
             this.archivesContent.innerHTML = `
                 <div class="error">
-                    Failed to load archives. Please try again later.
+                    [ERROR] Failed to load archives. Connection timeout.
+                    Please try again later.
                 </div>
             `;
         }
     }
 
     getPlaceholderArchives() {
-        return `PEN ARCHIVES - DIRECTIVE 001
+        return `// PEN ARCHIVES - DIRECTIVE 001
+// Last Updated: 2025-01-25 14:32:17 UTC
 
-[2025-01-15] Project CreamoCrypt initialized
-    - Advanced cipher suite deployed
-    - 13 encryption methods implemented
-    - Typewriter animation system online
+[SYSTEM BOOT]
+> Initializing Creamo Protocol...
+> Loading cipher modules...
+> Establishing secure connection...
 
-[2025-01-20] DeluxeTable integration
-    - Timetable system for 7B class
-    - Real-time countdown features
-    - Cloudflare-inspired design
+[PROJECT LOGS]
+[2025-01-15] CREAMOCRYPTH v1.0 DEPLOYED
+    - Advanced cipher suite: 13 encryption methods
+    - AES-256 with PBKDF2 key derivation
+    - Real-time typewriter output
+    - Secure encryption protocols
 
-[2025-01-25] Homepage architecture
-    - Binary animation system
-    - Modal interface for archives
-    - Responsive design patterns
+[2025-01-20] DELUXTABLE INTEGRATION
+    - 7B class timetable system
+    - Live countdown timers
+    - Cloudflare-inspired UI
+    - Mobile-responsive design
 
-[SYSTEM LOGS]
-- Encryption protocols: ACTIVE
-- Animation systems: OPERATIONAL
-- UI/UX frameworks: STABLE
+[2025-01-25] HOMEPAGE ARCHITECTURE
+    - Binary animation engine
+    - Modal interface system
+    - Dark blue color scheme
+    - Code-like typography
+
+[ACTIVE MODULES]
+✓ Encryption Engine
+✓ Animation System  
+✓ UI Framework
+✓ Security Protocols
 
 [DIRECTIVES]
 1. The pen writes again
 2. Code with purpose
-3. Animate everything
-4. Secure all communications
+3. Encrypt everything
+4. Animate the interface
 
-[UPCOMING FEATURES]
-- Enhanced cipher algorithms
-- Mobile optimization
-- Additional animation layers
-- Performance improvements
+[TECHNICAL SPECS]
+- Frontend: HTML5, CSS3, ES6+
+- Encryption: CryptoJS Integration
+- Animations: CSS3 + JavaScript
+- Typography: Monospace Stack
 
-END OF TRANSMISSION`;
+[STATUS: OPERATIONAL]
+All systems nominal. Ready for encryption tasks.
+
+// END OF TRANSMISSION`;
     }
 }
 
 // Initialize the homepage when DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
+    console.log('Creamo Homepage Initialized');
     new CreamoHomepage();
 });
 
-// Add some random binary code in the background occasionally
-setInterval(() => {
-    if (Math.random() > 0.7) {
-        const home = new CreamoHomepage();
-        home.createBinaryStream(
-            Math.random() * window.innerWidth,
-            window.innerHeight + 50,
-            Math.floor(Math.random() * 5)
-        );
-    }
-}, 3000);
+// Add console-style welcome message
+console.log(`
+%cCREAMO SYSTEMS - ONLINE
+%cDirective 001: The Pen Writes Again
+%cAll systems operational. Ready for encryption tasks.
+`, 
+'color: #3a5fc8; font-size: 18px; font-weight: bold;',
+'color: #8a9bb8; font-size: 14px;',
+'color: #8a9bb8; font-size: 12px;'
+);
