@@ -4,6 +4,7 @@ class CreamoApp {
         this.currentView = 'home';
         this.binaryContainer = document.getElementById('binaryContainer');
         this.archivesModal = document.getElementById('archivesModal');
+        this.portalModal = document.getElementById('portalModal');
         this.archivesContent = document.getElementById('archivesContent');
         this.homeContainer = document.querySelector('.home-container');
         this.creamocryptTool = document.getElementById('creamocryptTool');
@@ -24,10 +25,21 @@ class CreamoApp {
             this.hideArchivesModal();
         });
 
-        // Close modal when clicking outside
+        // Close portal modal with X button
+        document.getElementById('closePortal').addEventListener('click', () => {
+            this.hidePortalModal();
+        });
+
+        // Close modals when clicking outside
         this.archivesModal.addEventListener('click', (e) => {
             if (e.target === this.archivesModal) {
                 this.hideArchivesModal();
+            }
+        });
+
+        this.portalModal.addEventListener('click', (e) => {
+            if (e.target === this.portalModal) {
+                this.hidePortalModal();
             }
         });
     }
@@ -47,10 +59,10 @@ class CreamoApp {
             this.loadArchivesFile();
         });
 
-        // Portal button - toggle portal menu
+        // Portal button - show portal modal
         document.getElementById('portalBtn').addEventListener('click', (e) => {
             this.triggerBinaryAnimation(e);
-            this.togglePortalMenu();
+            this.showPortalModal();
         });
 
         // Portal menu options
@@ -58,7 +70,7 @@ class CreamoApp {
             this.triggerBinaryAnimation(e);
             setTimeout(() => {
                 window.open('https://deluxtable.pages.dev', '_blank');
-                this.hidePortalMenu();
+                this.hidePortalModal();
             }, 800);
         });
 
@@ -66,7 +78,7 @@ class CreamoApp {
             this.triggerBinaryAnimation(e);
             setTimeout(() => {
                 window.open('https://iankingsigma.github.io/tekken-8-website/', '_blank');
-                this.hidePortalMenu();
+                this.hidePortalModal();
             }, 800);
         });
 
@@ -105,36 +117,14 @@ class CreamoApp {
         document.querySelector('.site-footer').style.display = 'block';
     }
 
-    togglePortalMenu() {
-        const portalMenu = document.getElementById('portalMenu');
-        if (portalMenu.classList.contains('hidden')) {
-            this.showPortalMenu();
-        } else {
-            this.hidePortalMenu();
-        }
+    showPortalModal() {
+        this.portalModal.style.display = 'block';
+        document.body.style.overflow = 'hidden';
     }
 
-    showPortalMenu() {
-        const portalMenu = document.getElementById('portalMenu');
-        portalMenu.classList.remove('hidden');
-        // Close menu when clicking outside
-        setTimeout(() => {
-            document.addEventListener('click', this.handleClickOutsidePortal.bind(this));
-        }, 10);
-    }
-
-    hidePortalMenu() {
-        const portalMenu = document.getElementById('portalMenu');
-        portalMenu.classList.add('hidden');
-        document.removeEventListener('click', this.handleClickOutsidePortal.bind(this));
-    }
-
-    handleClickOutsidePortal(e) {
-        const portalMenu = document.getElementById('portalMenu');
-        const portalBtn = document.getElementById('portalBtn');
-        if (!portalMenu.contains(e.target) && !portalBtn.contains(e.target)) {
-            this.hidePortalMenu();
-        }
+    hidePortalModal() {
+        this.portalModal.style.display = 'none';
+        document.body.style.overflow = 'auto';
     }
 
     createRipple(event, button) {
@@ -221,7 +211,7 @@ class CreamoApp {
 
     getRandomBlueColor() {
         const colors = [
-            '#0a1a3a', '#1a3c8b', '#2d4b8f', '#1a3c8b', '#0a1a3a'
+            '#051225', '#0a1a3a', '#1a3c8b', '#0a1a3a', '#051225'
         ];
         return colors[Math.floor(Math.random() * colors.length)];
     }
