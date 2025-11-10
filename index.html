@@ -13,8 +13,8 @@
                 <svg viewBox="0 0 100 100" class="logo-svg" aria-hidden="true">
                     <defs>
                         <linearGradient id="g" x1="0" x2="1" y1="0" y2="1">
-                            <stop offset="0" stop-color="#0a1a3a"/>
-                            <stop offset="1" stop-color="#1a3c8b"/>
+                            <stop offset="0" stop-color="#051225"/>
+                            <stop offset="1" stop-color="#0a1a3a"/>
                         </linearGradient>
                     </defs>
                     <rect x="0" y="0" width="100" height="100" rx="16" fill="url(#g)"></rect>
@@ -50,16 +50,6 @@
                     <span class="btn-glow"></span>
                 </button>
             </div>
-            
-            <!-- Portal Dropdown Menu -->
-            <div id="portalMenu" class="portal-menu hidden">
-                <button class="portal-option" id="deluxtablePortal">
-                    <span class="portal-text">Deluxtable</span>
-                </button>
-                <button class="portal-option" id="tekkenPortal">
-                    <span class="portal-text">Tekken Fighting</span>
-                </button>
-            </div>
         </main>
 
         <!-- Binary Code Animation Container -->
@@ -75,6 +65,30 @@
                 <div class="modal-body">
                     <div id="archivesContent" class="archives-content">
                         <div class="loading">Loading archives...</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Portal Modal -->
+        <div id="portalModal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2>Portal</h2>
+                    <button class="close-btn" id="closePortal">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div class="portal-options">
+                        <button class="portal-option large" id="deluxtablePortal">
+                            <span class="portal-icon">🌐</span>
+                            <span class="portal-text">Deluxtable</span>
+                            <span class="portal-desc">External table reference</span>
+                        </button>
+                        <button class="portal-option large" id="tekkenPortal">
+                            <span class="portal-icon">🥊</span>
+                            <span class="portal-text">Tekken Fighting</span>
+                            <span class="portal-desc">Fighting game website</span>
+                        </button>
                     </div>
                 </div>
             </div>
