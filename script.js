@@ -15,6 +15,21 @@ class CreamoApp {
         this.setupCipherTool();
         this.animateGiantText();
         this.createBackgroundBinary();
+        this.setupEventListeners();
+    }
+
+    setupEventListeners() {
+        // Close archives modal with X button
+        document.getElementById('closeArchives').addEventListener('click', () => {
+            this.hideArchivesModal();
+        });
+
+        // Close modal when clicking outside
+        this.archivesModal.addEventListener('click', (e) => {
+            if (e.target === this.archivesModal) {
+                this.hideArchivesModal();
+            }
+        });
     }
 
     setupHomepage() {
@@ -32,11 +47,26 @@ class CreamoApp {
             this.loadArchivesFile();
         });
 
-        // Deluxtable button - navigate to external site
-        document.getElementById('deluxtableBtn').addEventListener('click', (e) => {
+        // Portal button - toggle portal menu
+        document.getElementById('portalBtn').addEventListener('click', (e) => {
+            this.triggerBinaryAnimation(e);
+            this.togglePortalMenu();
+        });
+
+        // Portal menu options
+        document.getElementById('deluxtablePortal').addEventListener('click', (e) => {
             this.triggerBinaryAnimation(e);
             setTimeout(() => {
                 window.open('https://deluxtable.pages.dev', '_blank');
+                this.hidePortalMenu();
+            }, 800);
+        });
+
+        document.getElementById('tekkenPortal').addEventListener('click', (e) => {
+            this.triggerBinaryAnimation(e);
+            setTimeout(() => {
+                window.open('https://iankingsigma.github.io/tekken-8-website/', '_blank');
+                this.hidePortalMenu();
             }, 800);
         });
 
@@ -75,6 +105,38 @@ class CreamoApp {
         document.querySelector('.site-footer').style.display = 'block';
     }
 
+    togglePortalMenu() {
+        const portalMenu = document.getElementById('portalMenu');
+        if (portalMenu.classList.contains('hidden')) {
+            this.showPortalMenu();
+        } else {
+            this.hidePortalMenu();
+        }
+    }
+
+    showPortalMenu() {
+        const portalMenu = document.getElementById('portalMenu');
+        portalMenu.classList.remove('hidden');
+        // Close menu when clicking outside
+        setTimeout(() => {
+            document.addEventListener('click', this.handleClickOutsidePortal.bind(this));
+        }, 10);
+    }
+
+    hidePortalMenu() {
+        const portalMenu = document.getElementById('portalMenu');
+        portalMenu.classList.add('hidden');
+        document.removeEventListener('click', this.handleClickOutsidePortal.bind(this));
+    }
+
+    handleClickOutsidePortal(e) {
+        const portalMenu = document.getElementById('portalMenu');
+        const portalBtn = document.getElementById('portalBtn');
+        if (!portalMenu.contains(e.target) && !portalBtn.contains(e.target)) {
+            this.hidePortalMenu();
+        }
+    }
+
     createRipple(event, button) {
         const ripple = document.createElement('span');
         const rect = button.getBoundingClientRect();
@@ -85,7 +147,7 @@ class CreamoApp {
         ripple.style.cssText = `
             position: absolute;
             border-radius: 50%;
-            background: rgba(58, 95, 200, 0.6);
+            background: rgba(26, 60, 139, 0.6);
             transform: scale(0);
             animation: ripple 0.6s linear;
             width: ${size}px;
@@ -159,7 +221,7 @@ class CreamoApp {
 
     getRandomBlueColor() {
         const colors = [
-            '#1a3c8b', '#2d4b8f', '#3a5fc8', '#4a6fc9', '#5b7fd0'
+            '#0a1a3a', '#1a3c8b', '#2d4b8f', '#1a3c8b', '#0a1a3a'
         ];
         return colors[Math.floor(Math.random() * colors.length)];
     }
@@ -243,7 +305,7 @@ class CreamoApp {
     }
 }
 
-// Cipher Tool Implementation (unchanged)
+// Cipher Tool Implementation
 class CipherTool {
     constructor() {
         this.PBKDF2_ITERATIONS = 10000;
@@ -317,8 +379,11 @@ class CipherTool {
         // Custom dropdown
         this.selectControl.addEventListener('click', (e) => {
             e.stopPropagation();
-            if (this.cipherList.classList.contains('hidden')) this.openDropdown();
-            else this.closeDropdown();
+            if (this.cipherList.classList.contains('hidden')) {
+                this.openDropdown();
+            } else {
+                this.closeDropdown();
+            }
         });
 
         this.cipherFilter.addEventListener('input', () => this.filterOptions());
@@ -339,7 +404,11 @@ class CipherTool {
         this.copyBtn.addEventListener('click', () => this.copyOutput());
 
         // Close dropdown on outside click
-        document.addEventListener('click', () => this.closeDropdown());
+        document.addEventListener('click', (e) => {
+            if (!this.customSelect.contains(e.target)) {
+                this.closeDropdown();
+            }
+        });
     }
 
     openDropdown() {
