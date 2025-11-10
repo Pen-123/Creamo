@@ -118,13 +118,17 @@ class CreamoApp {
     }
 
     showPortalModal() {
-        this.portalModal.style.display = 'block';
-        document.body.style.overflow = 'hidden';
+        if (this.portalModal) {
+            this.portalModal.style.display = 'block';
+            document.body.style.overflow = 'hidden';
+        }
     }
 
     hidePortalModal() {
-        this.portalModal.style.display = 'none';
-        document.body.style.overflow = 'auto';
+        if (this.portalModal) {
+            this.portalModal.style.display = 'none';
+            document.body.style.overflow = 'auto';
+        }
     }
 
     createRipple(event, button) {
