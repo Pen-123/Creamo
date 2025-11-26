@@ -44,52 +44,62 @@ class CreamoApp {
         });
     }
 
-    setupHomepage() {
-        // CreamoCrypt button - show cipher tool
-        document.getElementById('creamocryptBtn').addEventListener('click', (e) => {
-            this.triggerBinaryAnimation(e);
-            setTimeout(() => {
-                this.showCipherTool();
-            }, 800);
-        });
+setupHomepage() {
+    // CreamoCrypt button - show cipher tool
+    document.getElementById('creamocryptBtn').addEventListener('click', (e) => {
+        this.triggerBinaryAnimation(e);
+        setTimeout(() => {
+            this.showCipherTool();
+        }, 800);
+    });
 
-        // Pen Archives button - load Archives.txt
-        document.getElementById('archivesBtn').addEventListener('click', (e) => {
-            this.triggerBinaryAnimation(e);
-            this.loadArchivesFile();
-        });
+    // Pen Archives button - load Archives.txt
+    document.getElementById('archivesBtn').addEventListener('click', (e) => {
+        this.triggerBinaryAnimation(e);
+        this.loadArchivesFile();
+    });
 
-        // Portal button - show portal modal
-        document.getElementById('portalBtn').addEventListener('click', (e) => {
-            this.triggerBinaryAnimation(e);
-            this.showPortalModal();
-        });
+    // Portal button - show portal modal
+    document.getElementById('portalBtn').addEventListener('click', (e) => {
+        this.triggerBinaryAnimation(e);
+        this.showPortalModal();
+    });
 
-        // Portal menu options
-        document.getElementById('deluxtablePortal').addEventListener('click', (e) => {
-            this.triggerBinaryAnimation(e);
-            setTimeout(() => {
-                window.open('https://deluxtable.pages.dev', '_blank');
-                this.hidePortalModal();
-            }, 800);
-        });
+    // Portal menu options
+    document.getElementById('deluxtablePortal').addEventListener('click', (e) => {
+        this.triggerBinaryAnimation(e);
+        setTimeout(() => {
+            window.open('https://deluxtable.pages.dev', '_blank');
+            this.hidePortalModal();
+        }, 800);
+    });
 
-        document.getElementById('tekkenPortal').addEventListener('click', (e) => {
-            this.triggerBinaryAnimation(e);
-            setTimeout(() => {
-                window.open('https://iankingsigma.github.io/tekken-8-website/', '_blank');
-                this.hidePortalModal();
-            }, 800);
-        });
+    // Updated from tekkenPortal to brainrotPortal
+    document.getElementById('brainrotPortal').addEventListener('click', (e) => {
+        this.triggerBinaryAnimation(e);
+        setTimeout(() => {
+            window.open('https://iankingsigma.github.io/tekken-8-website/', '_blank');
+            this.hidePortalModal();
+        }, 800);
+    });
 
-        // Setup button animations
-        const buttons = document.querySelectorAll('.home-btn');
-        buttons.forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                this.createRipple(e, btn);
-            });
+    // New Control Centre portal
+    document.getElementById('controlCentrePortal').addEventListener('click', (e) => {
+        this.triggerBinaryAnimation(e);
+        setTimeout(() => {
+            window.open('https://controlc.pages.dev', '_blank');
+            this.hidePortalModal();
+        }, 800);
+    });
+
+    // Setup button animations
+    const buttons = document.querySelectorAll('.home-btn');
+    buttons.forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            this.createRipple(e, btn);
         });
-    }
+    });
+}
 
     setupCipherTool() {
         // Back to home button
