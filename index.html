@@ -49,6 +49,11 @@
                     <span class="btn-text">Portal</span>
                     <span class="btn-glow"></span>
                 </button>
+                
+                <button class="home-btn tv-btn" id="tvBtn">
+                    <span class="btn-text">Creamo TV</span>
+                    <span class="btn-glow"></span>
+                </button>
             </div>
         </main>
 
@@ -70,37 +75,38 @@
             </div>
         </div>
 
-<!-- Portal Modal -->
-<div id="portalModal" class="modal">
-    <div class="modal-content">
-        <div class="modal-header">
-            <h2>Portal</h2>
-            <button class="close-btn" id="closePortal">&times;</button>
-        </div>
-        <div class="modal-body">
-            <div class="portal-options">
-                <button class="portal-option large" id="deluxtablePortal">
-                    <span class="portal-icon">🌐</span>
-                    <span class="portal-text">Deluxtable</span>
-                    <span class="portal-desc">External table reference</span>
-                </button>
-                <button class="portal-option large" id="brainrotPortal">
-                    <span class="portal-icon">🥊</span>
-                    <span class="portal-text">Brainrot Fighters</span>
-                    <span class="portal-desc">Fighting game website</span>
-                </button>
-                <button class="portal-option large" id="controlCentrePortal">
-                    <span class="portal-icon">🛠️</span>
-                    <span class="portal-text">Control Centre</span>
-                    <span class="portal-desc">Utility hub</span>
-                </button>
+        <!-- Portal Modal -->
+        <div id="portalModal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2>Portal</h2>
+                    <button class="close-btn" id="closePortal">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div class="portal-options">
+                        <button class="portal-option large" id="deluxtablePortal">
+                            <span class="portal-icon">🌐</span>
+                            <span class="portal-text">Deluxtable</span>
+                            <span class="portal-desc">External table reference</span>
+                        </button>
+                        <button class="portal-option large" id="brainrotPortal">
+                            <span class="portal-icon">🥊</span>
+                            <span class="portal-text">Brainrot Fighters</span>
+                            <span class="portal-desc">Fighting game website</span>
+                        </button>
+                        <button class="portal-option large" id="controlCentrePortal">
+                            <span class="portal-icon">🛠️</span>
+                            <span class="portal-text">Control Centre</span>
+                            <span class="portal-desc">Utility hub</span>
+                        </button>
+                    </div>
+                </div>
             </div>
         </div>
-    </div>
-</div>
 
         <!-- CreamoCrypt Cipher Tool (Hidden by default) -->
         <div id="creamocryptTool" class="creamocrypt-container" style="display: none;">
+            <!-- ... existing cipher tool content ... -->
             <div class="cipher-header">
                 <button class="back-btn" id="backToHome">&larr; Back to Home</button>
                 <h1>CreamoCrypt — Advanced Cipher Suite</h1>
@@ -178,6 +184,11 @@
                     <div class="hint">Tip: Hashes (SHA-256/MD5) are one-way — they cannot be reversed by decrypt.</div>
                 </aside>
             </div>
+        </div>
+
+        <!-- Creamo TV Streaming Platform (Hidden by default) -->
+        <div id="creamotvTool" class="creamo-tv-container" style="display: none;">
+            <!-- TV navigation will be added here dynamically -->
         </div>
 
         <footer class="site-footer">
