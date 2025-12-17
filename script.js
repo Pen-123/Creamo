@@ -11,8 +11,8 @@ class CreamoApp {
         this.creamotvTool = document.getElementById('creamotvTool');
         this.tvInitialized = false;
         
-        // TMDB Configuration - YOU NEED TO GET YOUR OWN API KEY FROM https://www.themoviedb.org/
-        this.TMDB_API_KEY = 'f38b4f347bb1169cfede0acd87486fe8'; // REPLACE THIS!
+        // TMDB Configuration - Using Bearer Token Authentication
+        this.TMDB_ACCESS_TOKEN = 'eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiJmMzhiNGYzNDdiYjExNjljZmVkZTBhY2Q4NzQ4NmZlOCIsIm5iZiI6MTc2NTk2ODc5Ny4zODEsInN1YiI6IjY5NDI4YjlkZDM4ZTVlNGQ5ZjdhMmM3YiIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.KppyeeVe4_rte7wdlc2JM9PvrSkFkfO9wUTWvYAQjAg';
         this.TMDB_BASE_URL = 'https://api.themoviedb.org/3';
         this.TMDB_IMAGE_URL = 'https://image.tmdb.org/t/p/w500';
         
@@ -60,6 +60,11 @@ class CreamoApp {
             if (e.target === this.portalModal) {
                 this.hidePortalModal();
             }
+        });
+
+        // Back to home button for cipher tool
+        document.getElementById('backToHome').addEventListener('click', () => {
+            this.showHomepage();
         });
     }
 
@@ -127,29 +132,17 @@ class CreamoApp {
     }
 
     setupCipherTool() {
-        // Back to home button
-        document.getElementById('backToHome').addEventListener('click', () => {
-            this.showHomepage();
-        });
-
+        // Back to home button is already set up in setupEventListeners
         // Initialize cipher tool
         this.cipherTool = new CipherTool();
     }
 
     setupCreamoTV() {
-        // Back button for TV
-        const tvBackBtn = document.createElement('button');
-        tvBackBtn.className = 'tv-back-btn';
-        tvBackBtn.innerHTML = '&larr; Back to Creamo';
-        tvBackBtn.addEventListener('click', () => {
-            this.showHomepage();
-        });
-
-        // TV Navigation with Search Bar
+        // Create TV navigation
         const tvNav = document.createElement('div');
         tvNav.className = 'tv-nav';
         tvNav.innerHTML = `
-            ${tvBackBtn.outerHTML}
+            <button class="tv-back-btn" id="tvBackBtn">&larr; Back to Creamo</button>
             <h1 class="tv-nav-title">Creamo TV</h1>
             
             <!-- Search Bar -->
@@ -184,7 +177,10 @@ class CreamoApp {
         // Load initial TV content
         this.loadTVHome();
 
-        // Setup TV navigation
+        // Setup TV navigation - FIXED: Using arrow functions to maintain 'this' context
+        document.getElementById('tvBackBtn').addEventListener('click', () => {
+            this.showHomepage();
+        });
         document.getElementById('tvHomeBtn').addEventListener('click', () => {
             this.resetSearch();
             this.loadTVHome();
@@ -275,7 +271,7 @@ class CreamoApp {
                 tvContent.innerHTML = `
                     <div class="tv-section">
                         <h2>🔍 Search Results for "${query}"</h2>
-                        <div class="no-results" style="text-align: center; padding: 50px; color: #a0a0a0;">
+                        <div class="no-results">
                             <div style="font-size: 48px; margin-bottom: 20px;">🎬</div>
                             <h3>No results found</h3>
                             <p>Try a different search term</p>
@@ -343,6 +339,10 @@ class CreamoApp {
         this.tvPage = 1;
         this.currentSearchType = null;
         this.currentCategory = 'all';
+        const searchInput = document.getElementById('tvSearchInput');
+        const clearBtn = document.getElementById('tvClearSearch');
+        if (searchInput) searchInput.value = '';
+        if (clearBtn) clearBtn.style.display = 'none';
     }
 
     async loadTVHome() {
@@ -444,16 +444,16 @@ class CreamoApp {
             
             const loadMoreBtn = page > 1 ? `
                 <div class="load-more-container">
-                    <button class="load-more-btn" onclick="app.loadMoreMovies(${page + 1})">
+                    <button class="load-more-btn" id="loadMoreMoviesBtn">
                         Load More Movies (Page ${page + 1})
                     </button>
-                    <button class="load-more-btn outline" onclick="app.loadTVMovies(1)" style="margin-left: 10px;">
+                    <button class="load-more-btn outline" id="backToFirstPageBtn" style="margin-left: 10px;">
                         Back to First Page
                     </button>
                 </div>
             ` : `
                 <div class="load-more-container">
-                    <button class="load-more-btn" onclick="app.loadMoreMovies(2)">
+                    <button class="load-more-btn" id="loadMoreMoviesBtn">
                         Load More Movies
                     </button>
                 </div>
@@ -480,6 +480,24 @@ class CreamoApp {
                 </div>
             `;
 
+            // Add event listeners for load more buttons
+            setTimeout(() => {
+                const loadMoreBtn = document.getElementById('loadMoreMoviesBtn');
+                const backToFirstBtn = document.getElementById('backToFirstPageBtn');
+                
+                if (loadMoreBtn) {
+                    loadMoreBtn.addEventListener('click', () => {
+                        this.loadMoreMovies(page + 1);
+                    });
+                }
+                
+                if (backToFirstBtn) {
+                    backToFirstBtn.addEventListener('click', () => {
+                        this.loadTVMovies(1);
+                    });
+                }
+            }, 100);
+
             this.setupTVCardInteractions();
 
         } catch (error) {
@@ -500,23 +518,51 @@ class CreamoApp {
                 const loadMoreContainer = document.querySelector('.load-more-container');
                 if (loadMoreContainer && movies.page < movies.total_pages) {
                     loadMoreContainer.innerHTML = `
-                        <button class="load-more-btn" onclick="app.loadMoreMovies(${nextPage + 1})">
+                        <button class="load-more-btn" id="loadMoreMoviesBtn">
                             Load More Movies (Page ${nextPage + 1})
                         </button>
-                        <button class="load-more-btn outline" onclick="app.loadTVMovies(1)" style="margin-left: 10px;">
+                        <button class="load-more-btn outline" id="backToFirstPageBtn" style="margin-left: 10px;">
                             Back to First Page
                         </button>
                         <p style="margin-top: 10px; color: #a0a0a0; font-size: 12px;">
                             Loaded ${movies.results.length * nextPage} of ${movies.total_results} movies
                         </p>
                     `;
+                    
+                    // Re-add event listeners
+                    setTimeout(() => {
+                        const loadMoreBtn = document.getElementById('loadMoreMoviesBtn');
+                        const backToFirstBtn = document.getElementById('backToFirstPageBtn');
+                        
+                        if (loadMoreBtn) {
+                            loadMoreBtn.addEventListener('click', () => {
+                                this.loadMoreMovies(nextPage + 1);
+                            });
+                        }
+                        
+                        if (backToFirstBtn) {
+                            backToFirstBtn.addEventListener('click', () => {
+                                this.loadTVMovies(1);
+                            });
+                        }
+                    }, 100);
                 } else {
                     loadMoreContainer.innerHTML = `
                         <p style="color: #a0a0a0;">All ${movies.total_results} movies loaded!</p>
-                        <button class="load-more-btn outline" onclick="app.loadTVMovies(1)" style="margin-top: 10px;">
+                        <button class="load-more-btn outline" id="backToFirstPageBtn" style="margin-top: 10px;">
                             Back to First Page
                         </button>
                     `;
+                    
+                    // Re-add event listener
+                    setTimeout(() => {
+                        const backToFirstBtn = document.getElementById('backToFirstPageBtn');
+                        if (backToFirstBtn) {
+                            backToFirstBtn.addEventListener('click', () => {
+                                this.loadTVMovies(1);
+                            });
+                        }
+                    }, 100);
                 }
             }
             
@@ -543,16 +589,16 @@ class CreamoApp {
             
             const loadMoreBtn = page > 1 ? `
                 <div class="load-more-container">
-                    <button class="load-more-btn" onclick="app.loadMoreShows(${page + 1})">
+                    <button class="load-more-btn" id="loadMoreShowsBtn">
                         Load More Shows (Page ${page + 1})
                     </button>
-                    <button class="load-more-btn outline" onclick="app.loadTVShows(1)" style="margin-left: 10px;">
+                    <button class="load-more-btn outline" id="backToFirstShowsBtn" style="margin-left: 10px;">
                         Back to First Page
                     </button>
                 </div>
             ` : `
                 <div class="load-more-container">
-                    <button class="load-more-btn" onclick="app.loadMoreShows(2)">
+                    <button class="load-more-btn" id="loadMoreShowsBtn">
                         Load More Shows
                     </button>
                 </div>
@@ -570,6 +616,24 @@ class CreamoApp {
                     ${loadMoreBtn}
                 </div>
             `;
+
+            // Add event listeners for load more buttons
+            setTimeout(() => {
+                const loadMoreBtn = document.getElementById('loadMoreShowsBtn');
+                const backToFirstBtn = document.getElementById('backToFirstShowsBtn');
+                
+                if (loadMoreBtn) {
+                    loadMoreBtn.addEventListener('click', () => {
+                        this.loadMoreShows(page + 1);
+                    });
+                }
+                
+                if (backToFirstBtn) {
+                    backToFirstBtn.addEventListener('click', () => {
+                        this.loadTVShows(1);
+                    });
+                }
+            }, 100);
 
             this.setupTVCardInteractions();
 
@@ -591,23 +655,51 @@ class CreamoApp {
                 const loadMoreContainer = document.querySelector('.load-more-container');
                 if (loadMoreContainer && shows.page < shows.total_pages) {
                     loadMoreContainer.innerHTML = `
-                        <button class="load-more-btn" onclick="app.loadMoreShows(${nextPage + 1})">
+                        <button class="load-more-btn" id="loadMoreShowsBtn">
                             Load More Shows (Page ${nextPage + 1})
                         </button>
-                        <button class="load-more-btn outline" onclick="app.loadTVShows(1)" style="margin-left: 10px;">
+                        <button class="load-more-btn outline" id="backToFirstShowsBtn" style="margin-left: 10px;">
                             Back to First Page
                         </button>
                         <p style="margin-top: 10px; color: #a0a0a0; font-size: 12px;">
                             Loaded ${shows.results.length * nextPage} of ${shows.total_results} shows
                         </p>
                     `;
+                    
+                    // Re-add event listeners
+                    setTimeout(() => {
+                        const loadMoreBtn = document.getElementById('loadMoreShowsBtn');
+                        const backToFirstBtn = document.getElementById('backToFirstShowsBtn');
+                        
+                        if (loadMoreBtn) {
+                            loadMoreBtn.addEventListener('click', () => {
+                                this.loadMoreShows(nextPage + 1);
+                            });
+                        }
+                        
+                        if (backToFirstBtn) {
+                            backToFirstBtn.addEventListener('click', () => {
+                                this.loadTVShows(1);
+                            });
+                        }
+                    }, 100);
                 } else {
                     loadMoreContainer.innerHTML = `
                         <p style="color: #a0a0a0;">All ${shows.total_results} shows loaded!</p>
-                        <button class="load-more-btn outline" onclick="app.loadTVShows(1)" style="margin-top: 10px;">
+                        <button class="load-more-btn outline" id="backToFirstShowsBtn" style="margin-top: 10px;">
                             Back to First Page
                         </button>
                     `;
+                    
+                    // Re-add event listener
+                    setTimeout(() => {
+                        const backToFirstBtn = document.getElementById('backToFirstShowsBtn');
+                        if (backToFirstBtn) {
+                            backToFirstBtn.addEventListener('click', () => {
+                                this.loadTVShows(1);
+                            });
+                        }
+                    }, 100);
                 }
             }
             
@@ -739,9 +831,14 @@ class CreamoApp {
             }
         }
 
-        const url = `${this.TMDB_BASE_URL}/${endpoint}?api_key=${this.TMDB_API_KEY}&language=en-US&page=1`;
+        const url = `${this.TMDB_BASE_URL}/${endpoint}`;
         
-        const response = await fetch(url);
+        const headers = new Headers({
+            'Authorization': `Bearer ${this.TMDB_ACCESS_TOKEN}`,
+            'Accept': 'application/json'
+        });
+
+        const response = await fetch(url, { headers });
         
         if (!response.ok) {
             throw new Error(`TMDB API Error: ${response.status}`);
@@ -973,15 +1070,17 @@ class CreamoApp {
             <div class="error-section">
                 <div class="error-icon">⚠️</div>
                 <h3>TMDB API Connection Failed</h3>
-                <p>Unable to fetch movie data. Please check your TMDB API key.</p>
+                <p>Unable to fetch movie data. Please check your TMDB API access token.</p>
                 <p class="error-details">Error: ${error.message}</p>
                 
                 <div class="error-instructions">
                     <h4>How to fix:</h4>
                     <ol>
                         <li>Go to <a href="https://www.themoviedb.org/" target="_blank">TMDB.org</a></li>
-                        <li>Create an account and get an API key</li>
-                        <li>Replace "f38b4f347bb1169cfede0acd87486fe8" in script.js with your key</li>
+                        <li>Login to your account</li>
+                        <li>Go to Settings → API</li>
+                        <li>Create a new API read access token (v4 auth)</li>
+                        <li>Replace the access token in script.js with your new token</li>
                         <li>Refresh the page</li>
                     </ol>
                 </div>
@@ -1077,6 +1176,9 @@ class CreamoApp {
         this.creamotvTool.style.display = 'none';
         document.querySelector('.site-header').style.display = 'flex';
         document.querySelector('.site-footer').style.display = 'block';
+        
+        // Reset TV initialization to ensure fresh setup next time
+        this.tvInitialized = false;
     }
 
     showPortalModal() {
