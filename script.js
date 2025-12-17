@@ -20,6 +20,13 @@ class CreamoApp {
         this.movieCache = new Map();
         this.tvCache = new Map();
         
+        // Pagination and search
+        this.moviePage = 1;
+        this.tvPage = 1;
+        this.searchQuery = '';
+        this.currentSearchType = null;
+        this.currentCategory = 'all';
+        
         this.init();
     }
 
@@ -138,12 +145,24 @@ class CreamoApp {
             this.showHomepage();
         });
 
-        // TV Navigation
+        // TV Navigation with Search Bar
         const tvNav = document.createElement('div');
         tvNav.className = 'tv-nav';
         tvNav.innerHTML = `
             ${tvBackBtn.outerHTML}
             <h1 class="tv-nav-title">Creamo TV</h1>
+            
+            <!-- Search Bar -->
+            <div class="tv-search-container">
+                <input type="text" 
+                       id="tvSearchInput" 
+                       class="search-input" 
+                       placeholder="Search movies & shows..." 
+                       aria-label="Search for movies and TV shows">
+                <button id="tvSearchBtn" class="player-btn" style="white-space: nowrap;">Search</button>
+                <button id="tvClearSearch" class="player-btn outline" style="white-space: nowrap; display: none;">Clear</button>
+            </div>
+            
             <div style="margin-left: auto; display: flex; gap: 10px;">
                 <button class="player-btn" id="tvHomeBtn">Home</button>
                 <button class="player-btn" id="tvMoviesBtn">Movies</button>
@@ -166,10 +185,164 @@ class CreamoApp {
         this.loadTVHome();
 
         // Setup TV navigation
-        document.getElementById('tvHomeBtn').addEventListener('click', () => this.loadTVHome());
-        document.getElementById('tvMoviesBtn').addEventListener('click', () => this.loadTVMovies());
-        document.getElementById('tvShowsBtn').addEventListener('click', () => this.loadTVShows());
-        document.getElementById('tvTrendingBtn').addEventListener('click', () => this.loadTVTrending());
+        document.getElementById('tvHomeBtn').addEventListener('click', () => {
+            this.resetSearch();
+            this.loadTVHome();
+        });
+        document.getElementById('tvMoviesBtn').addEventListener('click', () => {
+            this.resetSearch();
+            this.loadTVMovies();
+        });
+        document.getElementById('tvShowsBtn').addEventListener('click', () => {
+            this.resetSearch();
+            this.loadTVShows();
+        });
+        document.getElementById('tvTrendingBtn').addEventListener('click', () => {
+            this.resetSearch();
+            this.loadTVTrending();
+        });
+
+        // Setup search functionality
+        this.setupTVSearch();
+        
+        this.tvInitialized = true;
+    }
+
+    setupTVSearch() {
+        const searchInput = document.getElementById('tvSearchInput');
+        const searchBtn = document.getElementById('tvSearchBtn');
+        const clearBtn = document.getElementById('tvClearSearch');
+
+        // Search on button click
+        searchBtn.addEventListener('click', () => {
+            const query = searchInput.value.trim();
+            if (query) {
+                this.searchTVContent(query);
+            }
+        });
+
+        // Search on Enter key
+        searchInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                const query = searchInput.value.trim();
+                if (query) {
+                    this.searchTVContent(query);
+                }
+            }
+        });
+
+        // Clear search
+        clearBtn.addEventListener('click', () => {
+            this.resetSearch();
+            searchInput.value = '';
+            clearBtn.style.display = 'none';
+            
+            // Go back to the last view
+            if (this.currentSearchType === 'movie') {
+                this.loadTVMovies();
+            } else if (this.currentSearchType === 'tv') {
+                this.loadTVShows();
+            } else {
+                this.loadTVHome();
+            }
+        });
+
+        // Show clear button when there's text
+        searchInput.addEventListener('input', () => {
+            clearBtn.style.display = searchInput.value.trim() ? 'inline-block' : 'none';
+        });
+    }
+
+    async searchTVContent(query, type = 'multi') {
+        const tvContent = document.getElementById('tvContent');
+        this.searchQuery = query;
+        
+        tvContent.innerHTML = `
+            <div class="loading-section">
+                <div class="loading-spinner"></div>
+                <p>Searching for "${query}"...</p>
+            </div>
+        `;
+
+        try {
+            const endpoint = type === 'multi' ? 
+                `search/multi?query=${encodeURIComponent(query)}&include_adult=false` :
+                `search/${type}?query=${encodeURIComponent(query)}&include_adult=false`;
+            
+            const searchResults = await this.fetchTMDBData(endpoint);
+            
+            if (searchResults.results.length === 0) {
+                tvContent.innerHTML = `
+                    <div class="tv-section">
+                        <h2>🔍 Search Results for "${query}"</h2>
+                        <div class="no-results" style="text-align: center; padding: 50px; color: #a0a0a0;">
+                            <div style="font-size: 48px; margin-bottom: 20px;">🎬</div>
+                            <h3>No results found</h3>
+                            <p>Try a different search term</p>
+                            <button class="player-btn" onclick="app.loadTVHome()" style="margin-top: 20px;">
+                                Back to Home
+                            </button>
+                        </div>
+                    </div>
+                `;
+                return;
+            }
+
+            // Separate movies and TV shows
+            const movies = searchResults.results.filter(item => item.media_type === 'movie');
+            const tvShows = searchResults.results.filter(item => item.media_type === 'tv');
+            
+            let content = `<div class="tv-section">
+                <h2>🔍 Search Results for "${query}"</h2>
+                <p style="color: #a0a0a0; margin-bottom: 20px;">
+                    Found ${searchResults.results.length} results
+                </p>`;
+            
+            if (movies.length > 0) {
+                content += `
+                    <h3 style="margin-top: 30px; margin-bottom: 15px; color: #e0e0e0;">🎬 Movies (${movies.length})</h3>
+                    <div class="tv-content-grid">
+                        ${this.generateMovieCards(movies.slice(0, 12))}
+                    </div>
+                `;
+            }
+            
+            if (tvShows.length > 0) {
+                content += `
+                    <h3 style="margin-top: 30px; margin-bottom: 15px; color: #e0e0e0;">📺 TV Shows (${tvShows.length})</h3>
+                    <div class="tv-content-grid">
+                        ${this.generateShowCards(tvShows.slice(0, 12))}
+                    </div>
+                `;
+            }
+            
+            content += `</div>`;
+            tvContent.innerHTML = content;
+            
+            this.currentSearchType = type;
+            this.setupTVCardInteractions();
+
+        } catch (error) {
+            console.error('Search error:', error);
+            tvContent.innerHTML = `
+                <div class="error-section">
+                    <div class="error-icon">⚠️</div>
+                    <h3>Search Failed</h3>
+                    <p>Unable to search TMDB. Please try again later.</p>
+                    <button class="player-btn" onclick="app.loadTVHome()" style="margin-top: 20px;">
+                        Back to Home
+                    </button>
+                </div>
+            `;
+        }
+    }
+
+    resetSearch() {
+        this.searchQuery = '';
+        this.moviePage = 1;
+        this.tvPage = 1;
+        this.currentSearchType = null;
+        this.currentCategory = 'all';
     }
 
     async loadTVHome() {
@@ -256,7 +429,7 @@ class CreamoApp {
         }
     }
 
-    async loadTVMovies() {
+    async loadTVMovies(page = 1) {
         const tvContent = document.getElementById('tvContent');
         tvContent.innerHTML = `
             <div class="loading-section">
@@ -266,24 +439,44 @@ class CreamoApp {
         `;
 
         try {
-            const movies = await this.fetchTMDBData('movie/popular');
+            const movies = await this.fetchTMDBData(`movie/popular?page=${page}`);
+            this.moviePage = page;
+            
+            const loadMoreBtn = page > 1 ? `
+                <div class="load-more-container">
+                    <button class="load-more-btn" onclick="app.loadMoreMovies(${page + 1})">
+                        Load More Movies (Page ${page + 1})
+                    </button>
+                    <button class="load-more-btn outline" onclick="app.loadTVMovies(1)" style="margin-left: 10px;">
+                        Back to First Page
+                    </button>
+                </div>
+            ` : `
+                <div class="load-more-container">
+                    <button class="load-more-btn" onclick="app.loadMoreMovies(2)">
+                        Load More Movies
+                    </button>
+                </div>
+            `;
             
             tvContent.innerHTML = `
                 <div class="tv-section">
                     <h2>🎬 All Movies</h2>
+                    <p style="color: #a0a0a0; margin-bottom: 20px;">
+                        Page ${page} • ${movies.total_results} movies total
+                    </p>
                     <div class="category-filter">
-                        <button class="filter-btn active" onclick="app.filterContent('all')">All</button>
-                        <button class="filter-btn" onclick="app.filterContent('action')">Action</button>
-                        <button class="filter-btn" onclick="app.filterContent('drama')">Drama</button>
-                        <button class="filter-btn" onclick="app.filterContent('comedy')">Comedy</button>
-                        <button class="filter-btn" onclick="app.filterContent('sci-fi')">Sci-Fi</button>
+                        <button class="filter-btn ${this.currentCategory === 'all' ? 'active' : ''}" onclick="app.setCategory('all')">All</button>
+                        <button class="filter-btn ${this.currentCategory === 'action' ? 'active' : ''}" onclick="app.filterByGenre(28, 'Action')">Action</button>
+                        <button class="filter-btn ${this.currentCategory === 'drama' ? 'active' : ''}" onclick="app.filterByGenre(18, 'Drama')">Drama</button>
+                        <button class="filter-btn ${this.currentCategory === 'comedy' ? 'active' : ''}" onclick="app.filterByGenre(35, 'Comedy')">Comedy</button>
+                        <button class="filter-btn ${this.currentCategory === 'sci-fi' ? 'active' : ''}" onclick="app.filterByGenre(878, 'Sci-Fi')">Sci-Fi</button>
+                        <button class="filter-btn ${this.currentCategory === 'horror' ? 'active' : ''}" onclick="app.filterByGenre(27, 'Horror')">Horror</button>
                     </div>
                     <div class="tv-content-grid" id="moviesGrid">
                         ${this.generateMovieCards(movies.results)}
                     </div>
-                    <div class="load-more-container">
-                        <button class="load-more-btn" onclick="app.loadMoreMovies()">Load More Movies</button>
-                    </div>
+                    ${loadMoreBtn}
                 </div>
             `;
 
@@ -294,7 +487,48 @@ class CreamoApp {
         }
     }
 
-    async loadTVShows() {
+    async loadMoreMovies(nextPage) {
+        try {
+            const movies = await this.fetchTMDBData(`movie/popular?page=${nextPage}`);
+            
+            // Append new movies to existing grid
+            const moviesGrid = document.getElementById('moviesGrid');
+            if (moviesGrid) {
+                moviesGrid.innerHTML += this.generateMovieCards(movies.results);
+                
+                // Update load more button
+                const loadMoreContainer = document.querySelector('.load-more-container');
+                if (loadMoreContainer && movies.page < movies.total_pages) {
+                    loadMoreContainer.innerHTML = `
+                        <button class="load-more-btn" onclick="app.loadMoreMovies(${nextPage + 1})">
+                            Load More Movies (Page ${nextPage + 1})
+                        </button>
+                        <button class="load-more-btn outline" onclick="app.loadTVMovies(1)" style="margin-left: 10px;">
+                            Back to First Page
+                        </button>
+                        <p style="margin-top: 10px; color: #a0a0a0; font-size: 12px;">
+                            Loaded ${movies.results.length * nextPage} of ${movies.total_results} movies
+                        </p>
+                    `;
+                } else {
+                    loadMoreContainer.innerHTML = `
+                        <p style="color: #a0a0a0;">All ${movies.total_results} movies loaded!</p>
+                        <button class="load-more-btn outline" onclick="app.loadTVMovies(1)" style="margin-top: 10px;">
+                            Back to First Page
+                        </button>
+                    `;
+                }
+            }
+            
+            this.setupTVCardInteractions();
+            
+        } catch (error) {
+            console.error('Error loading more movies:', error);
+            alert('Failed to load more movies. Please try again.');
+        }
+    }
+
+    async loadTVShows(page = 1) {
         const tvContent = document.getElementById('tvContent');
         tvContent.innerHTML = `
             <div class="loading-section">
@@ -304,17 +538,36 @@ class CreamoApp {
         `;
 
         try {
-            const shows = await this.fetchTMDBData('tv/popular');
+            const shows = await this.fetchTMDBData(`tv/popular?page=${page}`);
+            this.tvPage = page;
+            
+            const loadMoreBtn = page > 1 ? `
+                <div class="load-more-container">
+                    <button class="load-more-btn" onclick="app.loadMoreShows(${page + 1})">
+                        Load More Shows (Page ${page + 1})
+                    </button>
+                    <button class="load-more-btn outline" onclick="app.loadTVShows(1)" style="margin-left: 10px;">
+                        Back to First Page
+                    </button>
+                </div>
+            ` : `
+                <div class="load-more-container">
+                    <button class="load-more-btn" onclick="app.loadMoreShows(2)">
+                        Load More Shows
+                    </button>
+                </div>
+            `;
             
             tvContent.innerHTML = `
                 <div class="tv-section">
                     <h2>📺 TV Shows</h2>
-                    <div class="tv-content-grid">
+                    <p style="color: #a0a0a0; margin-bottom: 20px;">
+                        Page ${page} • ${shows.total_results} shows total
+                    </p>
+                    <div class="tv-content-grid" id="showsGrid">
                         ${this.generateShowCards(shows.results)}
                     </div>
-                    <div class="load-more-container">
-                        <button class="load-more-btn" onclick="app.loadMoreShows()">Load More Shows</button>
-                    </div>
+                    ${loadMoreBtn}
                 </div>
             `;
 
@@ -322,6 +575,47 @@ class CreamoApp {
 
         } catch (error) {
             this.showTMDBError(tvContent, error);
+        }
+    }
+
+    async loadMoreShows(nextPage) {
+        try {
+            const shows = await this.fetchTMDBData(`tv/popular?page=${nextPage}`);
+            
+            // Append new shows to existing grid
+            const showsGrid = document.getElementById('showsGrid');
+            if (showsGrid) {
+                showsGrid.innerHTML += this.generateShowCards(shows.results);
+                
+                // Update load more button
+                const loadMoreContainer = document.querySelector('.load-more-container');
+                if (loadMoreContainer && shows.page < shows.total_pages) {
+                    loadMoreContainer.innerHTML = `
+                        <button class="load-more-btn" onclick="app.loadMoreShows(${nextPage + 1})">
+                            Load More Shows (Page ${nextPage + 1})
+                        </button>
+                        <button class="load-more-btn outline" onclick="app.loadTVShows(1)" style="margin-left: 10px;">
+                            Back to First Page
+                        </button>
+                        <p style="margin-top: 10px; color: #a0a0a0; font-size: 12px;">
+                            Loaded ${shows.results.length * nextPage} of ${shows.total_results} shows
+                        </p>
+                    `;
+                } else {
+                    loadMoreContainer.innerHTML = `
+                        <p style="color: #a0a0a0;">All ${shows.total_results} shows loaded!</p>
+                        <button class="load-more-btn outline" onclick="app.loadTVShows(1)" style="margin-top: 10px;">
+                            Back to First Page
+                        </button>
+                    `;
+                }
+            }
+            
+            this.setupTVCardInteractions();
+            
+        } catch (error) {
+            console.error('Error loading more shows:', error);
+            alert('Failed to load more shows. Please try again.');
         }
     }
 
@@ -371,6 +665,69 @@ class CreamoApp {
         }
     }
 
+    setCategory(category) {
+        this.currentCategory = category;
+        
+        // Update filter buttons
+        document.querySelectorAll('.filter-btn').forEach(btn => {
+            btn.classList.remove('active');
+            if (btn.textContent.toLowerCase() === category) {
+                btn.classList.add('active');
+            }
+        });
+    }
+
+    async filterByGenre(genreId, genreName) {
+        const tvContent = document.getElementById('tvContent');
+        tvContent.innerHTML = `
+            <div class="loading-section">
+                <div class="loading-spinner"></div>
+                <p>Loading ${genreName} movies...</p>
+            </div>
+        `;
+
+        try {
+            const movies = await this.fetchTMDBData(`discover/movie?with_genres=${genreId}&sort_by=popularity.desc`);
+            this.currentCategory = genreName.toLowerCase();
+            
+            tvContent.innerHTML = `
+                <div class="tv-section">
+                    <h2>🎬 ${genreName} Movies</h2>
+                    <p style="color: #a0a0a0; margin-bottom: 20px;">
+                        ${movies.results.length} ${genreName.toLowerCase()} movies
+                    </p>
+                    <div class="category-filter">
+                        <button class="filter-btn" onclick="app.loadTVMovies()">← All Movies</button>
+                        <button class="filter-btn active">${genreName}</button>
+                    </div>
+                    <div class="tv-content-grid">
+                        ${this.generateMovieCards(movies.results.slice(0, 20))}
+                    </div>
+                    ${movies.results.length > 20 ? `
+                        <div class="load-more-container">
+                            <p style="color: #a0a0a0;">Showing 20 of ${movies.results.length} ${genreName.toLowerCase()} movies</p>
+                        </div>
+                    ` : ''}
+                </div>
+            `;
+
+            this.setupTVCardInteractions();
+            
+        } catch (error) {
+            console.error('Error filtering by genre:', error);
+            tvContent.innerHTML = `
+                <div class="error-section">
+                    <div class="error-icon">⚠️</div>
+                    <h3>Failed to Load ${genreName} Movies</h3>
+                    <p>Please try again later.</p>
+                    <button class="player-btn" onclick="app.loadTVMovies()" style="margin-top: 20px;">
+                        Back to All Movies
+                    </button>
+                </div>
+            `;
+        }
+    }
+
     async fetchTMDBData(endpoint) {
         const cacheKey = endpoint;
         
@@ -404,7 +761,7 @@ class CreamoApp {
     generateMovieCards(movies) {
         return movies.map(movie => `
             <div class="movie-card" data-id="${movie.id}" data-type="movie">
-                <div class="movie-poster" style="background: linear-gradient(135deg, #0a1a3a, #1a3c8b);">
+                <div class="movie-poster">
                     ${movie.poster_path ? 
                         `<img src="${this.TMDB_IMAGE_URL}${movie.poster_path}" alt="${movie.title}" loading="lazy">` :
                         `<div class="no-poster">${movie.title}</div>`
@@ -432,7 +789,7 @@ class CreamoApp {
     generateShowCards(shows) {
         return shows.map(show => `
             <div class="show-card" data-id="${show.id}" data-type="tv">
-                <div class="show-poster" style="background: linear-gradient(135deg, #0a1a3a, #1a3c8b);">
+                <div class="show-poster">
                     ${show.poster_path ? 
                         `<img src="${this.TMDB_IMAGE_URL}${show.poster_path}" alt="${show.name}" loading="lazy">` :
                         `<div class="no-poster">${show.name}</div>`
@@ -624,7 +981,7 @@ class CreamoApp {
                     <ol>
                         <li>Go to <a href="https://www.themoviedb.org/" target="_blank">TMDB.org</a></li>
                         <li>Create an account and get an API key</li>
-                        <li>Replace "YOUR_TMDB_API_KEY_HERE" in script.js with your key</li>
+                        <li>Replace "f38b4f347bb1169cfede0acd87486fe8" in script.js with your key</li>
                         <li>Refresh the page</li>
                     </ol>
                 </div>
@@ -653,7 +1010,7 @@ class CreamoApp {
         
         return fallbackMovies.map(movie => `
             <div class="movie-card" data-id="${movie.id}" data-type="${movie.media_type || 'movie'}">
-                <div class="movie-poster" style="background: linear-gradient(135deg, #0a1a3a, #1a3c8b);">
+                <div class="movie-poster">
                     <div class="no-poster">${movie.title}</div>
                     <div class="play-icon">
                         <svg width="24" height="24" viewBox="0 0 24 24" fill="#051225">
@@ -688,16 +1045,6 @@ class CreamoApp {
         if (genre !== 'all') {
             grid.innerHTML += `<div class="filter-message">Filtering by ${genre} would work with full API integration</div>`;
         }
-    }
-
-    loadMoreMovies() {
-        // In a real app, you would load page 2 from TMDB
-        alert('Load More feature would fetch next page of movies from TMDB API');
-    }
-
-    loadMoreShows() {
-        // In a real app, you would load page 2 from TMDB
-        alert('Load More feature would fetch next page of TV shows from TMDB API');
     }
 
     showCipherTool() {
@@ -906,7 +1253,7 @@ class CreamoApp {
     }
 }
 
-// Cipher Tool Implementation (keep this unchanged from before)
+// Cipher Tool Implementation
 class CipherTool {
     constructor() {
         this.PBKDF2_ITERATIONS = 10000;
@@ -1069,10 +1416,6 @@ class CipherTool {
         }
     }
 
-    // Cipher implementations (all methods from original class remain unchanged)
-    // ... [Keep all the cipher methods unchanged from your original code]
-    // (I'm omitting them here to save space, but keep them in your file)
-
     setOutput(text, isError=false) {
         try {
             text = String(text || '');
@@ -1186,6 +1529,264 @@ class CipherTool {
         } catch (e) {
             this.setOutput('Error: ' + (e && e.message ? e.message : String(e)), true);
         }
+    }
+
+    // Cipher implementations (kept from original)
+    base64EncodeUnicode(str) {
+        return btoa(encodeURIComponent(str).replace(/%([0-9A-F]{2})/g, (match, p1) => {
+            return String.fromCharCode('0x' + p1);
+        }));
+    }
+
+    base64DecodeUnicode(str) {
+        return decodeURIComponent(Array.prototype.map.call(atob(str), (c) => {
+            return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+        }).join(''));
+    }
+
+    base32Encode(str) {
+        const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567';
+        let bits = '';
+        let output = '';
+        
+        for (let i = 0; i < str.length; i++) {
+            const charCode = str.charCodeAt(i);
+            bits += charCode.toString(2).padStart(8, '0');
+        }
+        
+        while (bits.length % 5 !== 0) {
+            bits += '0';
+        }
+        
+        for (let i = 0; i < bits.length; i += 5) {
+            const chunk = bits.substr(i, 5);
+            const index = parseInt(chunk, 2);
+            output += alphabet[index];
+        }
+        
+        while (output.length % 8 !== 0) {
+            output += '=';
+        }
+        
+        return output;
+    }
+
+    base32Decode(str) {
+        const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567';
+        str = str.toUpperCase().replace(/=+$/, '');
+        let bits = '';
+        let output = '';
+        
+        for (let i = 0; i < str.length; i++) {
+            const char = str[i];
+            const index = alphabet.indexOf(char);
+            if (index === -1) throw new Error('Invalid Base32 character');
+            bits += index.toString(2).padStart(5, '0');
+        }
+        
+        for (let i = 0; i < bits.length; i += 8) {
+            const chunk = bits.substr(i, 8);
+            if (chunk.length < 8) break;
+            const charCode = parseInt(chunk, 2);
+            output += String.fromCharCode(charCode);
+        }
+        
+        return output;
+    }
+
+    hexEncode(str) {
+        let hex = '';
+        for (let i = 0; i < str.length; i++) {
+            hex += str.charCodeAt(i).toString(16).padStart(2, '0');
+        }
+        return hex.toUpperCase();
+    }
+
+    hexDecode(hex) {
+        hex = hex.replace(/\s/g, '');
+        if (hex.length % 2 !== 0) {
+            throw new Error('Invalid hex string');
+        }
+        let str = '';
+        for (let i = 0; i < hex.length; i += 2) {
+            str += String.fromCharCode(parseInt(hex.substr(i, 2), 16));
+        }
+        return str;
+    }
+
+    caesarCipher(str, shift) {
+        return str.replace(/[a-z]/gi, (char) => {
+            const code = char.charCodeAt(0);
+            const isUpper = code >= 65 && code <= 90;
+            const base = isUpper ? 65 : 97;
+            return String.fromCharCode(((code - base + shift + 26) % 26) + base);
+        });
+    }
+
+    rot13(str) {
+        return this.caesarCipher(str, 13);
+    }
+
+    toMorse(str) {
+        const morseMap = {
+            'A': '.-', 'B': '-...', 'C': '-.-.', 'D': '-..', 'E': '.',
+            'F': '..-.', 'G': '--.', 'H': '....', 'I': '..', 'J': '.---',
+            'K': '-.-', 'L': '.-..', 'M': '--', 'N': '-.', 'O': '---',
+            'P': '.--.', 'Q': '--.-', 'R': '.-.', 'S': '...', 'T': '-',
+            'U': '..-', 'V': '...-', 'W': '.--', 'X': '-..-', 'Y': '-.--',
+            'Z': '--..', '1': '.----', '2': '..---', '3': '...--',
+            '4': '....-', '5': '.....', '6': '-....', '7': '--...',
+            '8': '---..', '9': '----.', '0': '-----', ' ': '/'
+        };
+        
+        return str.toUpperCase().split('').map(char => {
+            return morseMap[char] || char;
+        }).join(' ');
+    }
+
+    fromMorse(morse) {
+        const reverseMorse = {
+            '.-': 'A', '-...': 'B', '-.-.': 'C', '-..': 'D', '.': 'E',
+            '..-.': 'F', '--.': 'G', '....': 'H', '..': 'I', '.---': 'J',
+            '-.-': 'K', '.-..': 'L', '--': 'M', '-.': 'N', '---': 'O',
+            '.--.': 'P', '--.-': 'Q', '.-.': 'R', '...': 'S', '-': 'T',
+            '..-': 'U', '...-': 'V', '.--': 'W', '-..-': 'X', '-.--': 'Y',
+            '--..': 'Z', '.----': '1', '..---': '2', '...--': '3',
+            '....-': '4', '.....': '5', '-....': '6', '--...': '7',
+            '---..': '8', '----.': '9', '-----': '0', '/': ' '
+        };
+        
+        return morse.trim().split(' ').map(code => {
+            return reverseMorse[code] || code;
+        }).join('');
+    }
+
+    urlEncode(str) {
+        return encodeURIComponent(str);
+    }
+
+    urlDecode(str) {
+        return decodeURIComponent(str);
+    }
+
+    xorEncrypt(str, key) {
+        if (!key) throw new Error('XOR requires a key');
+        let result = '';
+        for (let i = 0; i < str.length; i++) {
+            const charCode = str.charCodeAt(i) ^ key.charCodeAt(i % key.length);
+            result += String.fromCharCode(charCode);
+        }
+        return this.base64EncodeUnicode(result);
+    }
+
+    xorDecrypt(str, key) {
+        if (!key) throw new Error('XOR requires a key');
+        const decoded = this.base64DecodeUnicode(str);
+        let result = '';
+        for (let i = 0; i < decoded.length; i++) {
+            const charCode = decoded.charCodeAt(i) ^ key.charCodeAt(i % key.length);
+            result += String.fromCharCode(charCode);
+        }
+        return result;
+    }
+
+    aesEncryptPassphrase(str, passphrase) {
+        const salt = CryptoJS.lib.WordArray.random(128/8);
+        const key = CryptoJS.PBKDF2(passphrase, salt, {
+            keySize: 256/32,
+            iterations: 100
+        });
+        const iv = CryptoJS.lib.WordArray.random(128/8);
+        const encrypted = CryptoJS.AES.encrypt(str, key, {
+            iv: iv,
+            mode: CryptoJS.mode.CBC,
+            padding: CryptoJS.pad.Pkcs7
+        });
+        return salt.toString() + iv.toString() + encrypted.toString();
+    }
+
+    aesDecryptPassphrase(str, passphrase) {
+        const salt = CryptoJS.enc.Hex.parse(str.substr(0, 32));
+        const iv = CryptoJS.enc.Hex.parse(str.substr(32, 32));
+        const encrypted = str.substring(64);
+        const key = CryptoJS.PBKDF2(passphrase, salt, {
+            keySize: 256/32,
+            iterations: 100
+        });
+        const decrypted = CryptoJS.AES.decrypt(encrypted, key, {
+            iv: iv,
+            mode: CryptoJS.mode.CBC,
+            padding: CryptoJS.pad.Pkcs7
+        });
+        return decrypted.toString(CryptoJS.enc.Utf8);
+    }
+
+    aesEncryptPBKDF2(str, passphrase, iterations) {
+        const salt = CryptoJS.lib.WordArray.random(128/8);
+        const key = CryptoJS.PBKDF2(passphrase, salt, {
+            keySize: 256/32,
+            iterations: iterations
+        });
+        const iv = CryptoJS.lib.WordArray.random(128/8);
+        const encrypted = CryptoJS.AES.encrypt(str, key, {
+            iv: iv,
+            mode: CryptoJS.mode.CBC,
+            padding: CryptoJS.pad.Pkcs7
+        });
+        return salt.toString() + iv.toString() + encrypted.toString();
+    }
+
+    aesDecryptPBKDF2(str, passphrase, iterations) {
+        const salt = CryptoJS.enc.Hex.parse(str.substr(0, 32));
+        const iv = CryptoJS.enc.Hex.parse(str.substr(32, 32));
+        const encrypted = str.substring(64);
+        const key = CryptoJS.PBKDF2(passphrase, salt, {
+            keySize: 256/32,
+            iterations: iterations
+        });
+        const decrypted = CryptoJS.AES.decrypt(encrypted, key, {
+            iv: iv,
+            mode: CryptoJS.mode.CBC,
+            padding: CryptoJS.pad.Pkcs7
+        });
+        return decrypted.toString(CryptoJS.enc.Utf8);
+    }
+
+    vigenereCipher(str, key, encrypt = true) {
+        if (!key) throw new Error('Vigenère requires a keyword');
+        key = key.toUpperCase().replace(/[^A-Z]/g, '');
+        if (!key) throw new Error('Keyword must contain letters');
+        
+        let result = '';
+        let keyIndex = 0;
+        
+        for (let i = 0; i < str.length; i++) {
+            const char = str[i];
+            const charCode = char.charCodeAt(0);
+            
+            if (char.match(/[a-z]/i)) {
+                const isUpper = charCode >= 65 && charCode <= 90;
+                const base = isUpper ? 65 : 97;
+                const keyChar = key[keyIndex % key.length];
+                const keyShift = keyChar.charCodeAt(0) - 65;
+                const shift = encrypt ? keyShift : 26 - keyShift;
+                
+                result += String.fromCharCode(((charCode - base + shift) % 26) + base);
+                keyIndex++;
+            } else {
+                result += char;
+            }
+        }
+        
+        return result;
+    }
+
+    sha256Hash(str) {
+        return CryptoJS.SHA256(str).toString();
+    }
+
+    md5Hash(str) {
+        return CryptoJS.MD5(str).toString();
     }
 }
 
