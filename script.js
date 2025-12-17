@@ -8,6 +8,7 @@ class CreamoApp {
         this.archivesContent = document.getElementById('archivesContent');
         this.homeContainer = document.querySelector('.home-container');
         this.creamocryptTool = document.getElementById('creamocryptTool');
+        this.creamotvTool = document.getElementById('creamotvTool');
         this.init();
     }
 
@@ -44,62 +45,68 @@ class CreamoApp {
         });
     }
 
-setupHomepage() {
-    // CreamoCrypt button - show cipher tool
-    document.getElementById('creamocryptBtn').addEventListener('click', (e) => {
-        this.triggerBinaryAnimation(e);
-        setTimeout(() => {
-            this.showCipherTool();
-        }, 800);
-    });
-
-    // Pen Archives button - load Archives.txt
-    document.getElementById('archivesBtn').addEventListener('click', (e) => {
-        this.triggerBinaryAnimation(e);
-        this.loadArchivesFile();
-    });
-
-    // Portal button - show portal modal
-    document.getElementById('portalBtn').addEventListener('click', (e) => {
-        this.triggerBinaryAnimation(e);
-        this.showPortalModal();
-    });
-
-    // Portal menu options
-    document.getElementById('deluxtablePortal').addEventListener('click', (e) => {
-        this.triggerBinaryAnimation(e);
-        setTimeout(() => {
-            window.open('https://deluxtable.pages.dev', '_blank');
-            this.hidePortalModal();
-        }, 800);
-    });
-
-    // Updated from tekkenPortal to brainrotPortal
-    document.getElementById('brainrotPortal').addEventListener('click', (e) => {
-        this.triggerBinaryAnimation(e);
-        setTimeout(() => {
-            window.open('https://iankingsigma.github.io/tekken-8-website/', '_blank');
-            this.hidePortalModal();
-        }, 800);
-    });
-
-    // New Control Centre portal
-    document.getElementById('controlCentrePortal').addEventListener('click', (e) => {
-        this.triggerBinaryAnimation(e);
-        setTimeout(() => {
-            window.open('https://controlc.pages.dev', '_blank');
-            this.hidePortalModal();
-        }, 800);
-    });
-
-    // Setup button animations
-    const buttons = document.querySelectorAll('.home-btn');
-    buttons.forEach(btn => {
-        btn.addEventListener('click', (e) => {
-            this.createRipple(e, btn);
+    setupHomepage() {
+        // CreamoCrypt button - show cipher tool
+        document.getElementById('creamocryptBtn').addEventListener('click', (e) => {
+            this.triggerBinaryAnimation(e);
+            setTimeout(() => {
+                this.showCipherTool();
+            }, 800);
         });
-    });
-}
+
+        // Pen Archives button - load Archives.txt
+        document.getElementById('archivesBtn').addEventListener('click', (e) => {
+            this.triggerBinaryAnimation(e);
+            this.loadArchivesFile();
+        });
+
+        // Portal button - show portal modal
+        document.getElementById('portalBtn').addEventListener('click', (e) => {
+            this.triggerBinaryAnimation(e);
+            this.showPortalModal();
+        });
+
+        // Creamo TV button - show TV platform
+        document.getElementById('tvBtn').addEventListener('click', (e) => {
+            this.triggerBinaryAnimation(e);
+            setTimeout(() => {
+                this.showCreamoTV();
+            }, 800);
+        });
+
+        // Portal menu options
+        document.getElementById('deluxtablePortal').addEventListener('click', (e) => {
+            this.triggerBinaryAnimation(e);
+            setTimeout(() => {
+                window.open('https://deluxtable.pages.dev', '_blank');
+                this.hidePortalModal();
+            }, 800);
+        });
+
+        document.getElementById('brainrotPortal').addEventListener('click', (e) => {
+            this.triggerBinaryAnimation(e);
+            setTimeout(() => {
+                window.open('https://iankingsigma.github.io/tekken-8-website/', '_blank');
+                this.hidePortalModal();
+            }, 800);
+        });
+
+        document.getElementById('controlCentrePortal').addEventListener('click', (e) => {
+            this.triggerBinaryAnimation(e);
+            setTimeout(() => {
+                window.open('https://controlc.pages.dev', '_blank');
+                this.hidePortalModal();
+            }, 800);
+        });
+
+        // Setup button animations
+        const buttons = document.querySelectorAll('.home-btn');
+        buttons.forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                this.createRipple(e, btn);
+            });
+        });
+    }
 
     setupCipherTool() {
         // Back to home button
@@ -111,18 +118,263 @@ setupHomepage() {
         this.cipherTool = new CipherTool();
     }
 
+    setupCreamoTV() {
+        // Back button for TV
+        const tvBackBtn = document.createElement('button');
+        tvBackBtn.className = 'tv-back-btn';
+        tvBackBtn.innerHTML = '&larr; Back to Creamo';
+        tvBackBtn.addEventListener('click', () => {
+            this.showHomepage();
+        });
+
+        // TV Navigation
+        const tvNav = document.createElement('div');
+        tvNav.className = 'tv-nav';
+        tvNav.innerHTML = `
+            ${tvBackBtn.outerHTML}
+            <h1 class="tv-nav-title">Creamo TV</h1>
+            <div style="margin-left: auto; display: flex; gap: 10px;">
+                <button class="player-btn" id="tvHomeBtn">Home</button>
+                <button class="player-btn" id="tvMoviesBtn">Movies</button>
+                <button class="player-btn" id="tvShowsBtn">TV Shows</button>
+            </div>
+        `;
+
+        // TV Content Container
+        const tvContent = document.createElement('div');
+        tvContent.id = 'tvContent';
+        tvContent.className = 'tv-content';
+
+        // Insert into TV container
+        this.creamotvTool.innerHTML = '';
+        this.creamotvTool.appendChild(tvNav);
+        this.creamotvTool.appendChild(tvContent);
+
+        // Load initial TV content
+        this.loadTVHome();
+
+        // Setup TV navigation
+        document.getElementById('tvHomeBtn').addEventListener('click', () => this.loadTVHome());
+        document.getElementById('tvMoviesBtn').addEventListener('click', () => this.loadTVMovies());
+        document.getElementById('tvShowsBtn').addEventListener('click', () => this.loadTVShows());
+    }
+
+    loadTVHome() {
+        const tvContent = document.getElementById('tvContent');
+        tvContent.innerHTML = `
+            <div class="tv-section">
+                <h2>Featured Movies</h2>
+                <div class="tv-content-grid">
+                    ${this.generateMovieCards(4)}
+                </div>
+            </div>
+            
+            <div class="tv-section">
+                <h2>Popular TV Shows</h2>
+                <div class="tv-content-grid">
+                    ${this.generateShowCards(4)}
+                </div>
+            </div>
+            
+            <div class="tv-section">
+                <h2>Now Playing</h2>
+                <div class="tv-player">
+                    <div class="player-placeholder">
+                        <svg width="60" height="60" viewBox="0 0 24 24" fill="#d4af37">
+                            <path d="M8 5v14l11-7z"/>
+                        </svg>
+                        <p style="margin-top: 20px; font-size: 16px;">Stream Ready</p>
+                        <p style="font-size: 12px; opacity: 0.7;">Select content to begin playback</p>
+                    </div>
+                    <div class="player-info">
+                        <h3>Ready to Stream</h3>
+                        <p>Creamo TV - Premium Streaming Experience</p>
+                        <div class="player-controls">
+                            <button class="player-btn" onclick="app.playTVContent('demo')">▶ Play Demo</button>
+                            <button class="player-btn" onclick="app.browseMovies()">Browse Movies</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+
+        // Add click handlers to movie/show cards
+        this.setupTVCardInteractions();
+    }
+
+    loadTVMovies() {
+        const tvContent = document.getElementById('tvContent');
+        tvContent.innerHTML = `
+            <div class="tv-section">
+                <h2>All Movies</h2>
+                <div style="margin-bottom: 20px; display: flex; gap: 10px;">
+                    <button class="player-btn" onclick="app.filterMovies('all')">All</button>
+                    <button class="player-btn" onclick="app.filterMovies('action')">Action</button>
+                    <button class="player-btn" onclick="app.filterMovies('sci-fi')">Sci-Fi</button>
+                    <button class="player-btn" onclick="app.filterMovies('drama')">Drama</button>
+                </div>
+                <div class="tv-content-grid">
+                    ${this.generateMovieCards(12)}
+                </div>
+            </div>
+        `;
+        this.setupTVCardInteractions();
+    }
+
+    loadTVShows() {
+        const tvContent = document.getElementById('tvContent');
+        tvContent.innerHTML = `
+            <div class="tv-section">
+                <h2>TV Shows</h2>
+                <div class="tv-content-grid">
+                    ${this.generateShowCards(8)}
+                </div>
+            </div>
+        `;
+        this.setupTVCardInteractions();
+    }
+
+    generateMovieCards(count) {
+        const movies = [
+            { title: "Neural Dawn", year: "2025", rating: 8.7, quality: "4K", genre: "sci-fi" },
+            { title: "Cipher Protocol", year: "2024", rating: 9.1, quality: "HDR", genre: "thriller" },
+            { title: "Binary Shadows", year: "2023", rating: 8.4, quality: "HD", genre: "action" },
+            { title: "The Archive War", year: "2025", rating: 9.3, quality: "4K", genre: "drama" },
+            { title: "Data Storm", year: "2024", rating: 8.6, quality: "HD", genre: "action" },
+            { title: "Code of Silence", year: "2025", rating: 8.9, quality: "4K", genre: "thriller" },
+            { title: "Quantum Echo", year: "2024", rating: 9.0, quality: "HDR", genre: "sci-fi" },
+            { title: "Pen's Legacy", year: "2025", rating: 9.5, quality: "4K", genre: "drama" }
+        ];
+
+        return movies.slice(0, count).map(movie => `
+            <div class="movie-card" data-title="${movie.title}" data-genre="${movie.genre}">
+                <div class="movie-poster">
+                    <div class="play-icon">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="#051225">
+                            <path d="M8 5v14l11-7z"/>
+                        </svg>
+                    </div>
+                </div>
+                <div class="movie-info">
+                    <h3>${movie.title}</h3>
+                    <div class="movie-meta">
+                        <span>${movie.year}</span>
+                        <span class="rating">★ ${movie.rating}</span>
+                        <span class="quality-badge">${movie.quality}</span>
+                    </div>
+                </div>
+            </div>
+        `).join('');
+    }
+
+    generateShowCards(count) {
+        const shows = [
+            { title: "The Pen Chronicles", seasons: 3, rating: 9.2, quality: "4K" },
+            { title: "Ink Corporation", seasons: 2, rating: 8.8, quality: "HD" },
+            { title: "Data Rebels", seasons: 4, rating: 9.0, quality: "4K" },
+            { title: "Binary Wars", seasons: 1, rating: 8.5, quality: "HD" },
+            { title: "The Protocol", seasons: 5, rating: 9.4, quality: "4K" },
+            { title: "Neural Network", seasons: 2, rating: 8.7, quality: "HDR" }
+        ];
+
+        return shows.slice(0, count).map(show => `
+            <div class="show-card" data-title="${show.title}">
+                <div class="show-poster">
+                    <div class="play-icon">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="#051225">
+                            <path d="M8 5v14l11-7z"/>
+                        </svg>
+                    </div>
+                </div>
+                <div class="show-info">
+                    <h3>${show.title}</h3>
+                    <div class="show-meta">
+                        <span>${show.seasons} Season${show.seasons > 1 ? 's' : ''}</span>
+                        <span class="rating">★ ${show.rating}</span>
+                        <span class="quality-badge">${show.quality}</span>
+                    </div>
+                </div>
+            </div>
+        `).join('');
+    }
+
+    setupTVCardInteractions() {
+        setTimeout(() => {
+            document.querySelectorAll('.movie-card, .show-card').forEach(card => {
+                card.addEventListener('click', (e) => {
+                    const title = card.dataset.title;
+                    this.playTVContent(title);
+                });
+            });
+        }, 100);
+    }
+
+    playTVContent(title) {
+        const tvContent = document.getElementById('tvContent');
+        tvContent.innerHTML = `
+            <div class="tv-player">
+                <div class="player-placeholder">
+                    <svg width="80" height="80" viewBox="0 0 24 24" fill="#d4af37">
+                        <path d="M8 5v14l11-7z"/>
+                    </svg>
+                    <p style="margin-top: 20px; font-size: 18px;">Now Playing</p>
+                    <p style="font-size: 14px; opacity: 0.7;">${title}</p>
+                </div>
+                <div class="player-info">
+                    <h3>${title}</h3>
+                    <p>Streaming in premium quality with Creamo TV protocol</p>
+                    <div class="player-controls">
+                        <button class="player-btn" onclick="app.loadTVHome()">← Back to Library</button>
+                        <button class="player-btn" onclick="app.triggerBinaryAnimation(event)">Simulate Stream</button>
+                    </div>
+                    <div style="margin-top: 20px; padding: 15px; background: rgba(26, 60, 139, 0.3); border-radius: 8px;">
+                        <p style="font-size: 12px; color: #a0a0a0;">Stream Protocol Active: CREAMO-TV-001</p>
+                        <p style="font-size: 12px; color: #a0a0a0;">Connection: Secure • Quality: 4K • Status: Ready</p>
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+
+    filterMovies(genre) {
+        const cards = document.querySelectorAll('.movie-card');
+        cards.forEach(card => {
+            card.style.display = (genre === 'all' || card.dataset.genre === genre) ? 'block' : 'none';
+        });
+    }
+
+    browseMovies() {
+        this.loadTVMovies();
+    }
+
     showCipherTool() {
         this.currentView = 'cipher';
         this.homeContainer.style.display = 'none';
         this.creamocryptTool.style.display = 'block';
+        this.creamotvTool.style.display = 'none';
         document.querySelector('.site-header').style.display = 'none';
         document.querySelector('.site-footer').style.display = 'none';
+    }
+
+    showCreamoTV() {
+        this.currentView = 'tv';
+        this.homeContainer.style.display = 'none';
+        this.creamocryptTool.style.display = 'none';
+        this.creamotvTool.style.display = 'block';
+        document.querySelector('.site-header').style.display = 'none';
+        document.querySelector('.site-footer').style.display = 'none';
+        
+        if (!this.tvInitialized) {
+            this.setupCreamoTV();
+            this.tvInitialized = true;
+        }
     }
 
     showHomepage() {
         this.currentView = 'home';
         this.homeContainer.style.display = 'flex';
         this.creamocryptTool.style.display = 'none';
+        this.creamotvTool.style.display = 'none';
         document.querySelector('.site-header').style.display = 'flex';
         document.querySelector('.site-footer').style.display = 'block';
     }
@@ -176,7 +428,6 @@ setupHomepage() {
         const startX = rect.left + (rect.width / 2);
         const startY = rect.bottom;
         
-        // Create multiple binary streams
         for (let i = 0; i < 12; i++) {
             setTimeout(() => {
                 this.createBinaryStream(startX, startY, i);
@@ -188,7 +439,6 @@ setupHomepage() {
         const binaryElement = document.createElement('div');
         binaryElement.className = 'binary-code';
         
-        // Generate random binary string
         let binaryString = '';
         const length = 15 + Math.floor(Math.random() * 10);
         for (let i = 0; i < length; i++) {
@@ -197,7 +447,6 @@ setupHomepage() {
         
         binaryElement.textContent = binaryString;
         
-        // Randomize animation properties
         const duration = 1.5 + Math.random() * 1;
         const delay = index * 0.08;
         const rotation = -20 + Math.random() * 40;
@@ -215,7 +464,6 @@ setupHomepage() {
         
         this.binaryContainer.appendChild(binaryElement);
         
-        // Remove element after animation completes
         setTimeout(() => {
             if (binaryElement.parentNode) {
                 binaryElement.parentNode.removeChild(binaryElement);
@@ -231,7 +479,6 @@ setupHomepage() {
     }
 
     createBackgroundBinary() {
-        // Create occasional background binary effects
         setInterval(() => {
             if (Math.random() > 0.7) {
                 this.createBinaryStream(
@@ -262,11 +509,9 @@ setupHomepage() {
 
     async loadArchivesFile() {
         try {
-            // Show loading state
             this.showArchivesModal();
             this.archivesContent.innerHTML = '<div class="loading">Loading Archives.txt...</div>';
             
-            // Fetch the Archives.txt file
             const response = await fetch('Archives.txt');
             
             if (!response.ok) {
@@ -275,7 +520,6 @@ setupHomepage() {
             
             const archivesData = await response.text();
             
-            // Display the content
             this.archivesContent.innerHTML = `
                 <pre>${this.escapeHtml(archivesData)}</pre>
             `;
@@ -309,7 +553,7 @@ setupHomepage() {
     }
 }
 
-// Cipher Tool Implementation
+// Cipher Tool Implementation (unchanged)
 class CipherTool {
     constructor() {
         this.PBKDF2_ITERATIONS = 10000;
@@ -380,7 +624,6 @@ class CipherTool {
     }
 
     setupEventListeners() {
-        // Custom dropdown
         this.selectControl.addEventListener('click', (e) => {
             e.stopPropagation();
             if (this.cipherList.classList.contains('hidden')) {
@@ -399,15 +642,11 @@ class CipherTool {
             this.closeDropdown();
         });
 
-        // Cipher operations
         this.encryptBtn.addEventListener('click', () => this.encrypt());
         this.decryptBtn.addEventListener('click', () => this.decrypt());
         this.clearBtn.addEventListener('click', () => this.clear());
-
-        // Copy output
         this.copyBtn.addEventListener('click', () => this.copyOutput());
 
-        // Close dropdown on outside click
         document.addEventListener('click', (e) => {
             if (!this.customSelect.contains(e.target)) {
                 this.closeDropdown();
@@ -477,7 +716,7 @@ class CipherTool {
         }
     }
 
-    // Cipher implementations
+    // Cipher implementations (all methods from original class remain unchanged)
     base64EncodeUnicode(str) {
         const bytes = new TextEncoder().encode(str);
         let binary = '';
@@ -768,5 +1007,5 @@ class CipherTool {
 
 // Initialize the app when DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
-    new CreamoApp();
+    window.app = new CreamoApp();
 });
