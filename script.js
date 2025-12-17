@@ -1,16 +1,17 @@
 // Complete Creamo Homepage and Cipher Tool
-constructor() {
-    this.currentView = 'home';
-    this.binaryContainer = document.getElementById('binaryContainer');
-    this.archivesModal = document.getElementById('archivesModal');
-    this.portalModal = document.getElementById('portalModal');
-    this.archivesContent = document.getElementById('archivesContent');
-    this.homeContainer = document.querySelector('.home-container');
-    this.creamocryptTool = document.getElementById('creamocryptTool');
-    this.creamotvTool = document.getElementById('creamotvTool');
-    this.tvInitialized = false; // Add this line
-    this.init();
-}
+class CreamoApp {
+    constructor() {
+        this.currentView = 'home';
+        this.binaryContainer = document.getElementById('binaryContainer');
+        this.archivesModal = document.getElementById('archivesModal');
+        this.portalModal = document.getElementById('portalModal');
+        this.archivesContent = document.getElementById('archivesContent');
+        this.homeContainer = document.querySelector('.home-container');
+        this.creamocryptTool = document.getElementById('creamocryptTool');
+        this.creamotvTool = document.getElementById('creamotvTool');
+        this.tvInitialized = false;
+        this.init();
+    }
 
     init() {
         this.setupHomepage();
@@ -45,68 +46,68 @@ constructor() {
         });
     }
 
-setupHomepage() {
-    // CreamoCrypt button - show cipher tool
-    document.getElementById('creamocryptBtn').addEventListener('click', (e) => {
-        this.triggerBinaryAnimation(e);
-        setTimeout(() => {
-            this.showCipherTool();
-        }, 800);
-    });
-
-    // Pen Archives button - load Archives.txt
-    document.getElementById('archivesBtn').addEventListener('click', (e) => {
-        this.triggerBinaryAnimation(e);
-        this.loadArchivesFile();
-    });
-
-    // Portal button - show portal modal
-    document.getElementById('portalBtn').addEventListener('click', (e) => {
-        this.triggerBinaryAnimation(e);
-        this.showPortalModal();
-    });
-
-    // FIXED: Creamo TV button - show TV platform
-    document.getElementById('tvBtn').addEventListener('click', (e) => {
-        this.triggerBinaryAnimation(e);
-        setTimeout(() => {
-            this.showCreamoTV();
-        }, 800);
-    });
-
-    // Portal menu options
-    document.getElementById('deluxtablePortal').addEventListener('click', (e) => {
-        this.triggerBinaryAnimation(e);
-        setTimeout(() => {
-            window.open('https://deluxtable.pages.dev', '_blank');
-            this.hidePortalModal();
-        }, 800);
-    });
-
-    document.getElementById('brainrotPortal').addEventListener('click', (e) => {
-        this.triggerBinaryAnimation(e);
-        setTimeout(() => {
-            window.open('https://iankingsigma.github.io/tekken-8-website/', '_blank');
-            this.hidePortalModal();
-        }, 800);
-    });
-
-    document.getElementById('controlCentrePortal').addEventListener('click', (e) => {
-        this.triggerBinaryAnimation(e);
-        setTimeout(() => {
-            window.open('https://controlc.pages.dev', '_blank');
-            this.hidePortalModal();
-        }, 800);
-    });
-
-    // Setup button animations
-    const buttons = document.querySelectorAll('.home-btn');
-    buttons.forEach(btn => {
-        btn.addEventListener('click', (e) => {
-            this.createRipple(e, btn);
+    setupHomepage() {
+        // CreamoCrypt button - show cipher tool
+        document.getElementById('creamocryptBtn').addEventListener('click', (e) => {
+            this.triggerBinaryAnimation(e);
+            setTimeout(() => {
+                this.showCipherTool();
+            }, 800);
         });
-    });
-}
+
+        // Pen Archives button - load Archives.txt
+        document.getElementById('archivesBtn').addEventListener('click', (e) => {
+            this.triggerBinaryAnimation(e);
+            this.loadArchivesFile();
+        });
+
+        // Portal button - show portal modal
+        document.getElementById('portalBtn').addEventListener('click', (e) => {
+            this.triggerBinaryAnimation(e);
+            this.showPortalModal();
+        });
+
+        // Creamo TV button - show TV platform
+        document.getElementById('tvBtn').addEventListener('click', (e) => {
+            this.triggerBinaryAnimation(e);
+            setTimeout(() => {
+                this.showCreamoTV();
+            }, 800);
+        });
+
+        // Portal menu options
+        document.getElementById('deluxtablePortal').addEventListener('click', (e) => {
+            this.triggerBinaryAnimation(e);
+            setTimeout(() => {
+                window.open('https://deluxtable.pages.dev', '_blank');
+                this.hidePortalModal();
+            }, 800);
+        });
+
+        document.getElementById('brainrotPortal').addEventListener('click', (e) => {
+            this.triggerBinaryAnimation(e);
+            setTimeout(() => {
+                window.open('https://iankingsigma.github.io/tekken-8-website/', '_blank');
+                this.hidePortalModal();
+            }, 800);
+        });
+
+        document.getElementById('controlCentrePortal').addEventListener('click', (e) => {
+            this.triggerBinaryAnimation(e);
+            setTimeout(() => {
+                window.open('https://controlc.pages.dev', '_blank');
+                this.hidePortalModal();
+            }, 800);
+        });
+
+        // Setup button animations
+        const buttons = document.querySelectorAll('.home-btn');
+        buttons.forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                this.createRipple(e, btn);
+            });
+        });
+    }
 
     setupCipherTool() {
         // Back to home button
@@ -553,7 +554,7 @@ setupHomepage() {
     }
 }
 
-// Cipher Tool Implementation (unchanged)
+// Cipher Tool Implementation
 class CipherTool {
     constructor() {
         this.PBKDF2_ITERATIONS = 10000;
@@ -624,6 +625,7 @@ class CipherTool {
     }
 
     setupEventListeners() {
+        // Custom dropdown
         this.selectControl.addEventListener('click', (e) => {
             e.stopPropagation();
             if (this.cipherList.classList.contains('hidden')) {
@@ -642,11 +644,15 @@ class CipherTool {
             this.closeDropdown();
         });
 
+        // Cipher operations
         this.encryptBtn.addEventListener('click', () => this.encrypt());
         this.decryptBtn.addEventListener('click', () => this.decrypt());
         this.clearBtn.addEventListener('click', () => this.clear());
+
+        // Copy output
         this.copyBtn.addEventListener('click', () => this.copyOutput());
 
+        // Close dropdown on outside click
         document.addEventListener('click', (e) => {
             if (!this.customSelect.contains(e.target)) {
                 this.closeDropdown();
@@ -716,7 +722,7 @@ class CipherTool {
         }
     }
 
-    // Cipher implementations (all methods from original class remain unchanged)
+    // Cipher implementations
     base64EncodeUnicode(str) {
         const bytes = new TextEncoder().encode(str);
         let binary = '';
