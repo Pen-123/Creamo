@@ -1415,3 +1415,8 @@ textarea {
         padding: 6px 12px;
     }
 }
+.fighters-btn:hover {
+    background: rgba(26, 60, 139, 0.6);
+    border-color: #1a3c8b;
+    box-shadow: 0 10px 30px rgba(26, 60, 139, 0.8);
+}
