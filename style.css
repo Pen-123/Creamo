@@ -138,7 +138,11 @@ body {
     border-color: #d4af37;
     box-shadow: 0 10px 30px rgba(212, 175, 55, 0.4);
 }
-
+.fighters-btn:hover {
+    background: rgba(26, 60, 139, 0.6);
+    border-color: #1a3c8b;
+    box-shadow: 0 10px 30px rgba(26, 60, 139, 0.8);
+}
 .btn-text {
     position: relative;
     z-index: 2;
