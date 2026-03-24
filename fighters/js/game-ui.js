@@ -1,3 +1,5 @@
+// game-ui.js
+
 function detectDevice() {
     const ua = navigator.userAgent.toLowerCase();
     const isMobile = /mobile|android|tablet|ipad|iphone/.test(ua);
@@ -5,7 +7,14 @@ function detectDevice() {
     const hasTouch = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
     gameState.deviceType = (isTablet || (isMobile && hasTouch && window.innerWidth >= 768)) ? 'tablet' : 'desktop';
     document.getElementById('deviceType').textContent = gameState.deviceType === 'tablet' ? 'TABLET MODE' : 'DESKTOP MODE';
+    // Automatically proceed to loading after a short delay
+    setTimeout(() => {
+        document.getElementById('deviceDetection').classList.remove('active');
+        document.getElementById('loading').classList.add('active');
+        simulateLoading();
+    }, 1500);
 }
+
 function simulateLoading() {
     let progress = 0;
     const loadingBar = document.getElementById('loadingBar');
@@ -22,6 +31,7 @@ function simulateLoading() {
         loadingText.textContent = stages[Math.min(Math.floor(progress / 20), stages.length - 1)];
     }, 200);
 }
+
 function showScreen(screenId) {
     console.log('Showing screen:', screenId);
     document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
@@ -40,11 +50,23 @@ function showScreen(screenId) {
     }
     if (screenId === 'gameScreen') {
         setTimeout(() => { if (typeof initThreeJS === 'function') initThreeJS(); startGame(); }, 100);
-    } else if (screenId === 'characterSelect') renderCharacterSelect();
-    else if (screenId === 'shopScreen') setTimeout(() => { if (typeof loadShopItems === 'function') loadShopItems(); }, 100);
+    } else if (screenId === 'characterSelect') {
+        renderCharacterSelect();
+        // Add boss difficulty option if unlocked and not already present
+        const diffSelect = document.getElementById('difficultySelect');
+        if (gameState.bossUnlocked && !Array.from(diffSelect.options).some(opt => opt.value === 'sixtyseven')) {
+            const option = document.createElement('option');
+            option.value = 'sixtyseven';
+            option.textContent = '67 BOSS - SURVIVAL';
+            diffSelect.appendChild(option);
+        }
+    } else if (screenId === 'shopScreen') {
+        setTimeout(() => { if (typeof loadShopItems === 'function') loadShopItems(); }, 100);
+    }
     const touchControls = document.getElementById('touchControls');
     if (touchControls) touchControls.classList.toggle('active', screenId === 'gameScreen' && gameState.deviceType === 'tablet');
 }
+
 function renderCharacterSelect() {
     const grid = document.getElementById('characterGrid');
     const diffSelect = document.getElementById('difficultySelect');
@@ -80,7 +102,7 @@ function renderCharacterSelect() {
                 if (gameState.bossUnlocked) {
                     bossUnlockInfo.style.display = 'none';
                     bossUnlockedInfo.style.display = 'block';
-                    const difficulty = document.getElementById('difficultySelect').value;
+                    const difficulty = diffSelect.value;
                     bossWarningInfo.style.display = (difficulty === 'sixtyseven') ? 'block' : 'none';
                 } else {
                     bossUnlockInfo.style.display = 'block';
@@ -97,6 +119,7 @@ function renderCharacterSelect() {
         if (bossWarningInfo) bossWarningInfo.style.display = (difficulty === 'sixtyseven' && gameState.bossUnlocked) ? 'block' : 'none';
     });
 }
+
 function startGame() {
     console.log('Starting game... Mode:', gameState.gameMode);
     if (gameState.selectedCharacter === null) { showScreen('characterSelect'); return; }
@@ -168,6 +191,7 @@ function startGame() {
     gameState.score = 0;
     if (!gameState.cutsceneActive) animate();
 }
+
 function updateHealthBars() {
     const p1Health = document.getElementById('p1Health');
     const p2Health = document.getElementById('p2Health');
@@ -194,12 +218,11 @@ function updateHealthBars() {
     else if (p2Percent < 0.6) p2Health.style.background = 'linear-gradient(90deg, #ff9900 0%, #cc6600 100%)';
     else p2Health.style.background = 'linear-gradient(90deg, #1a3c8b 0%, #d4af37 100%)';
 }
+
 function setupEventListeners() {
     console.log('Setting up event listeners...');
-    document.getElementById('forceTablet').addEventListener('click', () => { gameState.deviceType = 'tablet'; document.getElementById('deviceType').textContent = 'TABLET MODE'; simulateLoading(); });
-    document.getElementById('forceDesktop').addEventListener('click', () => { gameState.deviceType = 'desktop'; document.getElementById('deviceType').textContent = 'DESKTOP MODE'; simulateLoading(); });
+    // Removed device buttons because auto-detect
     document.getElementById('arcadeBtn').addEventListener('click', () => showScreen('characterSelect'));
-    document.getElementById('practiceBtn').addEventListener('click', () => startPracticeMode());
     document.getElementById('shopBtn').addEventListener('click', () => showScreen('shopScreen'));
     document.getElementById('controlsBtn').addEventListener('click', () => showScreen('controlsScreen'));
     document.getElementById('updatesBtn').addEventListener('click', () => showScreen('updatesScreen'));
@@ -239,6 +262,7 @@ function setupEventListeners() {
         }
     });
 }
+
 function startBattle(mode = 'arcade') {
     if (gameState.selectedCharacter === null) { alert('Please select a character first!'); return; }
     gameState.gameMode = mode;
@@ -247,31 +271,7 @@ function startBattle(mode = 'arcade') {
     if (gameState.isBossFight) console.log('STARTING 67 BOSS SURVIVAL MODE!');
     showScreen('gameScreen');
 }
-function startPracticeMode() {
-    console.log('Starting practice mode...');
-    gameState.practiceStats = { comboCount: 0, damageDealt: 0, startTime: Date.now() };
-    let practiceUI = document.getElementById('practiceUI');
-    if (!practiceUI) {
-        practiceUI = document.createElement('div');
-        practiceUI.id = 'practiceUI';
-        practiceUI.style.cssText = `position:absolute; top:100px; left:50%; transform:translateX(-50%); background:rgba(0,0,0,0.8); color:#d4af37; padding:20px; border:2px solid #1a3c8b; border-radius:10px; z-index:100; text-align:center;`;
-        practiceUI.innerHTML = `<h3>PRACTICE MODE</h3><div>Combos: <span id="practiceComboCount">0</span></div><div>Damage: <span id="practiceDamage">0</span></div><div>Time: <span id="practiceTime">0s</span></div><button id="resetPractice" style="margin-top:10px; padding:5px 10px; background:#1a3c8b; color:#fff; border:none; border-radius:5px;">RESET</button>`;
-        document.getElementById('gameScreen').appendChild(practiceUI);
-        document.getElementById('resetPractice').addEventListener('click', () => startPracticeMode());
-    }
-    updatePracticeStats();
-    if (gameState.selectedCharacter === null) gameState.selectedCharacter = 0;
-    gameState.gameMode = 'practice';
-    startGame();
-}
-function updatePracticeStats() {
-    const combo = document.getElementById('practiceComboCount');
-    const damage = document.getElementById('practiceDamage');
-    const time = document.getElementById('practiceTime');
-    if (combo) combo.textContent = gameState.practiceStats.comboCount;
-    if (damage) damage.textContent = gameState.practiceStats.damageDealt;
-    if (time) time.textContent = `${Math.floor((Date.now() - gameState.practiceStats.startTime) / 1000)}s`;
-}
+
 function showBossDefeatedDialogue() {
     const div = document.createElement('div');
     div.style.cssText = `position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.9); display:flex; flex-direction:column; justify-content:center; align-items:center; z-index:1000; color:#d4af37; font-size:2rem; text-align:center; padding:2rem;`;
@@ -279,11 +279,12 @@ function showBossDefeatedDialogue() {
     document.body.appendChild(div);
     document.getElementById('continueBtn').addEventListener('click', () => { div.remove(); showScreen('characterSelect'); });
 }
+
+function exitToCreamo() { window.location.href = 'index.html'; }
+
 // Initialization – called when DOM is ready
 function init() {
     console.log('Brainrot Fighters initializing...');
-    detectDevice();               // sets device type text
-    setupEventListeners();       // attaches all button handlers
-    // The user must click a device mode button to proceed to loading.
-    // The loading screen will then show the main menu.
+    detectDevice();               // auto-detects, then starts loading
+    setupEventListeners();
 }
