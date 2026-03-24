@@ -224,14 +224,25 @@
     <audio id="bossMusic" loop><source src="./fighters/audio/Finale.mp3" type="audio/mpeg"></audio>
     <audio id="menuMusic" loop><source src="./fighters/audio/Menu.mp3" type="audio/mpeg"></audio>
 
+    <!-- JavaScript Files (order matters) -->
     <script src="./fighters/js/characters.js"></script>
     <script src="./fighters/js/game-core.js"></script>
-    <script src="./fighters/js/game-ui.js"></script>
-    <script src="./fighters/js/combat.js"></script>
     <script src="./fighters/js/ai.js"></script>
     <script src="./fighters/js/boss.js"></script>
+    <script src="./fighters/js/combat.js"></script>
     <script src="./fighters/js/shop.js"></script>
+    <script src="./fighters/js/game-ui.js"></script>
     <script src="./fighters/js/threejs-renderer.js"></script>
     <script src="./fighters/js/touch-controls.js"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            if (typeof init === 'function') {
+                init();
+            } else {
+                console.error('init() not found. Check script loading.');
+            }
+        });
+    </script>
 </body>
 </html>
