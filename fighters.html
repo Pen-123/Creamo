@@ -67,27 +67,18 @@
                     </select>
                 </div>
             </div>
-            
             <div class="character-grid" id="characterGrid"></div>
-            
             <div class="character-preview">
                 <div class="preview-model" id="previewModel"></div>
                 <div class="character-info">
                     <div class="char-name" id="previewName">SELECT BRAINROTTER</div>
                     <div class="char-style" id="previewStyle">-</div>
                     <div class="char-desc" id="previewDesc">Choose your brainrot warrior</div>
-                    <div class="boss-unlock" id="bossUnlockInfo" style="display: none; color: #ff0000; margin-top: 1rem; font-size: 0.9rem;">
-                        🔒 Defeat Insane mode with 67 to unlock 67 BOSS!
-                    </div>
-                    <div class="boss-unlocked" id="bossUnlockedInfo" style="display: none; color: #00ff00; margin-top: 1rem; font-size: 0.9rem;">
-                        ✅ 67 BOSS UNLOCKED! Select 67 character and 67 BOSS difficulty to fight!
-                    </div>
-                    <div class="boss-warning" id="bossWarningInfo" style="display: none; color: #ff9900; margin-top: 1rem; font-size: 0.9rem; font-weight: bold;">
-                        ⚠️ 67 BOSS: SURVIVAL MODE - Boss stuns every 40s with 1% damage, Second Life at 20% HP!
-                    </div>
+                    <div class="boss-unlock" id="bossUnlockInfo" style="display: none;">🔒 Defeat Insane mode with 67 to unlock 67 BOSS!</div>
+                    <div class="boss-unlocked" id="bossUnlockedInfo" style="display: none;">✅ 67 BOSS UNLOCKED! Select 67 character and 67 BOSS difficulty to fight!</div>
+                    <div class="boss-warning" id="bossWarningInfo" style="display: none;">⚠️ 67 BOSS: SURVIVAL MODE - Boss stuns every 40s with 1% damage, Second Life at 20% HP!</div>
                 </div>
             </div>
-            
             <div class="select-controls">
                 <button class="nav-btn" id="backBtn">BACK</button>
                 <button class="nav-btn confirm" id="confirmBtn" disabled>FIGHT!</button>
@@ -106,12 +97,10 @@
                     <div class="health-text" id="p1HealthText">100%</div>
                 </div>
             </div>
-            
             <div class="round-info">
                 <div class="round-text" id="roundText">ROUND 1</div>
                 <div class="timer" id="roundTimer">99</div>
             </div>
-            
             <div class="player-hud">
                 <div class="player-name" id="p2Name">CPU</div>
                 <div class="health-container">
@@ -120,8 +109,6 @@
                 </div>
             </div>
         </div>
-        
-        <!-- Touch Controls for Tablet -->
         <div id="touchControls" class="touch-controls">
             <div class="touch-left">
                 <div class="movement-buttons">
@@ -138,7 +125,6 @@
                 </div>
             </div>
         </div>
-        
         <div class="combo-display" id="comboDisplay">BRAINROT COMBO!</div>
         <button class="nav-btn" id="exitBattleBtn">EXIT BATTLE</button>
     </div>
@@ -163,36 +149,14 @@
                 <div class="controls-grid">
                     <div class="control-group">
                         <div class="control-title">BASIC CONTROLS</div>
-                        <div class="control-item">
-                            <div class="control-key">← →</div>
-                            <div class="control-action">Move Left/Right</div>
-                        </div>
-                        <div class="control-item">
-                            <div class="control-key">Z</div>
-                            <div class="control-action">Left Punch</div>
-                        </div>
-                        <div class="control-item">
-                            <div class="control-key">X</div>
-                            <div class="control-action">Right Punch</div>
-                        </div>
-                        <div class="control-item">
-                            <div class="control-key">A</div>
-                            <div class="control-action">Left Kick</div>
-                        </div>
-                        <div class="control-item">
-                            <div class="control-key">S</div>
-                            <div class="control-action">Right Kick</div>
-                        </div>
-                        <div class="control-item">
-                            <div class="control-key">SPACE</div>
-                            <div class="control-action">Parry (+10% HP, 20% Damage, 10s Cooldown)</div>
-                        </div>
-                        <div class="control-item">
-                            <div class="control-key">C</div>
-                            <div class="control-action">Special Combo</div>
-                        </div>
+                        <div class="control-item"><div class="control-key">← →</div><div class="control-action">Move Left/Right</div></div>
+                        <div class="control-item"><div class="control-key">Z</div><div class="control-action">Left Punch</div></div>
+                        <div class="control-item"><div class="control-key">X</div><div class="control-action">Right Punch</div></div>
+                        <div class="control-item"><div class="control-key">A</div><div class="control-action">Left Kick</div></div>
+                        <div class="control-item"><div class="control-key">S</div><div class="control-action">Right Kick</div></div>
+                        <div class="control-item"><div class="control-key">SPACE</div><div class="control-action">Parry (+10% HP, 20% Damage, 10s Cooldown)</div></div>
+                        <div class="control-item"><div class="control-key">C</div><div class="control-action">Special Combo</div></div>
                     </div>
-                    
                     <div class="control-group">
                         <div class="control-title">BRAINROT COMBOS</div>
                         <ul class="combo-list">
@@ -244,18 +208,9 @@
         <div class="credits-content">
             <h1 class="main-title">CREDITS</h1>
             <div class="credits-list">
-                <div class="credit-item">
-                    <div class="credit-name">IAN</div>
-                    <div class="credit-role">Director And Idea Management team</div>
-                </div>
-                <div class="credit-item">
-                    <div class="credit-name">ZIAD</div>
-                    <div class="credit-role">AI Programming & Combat System</div>
-                </div>
-                <div class="credit-item">
-                    <div class="credit-name">AAHIL</div>
-                    <div class="credit-role">3D Graphics & Big Improvement</div>
-                </div>
+                <div class="credit-item"><div class="credit-name">IAN</div><div class="credit-role">Director And Idea Management team</div></div>
+                <div class="credit-item"><div class="credit-name">ZIAD</div><div class="credit-role">AI Programming & Combat System</div></div>
+                <div class="credit-item"><div class="credit-name">AAHIL</div><div class="credit-role">3D Graphics & Big Improvement</div></div>
             </div>
             <button class="nav-btn" id="creditsBackBtn">BACK TO MENU</button>
         </div>
@@ -266,15 +221,9 @@
         <div id="cutsceneText">THE LEGEND OF 67...</div>
     </div>
 
-    <!-- Audio Elements -->
-    <audio id="bossMusic" loop>
-        <source src="./fighters/audio/Finale.mp3" type="audio/mpeg">
-    </audio>
-    <audio id="menuMusic" loop>
-        <source src="./fighters/audio/Menu.mp3" type="audio/mpeg">
-    </audio>
+    <audio id="bossMusic" loop><source src="./fighters/audio/Finale.mp3" type="audio/mpeg"></audio>
+    <audio id="menuMusic" loop><source src="./fighters/audio/Menu.mp3" type="audio/mpeg"></audio>
 
-    <!-- JavaScript Files (split) -->
     <script src="./fighters/js/characters.js"></script>
     <script src="./fighters/js/game-core.js"></script>
     <script src="./fighters/js/game-ui.js"></script>
