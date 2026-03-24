@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Brainrot Fighters — Blue Edition</title>
+    <link rel="stylesheet" href="./fighters/css/style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+</head>
+<body>
+    <!-- Device Detection -->
+    <div id="deviceDetection" class="screen active">
+        <div class="device-content">
+            <div class="pixel-logo">BRAINROT FIGHTERS</div>
+            <div class="device-type" id="deviceType">DETECTING DEVICE...</div>
+            <div class="device-controls">
+                <button class="device-btn" id="forceTablet">TABLET MODE</button>
+                <button class="device-btn" id="forceDesktop">DESKTOP MODE</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading Screen -->
+    <div id="loading" class="screen">
+        <div class="loading-content">
+            <div class="pixel-logo">BRAINROT FIGHTERS</div>
+            <div class="loading-bar-container">
+                <div class="loading-bar" id="loadingBar"></div>
+            </div>
+            <div class="loading-text" id="loadingText">INITIALIZING BRAINROT ENGINE...</div>
+            <div class="tip">TIP: Spam combos for maximum brainrot!</div>
+        </div>
+    </div>
+
+    <!-- Main Menu -->
+    <div id="mainMenu" class="screen">
+        <div class="menu-content">
+            <h1 class="main-title">BRAINROT FIGHTERS</h1>
+            <div class="menu-options">
+                <button class="menu-btn" id="arcadeBtn">ARCADE MODE</button>
+                <button class="menu-btn" id="practiceBtn">PRACTICE MODE</button>
+                <button class="menu-btn" id="shopBtn">SHOP</button>
+                <button class="menu-btn" id="controlsBtn">CONTROLS</button>
+                <button class="menu-btn" id="updatesBtn">UPDATE LOG</button>
+                <button class="menu-btn" id="creditsBtn">CREDITS</button>
+                <button class="menu-btn" id="exitToCreamoBtn">EXIT TO CREAMO</button>
+            </div>
+            <div class="menu-footer">
+                <div class="high-score">HIGH SCORE: <span id="highScore">0</span></div>
+                <div class="version">v4.5.0 | BLUE EDITION</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Character Selection -->
+    <div id="characterSelect" class="screen">
+        <div class="select-ui">
+            <div class="select-header">
+                <div class="player-tag">PLAYER 1</div>
+                <div class="select-title">CHOOSE YOUR BRAINROTTER</div>
+                <div class="difficulty-select">
+                    <select id="difficultySelect">
+                        <option value="easy">EASY</option>
+                        <option value="medium" selected>MEDIUM</option>
+                        <option value="hard">HARD</option>
+                        <option value="insane">INSANE</option>
+                    </select>
+                </div>
+            </div>
+            <div class="character-grid" id="characterGrid"></div>
+            <div class="character-preview">
+                <div class="preview-model" id="previewModel"></div>
+                <div class="character-info">
+                    <div class="char-name" id="previewName">SELECT BRAINROTTER</div>
+                    <div class="char-style" id="previewStyle">-</div>
+                    <div class="char-desc" id="previewDesc">Choose your brainrot warrior</div>
+                    <div class="boss-unlock" id="bossUnlockInfo" style="display: none;">🔒 Defeat Insane mode with 67 to unlock 67 BOSS!</div>
+                    <div class="boss-unlocked" id="bossUnlockedInfo" style="display: none;">✅ 67 BOSS UNLOCKED! Select 67 character and 67 BOSS difficulty to fight!</div>
+                    <div class="boss-warning" id="bossWarningInfo" style="display: none;">⚠️ 67 BOSS: SURVIVAL MODE - Boss stuns every 40s with 1% damage, Second Life at 20% HP!</div>
+                </div>
+            </div>
+            <div class="select-controls">
+                <button class="nav-btn" id="backBtn">BACK</button>
+                <button class="nav-btn confirm" id="confirmBtn" disabled>FIGHT!</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Game Screen -->
+    <div id="gameScreen" class="screen">
+        <canvas id="gameCanvas"></canvas>
+        <div class="hud">
+            <div class="player-hud">
+                <div class="player-name" id="p1Name">PLAYER</div>
+                <div class="health-container">
+                    <div class="health-bar" id="p1Health"></div>
+                    <div class="health-text" id="p1HealthText">100%</div>
+                </div>
+            </div>
+            <div class="round-info">
+                <div class="round-text" id="roundText">ROUND 1</div>
+                <div class="timer" id="roundTimer">99</div>
+            </div>
+            <div class="player-hud">
+                <div class="player-name" id="p2Name">CPU</div>
+                <div class="health-container">
+                    <div class="health-bar" id="p2Health"></div>
+                    <div class="health-text" id="p2HealthText">100%</div>
+                </div>
+            </div>
+        </div>
+        <div id="touchControls" class="touch-controls">
+            <div class="touch-left">
+                <div class="movement-buttons">
+                    <button class="touch-btn movement-btn left" data-direction="left">←</button>
+                    <button class="touch-btn movement-btn right" data-direction="right">→</button>
+                </div>
+            </div>
+            <div class="touch-right">
+                <div class="action-buttons">
+                    <button class="touch-btn punch" data-action="punch">PUNCH</button>
+                    <button class="touch-btn kick" data-action="kick">KICK</button>
+                    <button class="touch-btn special" data-action="special">COMBO</button>
+                    <button class="touch-btn parry" data-action="parry">PARRY</button>
+                </div>
+            </div>
+        </div>
+        <div class="combo-display" id="comboDisplay">BRAINROT COMBO!</div>
+        <button class="nav-btn" id="exitBattleBtn">EXIT BATTLE</button>
+    </div>
+
+    <!-- Shop Screen -->
+    <div id="shopScreen" class="screen">
+        <div class="shop-content">
+            <h1 class="main-title">BRAINROT SHOP</h1>
+            <div class="shop-info">
+                <div class="coins-display">COINS: <span id="coinsAmount">0</span></div>
+            </div>
+            <div class="shop-items" id="shopItems"></div>
+            <button class="nav-btn" id="shopBackBtn">BACK TO MENU</button>
+        </div>
+    </div>
+
+    <!-- Controls Screen -->
+    <div id="controlsScreen" class="screen">
+        <div class="controls-content">
+            <div class="controls-header">CONTROLS & MOVES</div>
+            <div class="controls-scroll">
+                <div class="controls-grid">
+                    <div class="control-group">
+                        <div class="control-title">BASIC CONTROLS</div>
+                        <div class="control-item"><div class="control-key">← →</div><div class="control-action">Move Left/Right</div></div>
+                        <div class="control-item"><div class="control-key">Z</div><div class="control-action">Left Punch</div></div>
+                        <div class="control-item"><div class="control-key">X</div><div class="control-action">Right Punch</div></div>
+                        <div class="control-item"><div class="control-key">A</div><div class="control-action">Left Kick</div></div>
+                        <div class="control-item"><div class="control-key">S</div><div class="control-action">Right Kick</div></div>
+                        <div class="control-item"><div class="control-key">SPACE</div><div class="control-action">Parry (+10% HP, 20% Damage, 10s Cooldown)</div></div>
+                        <div class="control-item"><div class="control-key">C</div><div class="control-action">Special Combo</div></div>
+                    </div>
+                    <div class="control-group">
+                        <div class="control-title">BRAINROT COMBOS</div>
+                        <ul class="combo-list">
+                            <li class="combo-item">→ → + Z : Dragon Uppercut</li>
+                            <li class="combo-item">↓ → + X : Fireball</li>
+                            <li class="combo-item">Z + X : Double Punch</li>
+                            <li class="combo-item">A + S : Spin Kick</li>
+                            <li class="combo-item">↓ ↓ + A : Low Sweep</li>
+                            <li class="combo-item">← ← + S : Back Kick</li>
+                            <li class="combo-item">Z → X → A : ULTIMATE BRAINROT</li>
+                            <li class="combo-item">SPAM ANY BUTTONS : RANDOM BRAINROT</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="controls-footer">
+                <button class="nav-btn" id="controlsBackBtn">BACK TO MAIN MENU</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Update Log Screen -->
+    <div id="updatesScreen" class="screen">
+        <div class="updates-content">
+            <h1 class="main-title">UPDATE LOG</h1>
+            <div class="updates-scroll">
+                <div class="update-version">
+                    <h3>v4.5.0 - BLUE EDITION</h3>
+                    <ul>
+                        <li>🎨 Blue theme integrated with Creamo</li>
+                        <li>🔧 Removed online multiplayer</li>
+                        <li>♾️ Infinite Parry (admin code: 231214)</li>
+                        <li>❤️ Infinite HP (admin code)</li>
+                        <li>🌍 Global Messages</li>
+                        <li>🎨 CUSTOM BACKGROUNDS in shop</li>
+                        <li>⏱️ 67 BOSS Extended cutscene</li>
+                        <li>🔄 Second Life auto-revive</li>
+                        <li>⚡ Boss Stun Phases</li>
+                        <li>🎵 Music Sync</li>
+                    </ul>
+                </div>
+            </div>
+            <button class="nav-btn" id="updatesBackBtn">BACK TO MENU</button>
+        </div>
+    </div>
+
+    <!-- Credits Screen -->
+    <div id="creditsScreen" class="screen">
+        <div class="credits-content">
+            <h1 class="main-title">CREDITS</h1>
+            <div class="credits-list">
+                <div class="credit-item"><div class="credit-name">IAN</div><div class="credit-role">Director And Idea Management team</div></div>
+                <div class="credit-item"><div class="credit-name">ZIAD</div><div class="credit-role">AI Programming & Combat System</div></div>
+                <div class="credit-item"><div class="credit-name">AAHIL</div><div class="credit-role">3D Graphics & Big Improvement</div></div>
+            </div>
+            <button class="nav-btn" id="creditsBackBtn">BACK TO MENU</button>
+        </div>
+    </div>
+
+    <!-- Cutscene Overlay -->
+    <div id="cutsceneOverlay" class="screen" style="display: none;">
+        <div id="cutsceneText">THE LEGEND OF 67...</div>
+    </div>
+
+    <audio id="bossMusic" loop><source src="./fighters/audio/Finale.mp3" type="audio/mpeg"></audio>
+    <audio id="menuMusic" loop><source src="./fighters/audio/Menu.mp3" type="audio/mpeg"></audio>
+
+    <!-- JavaScript Files (order matters) -->
+    <script src="./fighters/js/characters.js"></script>
+    <script src="./fighters/js/game-core.js"></script>
+    <script src="./fighters/js/ai.js"></script>
+    <script src="./fighters/js/boss.js"></script>
+    <script src="./fighters/js/combat.js"></script>
+    <script src="./fighters/js/shop.js"></script>
+    <script src="./fighters/js/game-ui.js"></script>
+    <script src="./fighters/js/threejs-renderer.js"></script>
+    <script src="./fighters/js/touch-controls.js"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            if (typeof init === 'function') {
+                init();
+            } else {
+                console.error('init() not found. Check script loading.');
+            }
+        });
+    </script>
+</body>
+</html>
