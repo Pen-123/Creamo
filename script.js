@@ -36,6 +36,12 @@ class CreamoApp {
         this.animateGiantText();
         this.createBackgroundBinary();
         this.setupEventListeners();
+        document.getElementById('fightersBtn').addEventListener('click', (e) => {
+    this.triggerBinaryAnimation(e);
+    setTimeout(() => {
+        window.location.href = 'fighters.html';
+    }, 800);
+});
     }
 
     setupEventListeners() {
