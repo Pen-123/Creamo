@@ -42,6 +42,15 @@ class CreamoApp {
         window.location.href = 'fighters.html';
     }, 800);
 });
+        // Inside setupHomepage(), after other buttons:
+document.getElementById('fightersBtn').addEventListener('click', (e) => {
+    this.triggerBinaryAnimation(e);
+    setTimeout(() => {
+        window.location.href = 'fighters.html';
+    }, 800);
+});
+
+// Remove all portal-related code: remove #portalBtn event, remove portal modal close listeners, and remove the portal options in the HTML (already removed in index.html).
     }
 
     setupEventListeners() {
