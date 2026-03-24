@@ -279,3 +279,11 @@ function showBossDefeatedDialogue() {
     document.body.appendChild(div);
     document.getElementById('continueBtn').addEventListener('click', () => { div.remove(); showScreen('characterSelect'); });
 }
+// Initialization – called when DOM is ready
+function init() {
+    console.log('Brainrot Fighters initializing...');
+    detectDevice();               // sets device type text
+    setupEventListeners();       // attaches all button handlers
+    // The user must click a device mode button to proceed to loading.
+    // The loading screen will then show the main menu.
+}
