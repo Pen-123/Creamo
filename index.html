@@ -107,6 +107,7 @@
         </div>
 
         <div id="creamocryptTool" class="creamocrypt-container" style="display: none;">
+            <!-- same cipher tool content as before -->
             <div class="cipher-header">
                 <button class="back-btn" id="backToHome">&larr; Back to Home</button>
                 <h1>CreamoCrypt — Advanced Cipher Suite</h1>
@@ -183,8 +184,7 @@
             </div>
         </div>
 
-        <div id="creamotvTool" class="creamo-tv-container" style="display: none;"></div>
-
+        <!-- TV container removed – now separate page -->
         <footer class="site-footer">
             <p>Directive 001: The Pen Writes Again. © 2025 Yappinghood</p>
         </footer>
@@ -203,7 +203,6 @@
             const audio = document.getElementById('bgAudio');
             audio.play().catch(e => console.log("Audio waiting for click..."));
             
-            // Cleanup: remove listeners once audio starts
             document.removeEventListener('click', playOnInteraction);
             document.removeEventListener('keydown', playOnInteraction);
             document.removeEventListener('touchstart', playOnInteraction);
