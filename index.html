@@ -55,7 +55,6 @@
                     <span class="btn-glow"></span>
                 </button>
                 
-                <!-- New Brainrot Fighters button -->
                 <button class="home-btn fighters-btn" id="fightersBtn">
                     <span class="btn-text">Brainrot Fighters</span>
                     <span class="btn-glow"></span>
@@ -63,10 +62,8 @@
             </div>
         </main>
 
-        <!-- Binary Code Animation Container -->
         <div id="binaryContainer" class="binary-container"></div>
 
-        <!-- Archives Modal -->
         <div id="archivesModal" class="modal">
             <div class="modal-content">
                 <div class="modal-header">
@@ -81,7 +78,6 @@
             </div>
         </div>
 
-        <!-- Portal Modal -->
         <div id="portalModal" class="modal">
             <div class="modal-content">
                 <div class="modal-header">
@@ -110,7 +106,6 @@
             </div>
         </div>
 
-        <!-- CreamoCrypt Cipher Tool (Hidden by default) -->
         <div id="creamocryptTool" class="creamocrypt-container" style="display: none;">
             <div class="cipher-header">
                 <button class="back-btn" id="backToHome">&larr; Back to Home</button>
@@ -163,49 +158,60 @@
 
                     <div class="form-row salt-row hidden" id="saltRow">
                         <label for="saltInput">PBKDF2 Salt (optional)</label>
-                        <input type="text" id="saltInput" placeholder="Optional custom salt — normally generated automatically" />
+                        <input type="text" id="saltInput" placeholder="Optional custom salt" />
                     </div>
 
                     <div class="button-group">
                         <button class="btn primary" id="encryptBtn">Encrypt</button>
                         <button class="btn" id="decryptBtn">Decrypt</button>
-                        <button class="btn outline" id="clearBtn" title="Clear fields">Clear</button>
+                        <button class="btn outline" id="clearBtn">Clear</button>
                     </div>
 
                     <div class="output-wrap">
                         <div class="output-header">
                             <strong>Result</strong>
-                            <div>
-                                <button class="btn tiny" id="copyBtn" title="Copy result">Copy</button>
-                            </div>
+                            <button class="btn tiny" id="copyBtn">Copy</button>
                         </div>
                         <pre id="output" aria-live="polite" class="output"><span id="typedContent">No output yet.</span><span id="caret" class="caret" aria-hidden="true">▌</span></pre>
                     </div>
                 </section>
 
-                <aside class="card info-card" aria-labelledby="protocol-title">
-                    <h2 id="protocol-title">Cipher Logs & Protocols</h2>
+                <aside class="card info-card">
+                    <h2>Cipher Logs & Protocols</h2>
                     <div id="infoContent" class="info-content">Select a cipher to view its protocol.</div>
-                    <div class="hint">Tip: Hashes (SHA-256/MD5) are one-way — they cannot be reversed by decrypt.</div>
                 </aside>
             </div>
         </div>
 
-        <!-- Creamo TV Streaming Platform (Hidden by default) -->
-        <div id="creamotvTool" class="creamo-tv-container" style="display: none;">
-            <!-- TV navigation will be added here dynamically -->
-        </div>
+        <div id="creamotvTool" class="creamo-tv-container" style="display: none;"></div>
 
         <footer class="site-footer">
             <p>Directive 001: The Pen Writes Again. © 2025 Yappinghood</p>
         </footer>
     </div>
 
-    <!-- Include CryptoJS from CDN -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
     <script src="script.js"></script>
-<audio id="bgAudio" autoplay loop>
-    <source src="cmenu.mp3" type="audio/mpeg">
-</audio>
+
+    <audio id="bgAudio" loop preload="auto">
+        <source src="cmenu.mp3" type="audio/mpeg">
+    </audio>
+
+    <script>
+        // Start audio once user interacts with the page
+        function playOnInteraction() {
+            const audio = document.getElementById('bgAudio');
+            audio.play().catch(e => console.log("Audio waiting for click..."));
+            
+            // Cleanup: remove listeners once audio starts
+            document.removeEventListener('click', playOnInteraction);
+            document.removeEventListener('keydown', playOnInteraction);
+            document.removeEventListener('touchstart', playOnInteraction);
+        }
+
+        document.addEventListener('click', playOnInteraction);
+        document.addEventListener('keydown', playOnInteraction);
+        document.addEventListener('touchstart', playOnInteraction);
+    </script>
 </body>
 </html>
