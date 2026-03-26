@@ -26,6 +26,7 @@ window.gameState = {
     isBossFight: false,
     bossSpecialAttackCooldown: 0,
     bossStunTimer: 0,
+    dashCooldown: 0,
     isBossStunned: false,
     bossSelfDamageTimer: 0,
     playerHiddenHealTimer: 0,
