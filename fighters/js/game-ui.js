@@ -256,6 +256,12 @@ function setupEventListeners() {
             else if (key === 'a' || key === 's') doPlayerAttack('kick');
             else if (key === ' ') doPlayerAttack('parry');
             else if (key === 'c') doPlayerAttack('special');
+            if (key === 'l') {
+    if (gameState.gameActive && gameState.player.dashCooldown <= 0) {
+        doPlayerDash();
+        e.preventDefault();
+    }
+}
         }
     });
     document.addEventListener('keyup', (e) => { gameState.keys[e.key.toLowerCase()] = false; });
