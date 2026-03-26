@@ -74,7 +74,7 @@ function endCutscene() {
 
 function updateBossSurvival() {
     const now = Date.now();
-    if (!gameState.isBossStunned && (now - lastStunTime) >= 3500) {
+    if (!gameState.isBossStunned && (now - lastStunTime) >= 4000) {
         gameState.isBossStunned = true;
         lastStunTime = now;
         const damage = gameState.cpu.maxHealth * 0.05;
