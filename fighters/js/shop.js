@@ -12,10 +12,17 @@ const SHOP_ITEMS = [
     { id: 'bgIce', name: 'Ice Palace Background', description: 'Unlock frozen ice palace background', price: 450, type: 'permanent', effect: 'background', bgId: 'ice' }
 ];
 
+// Missing function – add this
+function initShop() {
+    if (!window.gameState) return;
+    if (!gameState.coins) gameState.coins = parseInt(localStorage.getItem('brainrotCoins')) || 1000;
+    if (!gameState.playerInventory) gameState.playerInventory = JSON.parse(localStorage.getItem('playerInventory')) || {};
+}
+
 function loadShopItems() {
     const container = document.getElementById('shopItems');
     if (!container) return;
-    initShop();
+    initShop();  // now defined
     container.innerHTML = '';
     
     SHOP_ITEMS.forEach(item => {
@@ -27,10 +34,9 @@ function loadShopItems() {
         let buttonDisabled = owned || (isBackground && owned);
         let buttonText = owned ? (isBackground ? (activeBackground ? 'ACTIVE' : 'OWNED') : 'OWNED') : (canAfford ? 'BUY NOW' : 'NEED COINS');
         
-        // For backgrounds, if owned, we disable the button and gray it out (no selection)
         if (isBackground && owned) {
             buttonDisabled = true;
-            buttonText = 'OWNED';  // or 'OWNED'
+            buttonText = 'OWNED';
         }
         
         const div = document.createElement('div');
@@ -49,13 +55,16 @@ function loadShopItems() {
     updateCoinsDisplay();
 }
 
+function updateCoinsDisplay() {
+    const el = document.getElementById('coinsAmount');
+    if (el) el.textContent = gameState.coins;
+}
+
 function buyItem(id) {
     const item = SHOP_ITEMS.find(i => i.id === id);
     if (!item) return;
     
-    // For backgrounds, if already owned, do nothing (button disabled)
     if (item.effect === 'background' && gameState.playerInventory[id]) {
-        // Already owned – cannot re‑select
         return;
     }
     
@@ -80,7 +89,6 @@ function buyItem(id) {
             alert('67 BOSS UNLOCKED!');
         }
         else if (item.effect === 'background') {
-            // Set this as active background
             gameState.customBackground = item.bgId;
             localStorage.setItem('customBackground', item.bgId);
             applyCustomBackground();
@@ -92,6 +100,14 @@ function buyItem(id) {
     
     localStorage.setItem('brainrotCoins', gameState.coins);
     localStorage.setItem('playerInventory', JSON.stringify(gameState.playerInventory));
-    loadShopItems();  // refresh shop UI
+    loadShopItems();
     showPurchaseSuccess(item.name);
+}
+
+function showPurchaseSuccess(itemName) {
+    const div = document.createElement('div');
+    div.style.cssText = `position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); display:flex; justify-content:center; align-items:center; z-index:1000;`;
+    div.innerHTML = `<div class="success-message" style="background:#000; border:2px solid #1a3c8b; border-radius:10px; padding:20px; text-align:center;"><h3>✅ PURCHASE SUCCESSFUL!</h3><p>You bought: ${itemName}</p><button class="nav-btn" id="closeSuccess">CLOSE</button></div>`;
+    document.body.appendChild(div);
+    document.getElementById('closeSuccess').addEventListener('click', () => div.remove());
 }
