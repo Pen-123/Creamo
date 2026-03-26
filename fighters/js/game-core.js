@@ -47,6 +47,14 @@ window.gameState = {
     customBackground: localStorage.getItem('customBackground') || 'default',
     customBackgroundUrl: localStorage.getItem('customBackgroundUrl') || ''
 };
+// ADD THIS RIGHT AFTER creating the player object:
+if (isBossFight) {
+    // Increase player HP for boss fight (example: double HP)
+    gameState.player.maxHealth = playerChar.hp * 2;
+    gameState.player.health = gameState.player.maxHealth;
+    gameState.playerRealHP = 300;
+    gameState.playerFakeHP = 100;
+}
 
 // Admin panel
 function initAdminPanel() {
