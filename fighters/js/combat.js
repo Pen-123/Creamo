@@ -1,3 +1,37 @@
+// ... (keep all existing functions except the misplaced doPlayerDash)
+// ADD THIS FUNCTION AT THE TOP (outside any other function)
+
+function doPlayerDash() {
+    if (!gameState.gameActive || gameState.player.dashCooldown > 0) return;
+    
+    let dir = 0;
+    if (gameState.keys["arrowleft"]) dir = -1;
+    else if (gameState.keys["arrowright"]) dir = 1;
+    else dir = gameState.player.facing;
+    if (dir === 0) dir = 1;
+    
+    const dashDistance = 3.5;
+    let newX = gameState.player.x + (dir * dashDistance);
+    newX = Math.min(8, Math.max(-8, newX));
+    gameState.player.x = newX;
+    
+    createDashEffect(gameState.player.x - (dir * dashDistance), gameState.player.x);
+    
+    if (window.playerModel) {
+        window.playerModel.position.x = gameState.player.x;
+        window.playerModel.rotation.y = dir === 1 ? 0 : Math.PI;
+    }
+    
+    gameState.player.dashCooldown = 30;
+    
+    const disp = document.getElementById('comboDisplay');
+    if (disp) {
+        disp.textContent = "⚡ SPEED DASH!";
+        disp.classList.add('active');
+        setTimeout(() => disp.classList.remove('active'), 500);
+    }
+}
+
 function doPlayerAttack(type) {
     if (!gameState.gameActive || gameState.player.attackCooldown > 0) return;
     if (type === 'parry') {
@@ -151,40 +185,5 @@ function executeCombo(combo) {
     }
     if (gameState.cpu.memory) gameState.cpu.memory.dodgeChance = Math.min(0.6, gameState.cpu.memory.dodgeChance + 0.02);
     setTimeout(() => { if (display) display.classList.remove('active'); }, 1000);
-    // Dash function
-function doPlayerDash() {
-    if (!gameState.gameActive || gameState.player.dashCooldown > 0) return;
-    
-    // Determine dash direction (use arrow keys if pressed, otherwise face direction)
-    let dir = 0;
-    if (gameState.keys["arrowleft"]) dir = -1;
-    else if (gameState.keys["arrowright"]) dir = 1;
-    else dir = gameState.player.facing;
-    
-    if (dir === 0) dir = 1; // default dash forward
-    
-    const dashDistance = 3.5;
-    let newX = gameState.player.x + (dir * dashDistance);
-    newX = Math.min(8, Math.max(-8, newX)); // clamp to arena bounds
-    gameState.player.x = newX;
-    
-    // Visual effect: create a dash trail
-    createDashEffect(gameState.player.x - (dir * dashDistance), gameState.player.x);
-    
-    // Update 3D model position if exists
-    if (window.playerModel) {
-        window.playerModel.position.x = gameState.player.x;
-        window.playerModel.rotation.y = dir === 1 ? 0 : Math.PI;
-    }
-    
-    gameState.player.dashCooldown = 30; // frames cooldown (approx 0.5s at 60fps)
-    
-    // Show combo display message
-    const disp = document.getElementById('comboDisplay');
-    if (disp) {
-        disp.textContent = "⚡ SPEED DASH!";
-        disp.classList.add('active');
-        setTimeout(() => disp.classList.remove('active'), 500);
-    }
 }
-}
+
