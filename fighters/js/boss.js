@@ -67,16 +67,25 @@ function endCutscene() {
     if (disp) { disp.textContent = "SURVIVE! Boss stuns every 40s with 1% damage!"; disp.classList.add('active'); setTimeout(() => disp.classList.remove('active'), 3000); }
 }
 function updateBossSurvival() {
-    gameState.bossSelfDamageTimer++;
-    if (gameState.bossSelfDamageTimer >= 150) {
-        gameState.bossSelfDamageTimer = 0;
+    // Check for stun every 5 seconds
+    const now = Date.now();
+    if (!gameState.isBossStunned && (now - lastStunTime) >= 5000) {
         gameState.isBossStunned = true;
+        lastStunTime = now;
+        
+        // Apply stun damage (5% of max health)
         const damage = gameState.cpu.maxHealth * 0.05;
         gameState.cpu.health = Math.max(0, gameState.cpu.health - damage);
         createBossStunEffect();
-        gameState.survivalPhase++;
+        
         const disp = document.getElementById('comboDisplay');
-        if (disp) { disp.textContent = `67 BOSS STUNNED! -5% HP`; disp.classList.add('active'); setTimeout(() => disp.classList.remove('active'), 2000); }
+        if (disp) {
+            disp.textContent = `67 BOSS STUNNED! -5% HP`;
+            disp.classList.add('active');
+            setTimeout(() => disp.classList.remove('active'), 2000);
+        }
+        
+        // Clear stun after 0.5 seconds
         setTimeout(() => { gameState.isBossStunned = false; }, 500);
     }
     gameState.playerHiddenHealTimer++;
