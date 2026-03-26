@@ -11,7 +11,7 @@ function startBossCutscene() {
     gameState.cutsceneActive = true;
     gameState.cutsceneStartTime = null;
     gameState.secondLifeUsed = false;
-    gameState.bossDamageMultiplier = 0.5;
+    gameState.bossDamageMultiplier = 0.2;
     gameState.bossStunPhase = 0;
     gameState.bossStunTimer = 0;
     document.getElementById('gameCanvas').style.opacity = '0.3';
@@ -126,7 +126,7 @@ function doBossStompAttack() {
     console.log("BOSS STOMP ATTACK!");
     if (window.cpuModel) {
         window.cpuModel.position.y = 3;
-        setTimeout(() => { if (window.cpuModel) { window.cpuModel.position.y = 0; createShockwaveEffect(gameState.cpu.x); } }, 500);
+        setTimeout(() => { if (window.cpuModel) { window.cpuModel.position.y = 0; createShockwaveEffect(gameState.cpu.x); } }, 600);
     }
     const disp = document.getElementById('comboDisplay');
     if (disp) { disp.textContent = "67 BOSS: MEGA STOMP!"; disp.classList.add('active'); setTimeout(() => disp.classList.remove('active'), 2000); }
@@ -157,7 +157,7 @@ function doBossDashAttack() {
 }
 
 function checkSecondLife() {
-    if (gameState.isBossFight && !gameState.secondLifeUsed && (gameState.playerRealHP <= 20 || (gameState.playerRealHP - 10 <= 0))) {
+    if (gameState.isBossFight && !gameState.secondLifeUsed && (gameState.playerRealHP <= 5|| (gameState.playerRealHP - 10 <= 0))) {
         gameState.secondLifeUsed = true;
         gameState.playerRealHP = 100;
         gameState.playerFakeHP = 100;
