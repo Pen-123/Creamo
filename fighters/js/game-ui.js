@@ -237,33 +237,32 @@ function setupEventListeners() {
     document.getElementById('creditsBackBtn').addEventListener('click', () => showScreen('mainMenu'));
     document.getElementById('confirmBtn').addEventListener('click', () => startBattle('arcade'));
     document.addEventListener('keydown', (e) => {
-        if (gameState.cutsceneActive) return;
-        const key = e.key.toLowerCase();
-        gameState.keys[key] = true;
-        // Handle dash key (L) only in boss fight
-        if (key === 'l' && gameState.gameActive && gameState.isBossFight && gameState.player.dashCooldown <= 0) {
-            doPlayerAttack('dash');
-            e.preventDefault();
-        }
-        if (['arrowleft','arrowright','z','x','a','s',' ','c'].includes(key)) {
-            const keyMap = { 'arrowleft':'left','arrowright':'right','z':'punch','x':'punch','a':'kick','s':'kick',' ':'parry','c':'special' };
-            const now = Date.now();
-            if (now - gameState.lastKeyTime > 1000) gameState.combo = [];
-            if (keyMap[key]) { gameState.combo.push(keyMap[key]); gameState.lastKeyTime = now; checkCombos(); }
-        }
-        if (gameState.gameActive && gameState.player.attackCooldown <= 0) {
-            if (key === 'z' || key === 'x') doPlayerAttack('punch');
-            else if (key === 'a' || key === 's') doPlayerAttack('kick');
-            else if (key === ' ') doPlayerAttack('parry');
-            else if (key === 'c') doPlayerAttack('special');
-            if (key === 'l') {
-    if (gameState.gameActive && gameState.player.dashCooldown <= 0) {
+    if (gameState.cutsceneActive) return;
+    const key = e.key.toLowerCase();
+    gameState.keys[key] = true;
+    
+    // Handle dash key (L)
+    if (key === 'l' && gameState.gameActive && gameState.player.dashCooldown <= 0) {
         doPlayerDash();
         e.preventDefault();
     }
-}
-        }
-    });
+    
+    // Combo detection
+    if (['arrowleft','arrowright','z','x','a','s',' ','c'].includes(key)) {
+        const keyMap = { 'arrowleft':'left','arrowright':'right','z':'punch','x':'punch','a':'kick','s':'kick',' ':'parry','c':'special' };
+        const now = Date.now();
+        if (now - gameState.lastKeyTime > 1000) gameState.combo = [];
+        if (keyMap[key]) { gameState.combo.push(keyMap[key]); gameState.lastKeyTime = now; checkCombos(); }
+    }
+    
+    // Attacks
+    if (gameState.gameActive && gameState.player.attackCooldown <= 0) {
+        if (key === 'z' || key === 'x') doPlayerAttack('punch');
+        else if (key === 'a' || key === 's') doPlayerAttack('kick');
+        else if (key === ' ') doPlayerAttack('parry');
+        else if (key === 'c') doPlayerAttack('special');
+    }
+});
     document.addEventListener('keyup', (e) => { gameState.keys[e.key.toLowerCase()] = false; });
     window.addEventListener('resize', () => {
         if (window.camera && window.renderer) {
