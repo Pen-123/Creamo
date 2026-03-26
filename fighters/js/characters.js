@@ -69,7 +69,7 @@ const BOSS_67 = {
     id: 6667,
     name: "67 BOSS",
     style: "Final Brainrot",
-    hp: 5000,
+    hp: 4000,
     color: "#1a3c8b",
     icon: "💀",
     description: "The ultimate 67 manifestation. Defeat it to uncover the truth.",
