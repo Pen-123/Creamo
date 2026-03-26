@@ -8,9 +8,6 @@ class CreamoApp {
         this.archivesContent = document.getElementById('archivesContent');
         this.homeContainer = document.querySelector('.home-container');
         this.creamocryptTool = document.getElementById('creamocryptTool');
-        
-        // TMDB Configuration - removed (moved to tv.html)
-        
         this.init();
     }
 
@@ -29,105 +26,51 @@ class CreamoApp {
     }
 
     setupEventListeners() {
-        // Close archives modal with X button
-        document.getElementById('closeArchives').addEventListener('click', () => {
-            this.hideArchivesModal();
-        });
-
-        // Close portal modal with X button
-        document.getElementById('closePortal').addEventListener('click', () => {
-            this.hidePortalModal();
-        });
-
-        // Close modals when clicking outside
-        this.archivesModal.addEventListener('click', (e) => {
-            if (e.target === this.archivesModal) {
-                this.hideArchivesModal();
-            }
-        });
-
-        this.portalModal.addEventListener('click', (e) => {
-            if (e.target === this.portalModal) {
-                this.hidePortalModal();
-            }
-        });
-
-        // Back to home button for cipher tool
-        document.getElementById('backToHome').addEventListener('click', () => {
-            this.showHomepage();
-        });
+        document.getElementById('closeArchives').addEventListener('click', () => this.hideArchivesModal());
+        document.getElementById('closePortal').addEventListener('click', () => this.hidePortalModal());
+        this.archivesModal.addEventListener('click', (e) => { if (e.target === this.archivesModal) this.hideArchivesModal(); });
+        this.portalModal.addEventListener('click', (e) => { if (e.target === this.portalModal) this.hidePortalModal(); });
+        document.getElementById('backToHome').addEventListener('click', () => this.showHomepage());
     }
 
     setupHomepage() {
-        // CreamoCrypt button - show cipher tool
         document.getElementById('creamocryptBtn').addEventListener('click', (e) => {
             this.triggerBinaryAnimation(e);
-            setTimeout(() => {
-                this.showCipherTool();
-            }, 800);
+            setTimeout(() => this.showCipherTool(), 800);
         });
-
-        // Pen Archives button - load Archives.txt
         document.getElementById('archivesBtn').addEventListener('click', (e) => {
             this.triggerBinaryAnimation(e);
             this.loadArchivesFile();
         });
-
-        // Portal button - show portal modal
         document.getElementById('portalBtn').addEventListener('click', (e) => {
             this.triggerBinaryAnimation(e);
             this.showPortalModal();
         });
-
-        // TV button - redirect to separate page
         document.getElementById('tvBtn').addEventListener('click', (e) => {
             this.triggerBinaryAnimation(e);
-            setTimeout(() => {
-                window.location.href = 'tv.html';
-            }, 800);
+            setTimeout(() => window.location.href = 'tv.html', 800);
         });
-
-        // Portal menu options
         document.getElementById('deluxtablePortal').addEventListener('click', (e) => {
             this.triggerBinaryAnimation(e);
-            setTimeout(() => {
-                window.open('https://deluxtable.pages.dev', '_blank');
-                this.hidePortalModal();
-            }, 800);
+            setTimeout(() => { window.open('https://deluxtable.pages.dev', '_blank'); this.hidePortalModal(); }, 800);
         });
-
         document.getElementById('brainrotPortal').addEventListener('click', (e) => {
             this.triggerBinaryAnimation(e);
-            setTimeout(() => {
-                window.open('https://iankingsigma.github.io/tekken-8-website/', '_blank');
-                this.hidePortalModal();
-            }, 800);
+            setTimeout(() => { window.open('https://iankingsigma.github.io/tekken-8-website/', '_blank'); this.hidePortalModal(); }, 800);
         });
-
         document.getElementById('controlCentrePortal').addEventListener('click', (e) => {
             this.triggerBinaryAnimation(e);
-            setTimeout(() => {
-                window.open('https://controlc.pages.dev', '_blank');
-                this.hidePortalModal();
-            }, 800);
+            setTimeout(() => { window.open('https://controlc.pages.dev', '_blank'); this.hidePortalModal(); }, 800);
         });
-
-        // Setup button animations
-        const buttons = document.querySelectorAll('.home-btn');
-        buttons.forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                this.createRipple(e, btn);
-            });
+        document.querySelectorAll('.home-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => this.createRipple(e, btn));
         });
     }
 
     setupCipherTool() {
-        // Back to home button is already set up in setupEventListeners
-        // Initialize cipher tool
         this.cipherTool = new CipherTool();
     }
 
-    // All TV-related methods removed
     showCipherTool() {
         this.currentView = 'cipher';
         this.homeContainer.style.display = 'none';
@@ -143,9 +86,6 @@ class CreamoApp {
         document.querySelector('.site-header').style.display = 'flex';
         document.querySelector('.site-footer').style.display = 'block';
     }
-
-    // ... (rest of the class unchanged: ripple, binary animation, modal handling, archive loading, cipher tool)
-}
 
     showPortalModal() {
         if (this.portalModal) {
@@ -167,7 +107,6 @@ class CreamoApp {
         const size = Math.max(rect.width, rect.height);
         const x = event.clientX - rect.left - size / 2;
         const y = event.clientY - rect.top - size / 2;
-
         ripple.style.cssText = `
             position: absolute;
             border-radius: 50%;
@@ -181,44 +120,30 @@ class CreamoApp {
             pointer-events: none;
             z-index: 1;
         `;
-
         button.appendChild(ripple);
-
-        setTimeout(() => {
-            if (ripple.parentNode) {
-                ripple.parentNode.removeChild(ripple);
-            }
-        }, 600);
+        setTimeout(() => ripple.remove(), 600);
     }
 
     triggerBinaryAnimation(event) {
         const rect = event.currentTarget.getBoundingClientRect();
-        const startX = rect.left + (rect.width / 2);
+        const startX = rect.left + rect.width / 2;
         const startY = rect.bottom;
-        
         for (let i = 0; i < 12; i++) {
-            setTimeout(() => {
-                this.createBinaryStream(startX, startY, i);
-            }, i * 80);
+            setTimeout(() => this.createBinaryStream(startX, startY, i), i * 80);
         }
     }
 
     createBinaryStream(startX, startY, index) {
         const binaryElement = document.createElement('div');
         binaryElement.className = 'binary-code';
-        
         let binaryString = '';
-        const length = 15 + Math.floor(Math.random() * 10);
-        for (let i = 0; i < length; i++) {
+        for (let i = 0; i < 15 + Math.floor(Math.random() * 10); i++) {
             binaryString += Math.random() > 0.5 ? '1' : '0';
         }
-        
         binaryElement.textContent = binaryString;
-        
         const duration = 1.5 + Math.random() * 1;
         const delay = index * 0.08;
         const rotation = -20 + Math.random() * 40;
-        
         binaryElement.style.cssText = `
             left: ${startX}px;
             top: ${startY}px;
@@ -229,40 +154,25 @@ class CreamoApp {
             font-size: ${12 + Math.random() * 8}px;
             opacity: ${0.7 + Math.random() * 0.3};
         `;
-        
         this.binaryContainer.appendChild(binaryElement);
-        
-        setTimeout(() => {
-            if (binaryElement.parentNode) {
-                binaryElement.parentNode.removeChild(binaryElement);
-            }
-        }, (duration + delay) * 1000);
+        setTimeout(() => binaryElement.remove(), (duration + delay) * 1000);
     }
 
     getRandomBlueColor() {
-        const colors = [
-            '#051225', '#0a1a3a', '#1a3c8b', '#0a1a3a', '#051225'
-        ];
-        return colors[Math.floor(Math.random() * colors.length)];
+        return ['#051225', '#0a1a3a', '#1a3c8b'][Math.floor(Math.random() * 3)];
     }
 
     createBackgroundBinary() {
         setInterval(() => {
             if (Math.random() > 0.7) {
-                this.createBinaryStream(
-                    Math.random() * window.innerWidth,
-                    window.innerHeight + 50,
-                    Math.floor(Math.random() * 3)
-                );
+                this.createBinaryStream(Math.random() * window.innerWidth, window.innerHeight + 50, Math.floor(Math.random() * 3));
             }
         }, 2000);
     }
 
     animateGiantText() {
         const giantText = document.getElementById('giantCreamo');
-        let scale = 1;
-        let growing = true;
-        
+        let scale = 1, growing = true;
         setInterval(() => {
             if (growing) {
                 scale += 0.001;
@@ -279,28 +189,13 @@ class CreamoApp {
         try {
             this.showArchivesModal();
             this.archivesContent.innerHTML = '<div class="loading">Loading Archives.txt...</div>';
-            
             const response = await fetch('Archives.txt');
-            
-            if (!response.ok) {
-                throw new Error(`Failed to load Archives.txt: ${response.status} ${response.statusText}`);
-            }
-            
+            if (!response.ok) throw new Error(`Failed to load Archives.txt: ${response.status}`);
             const archivesData = await response.text();
-            
-            this.archivesContent.innerHTML = `
-                <pre>${this.escapeHtml(archivesData)}</pre>
-            `;
-            
+            this.archivesContent.innerHTML = `<pre>${this.escapeHtml(archivesData)}</pre>`;
         } catch (error) {
             console.error('Error loading Archives.txt:', error);
-            this.archivesContent.innerHTML = `
-                <div class="error">
-                    [ERROR] Failed to load Archives.txt<br>
-                    ${error.message}<br>
-                    Please ensure Archives.txt exists in the same directory.
-                </div>
-            `;
+            this.archivesContent.innerHTML = `<div class="error">[ERROR] Failed to load Archives.txt<br>${error.message}<br>Please ensure Archives.txt exists.</div>`;
         }
     }
 
@@ -320,6 +215,7 @@ class CreamoApp {
         document.body.style.overflow = 'auto';
     }
 }
+
 
 // Cipher Tool Implementation
 class CipherTool {
