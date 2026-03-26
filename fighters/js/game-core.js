@@ -152,6 +152,7 @@ function updateGame() {
     if (gameState.cutsceneActive) return;
     if (gameState.player.attackCooldown > 0) gameState.player.attackCooldown--;
     if (gameState.cpu.attackCooldown > 0) gameState.cpu.attackCooldown--;
+    if (gameState.player.dashCooldown > 0) gameState.player.dashCooldown--;
     if (gameState.player.parryCooldown > 0) gameState.player.parryCooldown--;
     if (gameState.bossSpecialAttackCooldown > 0) gameState.bossSpecialAttackCooldown--;
     if (gameState.isBossFight) updateBossSurvival();
