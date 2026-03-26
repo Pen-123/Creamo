@@ -11,7 +11,7 @@ function startBossCutscene() {
     gameState.cutsceneActive = true;
     gameState.cutsceneStartTime = null;
     gameState.secondLifeUsed = false;
-    gameState.bossDamageMultiplier = 1.0;
+    gameState.bossDamageMultiplier = 0.5;
     gameState.bossStunPhase = 0;
     gameState.bossStunTimer = 0;
     document.getElementById('gameCanvas').style.opacity = '0.3';
