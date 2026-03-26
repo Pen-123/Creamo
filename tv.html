@@ -32,6 +32,7 @@
             background: rgba(26, 60, 139, 0.8);
             transform: translateY(-2px);
         }
+        /* Ensure TV styles from main style.css apply */
         .tv-nav {
             display: flex;
             align-items: center;
@@ -42,138 +43,566 @@
             border-bottom: 1px solid #1a3c8b;
             flex-wrap: wrap;
         }
-        /* rest of TV styles are already in style.css */
+        .tv-search-container {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            margin-left: 20px;
+            flex: 1;
+            min-width: 300px;
+            max-width: 500px;
+        }
+        .search-input {
+            background: rgba(5, 18, 37, 0.9);
+            border: 1px solid #1a3c8b;
+            color: #e0e0e0;
+            padding: 10px 15px;
+            border-radius: 6px;
+            width: 100%;
+            font-family: 'Courier New', monospace;
+        }
+        .search-input:focus {
+            outline: none;
+            border-color: #d4af37;
+        }
+        .tv-content-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+            gap: 25px;
+            margin-top: 20px;
+        }
+        .tv-section {
+            background: rgba(10, 26, 58, 0.8);
+            border: 1px solid #0a1a3a;
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 30px;
+            backdrop-filter: blur(10px);
+        }
+        .movie-card, .show-card, .trending-card {
+            background: rgba(5, 18, 37, 0.9);
+            border: 1px solid #051225;
+            border-radius: 10px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+            min-height: 380px;
+        }
+        .movie-card:hover, .show-card:hover, .trending-card:hover {
+            transform: translateY(-8px);
+            border-color: #d4af37;
+            box-shadow: 0 15px 35px rgba(212, 175, 55, 0.3);
+        }
+        .movie-poster, .show-poster, .trending-poster {
+            width: 100%;
+            height: 320px;
+            background: linear-gradient(135deg, #0a1a3a, #1a3c8b);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+        .movie-poster img, .show-poster img, .trending-poster img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.3s ease;
+        }
+        .no-poster {
+            color: #a0a0a0;
+            font-size: 16px;
+            text-align: center;
+            padding: 20px;
+        }
+        .play-icon {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 50px;
+            height: 50px;
+            background: rgba(212, 175, 55, 0.9);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            z-index: 2;
+        }
+        .movie-card:hover .play-icon,
+        .show-card:hover .play-icon,
+        .trending-card:hover .play-icon {
+            opacity: 1;
+        }
+        .movie-overlay, .show-overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 60px;
+            background: linear-gradient(to top, rgba(5, 18, 37, 0.9), transparent);
+            z-index: 1;
+        }
+        .movie-info, .show-info, .trending-info {
+            padding: 15px;
+            position: relative;
+            z-index: 1;
+        }
+        .movie-info h3, .show-info h3, .trending-info h4 {
+            font-size: 16px;
+            margin-bottom: 8px;
+            color: #e0e0e0;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .movie-meta, .show-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 12px;
+            color: #a0a0a0;
+            margin-bottom: 10px;
+        }
+        .rating {
+            color: #d4af37;
+            font-weight: bold;
+        }
+        .quality-badge {
+            background: linear-gradient(45deg, #1a3c8b, #2d4b8f);
+            color: white;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 10px;
+            font-weight: bold;
+        }
+        .popular-badge {
+            background: linear-gradient(45deg, #d4af37, #f4d03f);
+            color: #051225;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 10px;
+            font-weight: bold;
+        }
+        .movie-overview, .show-overview {
+            font-size: 12px;
+            color: #a0a0a0;
+            line-height: 1.4;
+            margin-top: 8px;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+        .trending-rank {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background: rgba(5, 18, 37, 0.9);
+            color: #d4af37;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 14px;
+            z-index: 2;
+        }
+        .trending-poster {
+            height: 200px;
+        }
+        .trending-type {
+            font-size: 11px;
+            color: #a0a0a0;
+            margin: 5px 0;
+        }
+        .trending-rating {
+            color: #d4af37;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        .loading-section {
+            text-align: center;
+            padding: 60px 20px;
+        }
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 3px solid rgba(26, 60, 139, 0.3);
+            border-top: 3px solid #1a3c8b;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .error-section {
+            text-align: center;
+            padding: 40px 20px;
+            background: rgba(5, 18, 37, 0.8);
+            border: 1px solid #ff6b6b;
+            border-radius: 12px;
+            margin: 20px 0;
+        }
+        .player-btn {
+            padding: 8px 16px;
+            background: rgba(26, 60, 139, 0.6);
+            border: 1px solid #1a3c8b;
+            border-radius: 6px;
+            color: #e0e0e0;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+        }
+        .player-btn:hover {
+            background: rgba(26, 60, 139, 0.8);
+            transform: translateY(-2px);
+        }
+        .player-btn.outline {
+            background: transparent;
+            border: 1px solid #1a3c8b;
+        }
+        .load-more-container {
+            text-align: center;
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(26, 60, 139, 0.3);
+        }
+        .load-more-btn {
+            padding: 12px 30px;
+            background: linear-gradient(45deg, #051225, #1a3c8b);
+            border: 1px solid #1a3c8b;
+            border-radius: 6px;
+            color: #e0e0e0;
+            font-family: 'Courier New', monospace;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+            margin: 5px;
+        }
+        .load-more-btn.outline {
+            background: transparent;
+            border: 1px solid #1a3c8b;
+        }
+        .load-more-btn:hover {
+            background: linear-gradient(45deg, #0a1a3a, #2d4b8f);
+            transform: translateY(-2px);
+        }
+        .tv-player {
+            margin-top: 30px;
+            background: rgba(5, 18, 37, 0.9);
+            border: 1px solid #1a3c8b;
+            border-radius: 12px;
+            overflow: hidden;
+            padding: 20px;
+        }
+        .player-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .vidking-player-container {
+            position: relative;
+            width: 100%;
+            background: #051225;
+            border-radius: 12px;
+            overflow: hidden;
+            margin: 20px 0;
+        }
+        .vidking-player {
+            border: none;
+            border-radius: 8px;
+        }
+        .player-controls {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        .season-selector {
+            margin: 20px 0;
+            padding: 15px;
+            background: rgba(26, 60, 139, 0.2);
+            border-radius: 8px;
+        }
+        .season-selector select {
+            background: rgba(5, 18, 37, 0.9);
+            border: 1px solid #1a3c8b;
+            color: #e0e0e0;
+            padding: 8px 15px;
+            border-radius: 6px;
+            font-family: 'Courier New', monospace;
+        }
+        @media (max-width: 768px) {
+            .tv-nav {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+            }
+            .tv-search-container {
+                margin-left: 0;
+                width: 100%;
+                max-width: 100%;
+            }
+            .tv-content-grid {
+                grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+                gap: 15px;
+            }
+            .movie-poster, .show-poster {
+                height: 240px;
+            }
+            .vidking-player {
+                height: 400px;
+            }
+        }
+        @media (max-width: 480px) {
+            .tv-content-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .vidking-player {
+                height: 300px;
+            }
+        }
     </style>
 </head>
 <body>
-    <div class="creamo-tv-container" id="creamotvTool">
-        <!-- TV content will be injected here by JavaScript -->
-    </div>
+    <div class="creamo-tv-container" id="creamotvTool"></div>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
     <script>
-        // TMDB Configuration
+        // ==================== TMDB Configuration ====================
         const TMDB_ACCESS_TOKEN = 'eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiJmMzhiNGYzNDdiYjExNjljZmVkZTBhY2Q4NzQ4NmZlOCIsIm5iZiI6MTc2NTk2ODc5Ny4zODEsInN1YiI6IjY5NDI4YjlkZDM4ZTVlNGQ5ZjdhMmM3YiIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.KppyeeVe4_rte7wdlc2JM9PvrSkFkfO9wUTWvYAQjAg';
         const TMDB_BASE_URL = 'https://api.themoviedb.org/3';
         const TMDB_IMAGE_URL = 'https://image.tmdb.org/t/p/w500';
 
-        // State variables
+        // Cache and state
         let movieCache = new Map();
+        let tvCache = new Map();
         let moviePage = 1;
         let tvPage = 1;
         let searchQuery = '';
         let currentSearchType = null;
         let currentCategory = 'all';
 
-        // DOM elements
         let tvContainer = document.getElementById('creamotvTool');
 
-        // Setup TV when page loads
-        function initTV() {
-            setupTV();
+        // ==================== Helper Functions ====================
+        async function fetchTMDBData(endpoint) {
+            const cacheKey = endpoint;
+            if (movieCache.has(cacheKey)) {
+                const cached = movieCache.get(cacheKey);
+                if (Date.now() - cached.timestamp < 5 * 60 * 1000) {
+                    return cached.data;
+                }
+            }
+
+            const url = `${TMDB_BASE_URL}/${endpoint}`;
+            const headers = new Headers({
+                'Authorization': `Bearer ${TMDB_ACCESS_TOKEN}`,
+                'Accept': 'application/json'
+            });
+
+            const response = await fetch(url, { headers });
+            if (!response.ok) {
+                throw new Error(`TMDB API Error: ${response.status}`);
+            }
+            const data = await response.json();
+            movieCache.set(cacheKey, { data, timestamp: Date.now() });
+            return data;
         }
 
-        function setupTV() {
-            // Add back button
-            const backBtn = document.createElement('button');
-            backBtn.className = 'back-to-creamo';
-            backBtn.textContent = '← Back to Creamo';
-            backBtn.addEventListener('click', () => {
-                window.location.href = 'index.html';
-            });
-            tvContainer.prepend(backBtn);
-
-            // Create TV navigation
-            const tvNav = document.createElement('div');
-            tvNav.className = 'tv-nav';
-            tvNav.innerHTML = `
-                <h1 class="tv-nav-title">Creamo TV</h1>
-                <div class="tv-search-container">
-                    <input type="text" 
-                           id="tvSearchInput" 
-                           class="search-input" 
-                           placeholder="Search movies & shows..." 
-                           aria-label="Search for movies and TV shows">
-                    <button id="tvSearchBtn" class="player-btn" style="white-space: nowrap;">Search</button>
-                    <button id="tvClearSearch" class="player-btn outline" style="white-space: nowrap; display: none;">Clear</button>
+        function generateMovieCards(movies) {
+            return movies.map(movie => `
+                <div class="movie-card" data-id="${movie.id}" data-type="movie">
+                    <div class="movie-poster">
+                        ${movie.poster_path ? 
+                            `<img src="${TMDB_IMAGE_URL}${movie.poster_path}" alt="${movie.title}" loading="lazy">` :
+                            `<div class="no-poster">${movie.title}</div>`
+                        }
+                        <div class="play-icon">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="#051225">
+                                <path d="M8 5v14l11-7z"/>
+                            </svg>
+                        </div>
+                        <div class="movie-overlay"></div>
+                    </div>
+                    <div class="movie-info">
+                        <h3 title="${movie.title}">${movie.title}</h3>
+                        <div class="movie-meta">
+                            <span>${movie.release_date ? movie.release_date.split('-')[0] : 'N/A'}</span>
+                            <span class="rating">★ ${movie.vote_average ? movie.vote_average.toFixed(1) : 'N/A'}</span>
+                            ${movie.vote_count > 1000 ? '<span class="popular-badge">Popular</span>' : ''}
+                        </div>
+                        <p class="movie-overview">${movie.overview ? movie.overview.substring(0, 100) + '...' : 'No description available'}</p>
+                    </div>
                 </div>
-                <div style="margin-left: auto; display: flex; gap: 10px;">
-                    <button class="player-btn" id="tvHomeBtn">Home</button>
-                    <button class="player-btn" id="tvMoviesBtn">Movies</button>
-                    <button class="player-btn" id="tvShowsBtn">TV Shows</button>
-                    <button class="player-btn" id="tvTrendingBtn">Trending</button>
+            `).join('');
+        }
+
+        function generateShowCards(shows) {
+            return shows.map(show => `
+                <div class="show-card" data-id="${show.id}" data-type="tv">
+                    <div class="show-poster">
+                        ${show.poster_path ? 
+                            `<img src="${TMDB_IMAGE_URL}${show.poster_path}" alt="${show.name}" loading="lazy">` :
+                            `<div class="no-poster">${show.name}</div>`
+                        }
+                        <div class="play-icon">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="#051225">
+                                <path d="M8 5v14l11-7z"/>
+                            </svg>
+                        </div>
+                        <div class="show-overlay"></div>
+                    </div>
+                    <div class="show-info">
+                        <h3 title="${show.name}">${show.name}</h3>
+                        <div class="show-meta">
+                            <span>${show.first_air_date ? show.first_air_date.split('-')[0] : 'N/A'}</span>
+                            <span class="rating">★ ${show.vote_average ? show.vote_average.toFixed(1) : 'N/A'}</span>
+                            <span class="quality-badge">TV</span>
+                        </div>
+                        <p class="show-overview">${show.overview ? show.overview.substring(0, 100) + '...' : 'No description available'}</p>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function generateTrendingCards(items) {
+            return items.map((item, index) => `
+                <div class="trending-card ${index < 3 ? 'top-three' : ''}" data-id="${item.id}" data-type="${item.media_type}">
+                    <div class="trending-rank">#${index + 1}</div>
+                    <div class="trending-poster">
+                        ${item.poster_path ? 
+                            `<img src="${TMDB_IMAGE_URL}${item.poster_path}" alt="${item.title || item.name}" loading="lazy">` :
+                            `<div class="no-poster">${item.title || item.name}</div>`
+                        }
+                    </div>
+                    <div class="trending-info">
+                        <h4>${item.title || item.name}</h4>
+                        <p class="trending-type">${item.media_type === 'movie' ? '🎬 Movie' : '📺 TV Show'}</p>
+                        <span class="trending-rating">★ ${item.vote_average ? item.vote_average.toFixed(1) : 'N/A'}</span>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function setupTVCardInteractions() {
+            setTimeout(() => {
+                document.querySelectorAll('.movie-card, .show-card, .trending-card').forEach(card => {
+                    card.addEventListener('click', (e) => {
+                        const id = card.dataset.id;
+                        const type = card.dataset.type;
+                        const title = card.querySelector('h3, h4').textContent;
+                        if (type === 'movie') {
+                            playMovie(id, title);
+                        } else {
+                            playTVShow(id, title);
+                        }
+                    });
+                });
+            }, 100);
+        }
+
+        function playMovie(movieId, title) {
+            const tvContent = document.getElementById('tvContent');
+            const vidkingUrl = `https://www.vidking.net/embed/movie/${movieId}?color=d4af37&autoPlay=true`;
+            tvContent.innerHTML = `
+                <div class="tv-player">
+                    <div class="player-header">
+                        <h2>🎬 Now Playing: ${title}</h2>
+                        <button class="player-btn" onclick="loadTVHome()">← Back to Library</button>
+                    </div>
+                    <div class="vidking-player-container">
+                        <iframe 
+                            src="${vidkingUrl}" 
+                            width="100%" 
+                            height="600" 
+                            frameborder="0" 
+                            allowfullscreen
+                            class="vidking-player"
+                            title="Vidking Player - ${title}"
+                        ></iframe>
+                    </div>
+                    <div class="player-info">
+                        <h3>${title}</h3>
+                        <p>Streaming via Vidking Player with real-time progress tracking</p>
+                        <div class="player-controls">
+                            <button class="player-btn primary" onclick="loadTVMovies()">Browse More Movies</button>
+                            <button class="player-btn" onclick="loadTVShows()">Switch to TV Shows</button>
+                        </div>
+                    </div>
                 </div>
             `;
-
-            // TV Content Container
-            const tvContent = document.createElement('div');
-            tvContent.id = 'tvContent';
-            tvContent.className = 'tv-content';
-
-            tvContainer.appendChild(tvNav);
-            tvContainer.appendChild(tvContent);
-
-            // Load initial TV content
-            loadTVHome();
-
-            // Setup event listeners
-            document.getElementById('tvHomeBtn').addEventListener('click', () => {
-                resetSearch();
-                loadTVHome();
-            });
-            document.getElementById('tvMoviesBtn').addEventListener('click', () => {
-                resetSearch();
-                loadTVMovies();
-            });
-            document.getElementById('tvShowsBtn').addEventListener('click', () => {
-                resetSearch();
-                loadTVShows();
-            });
-            document.getElementById('tvTrendingBtn').addEventListener('click', () => {
-                resetSearch();
-                loadTVTrending();
-            });
-
-            setupTVSearch();
         }
 
-        function setupTVSearch() {
+        function playTVShow(showId, title, season = 1, episode = 1) {
+            const tvContent = document.getElementById('tvContent');
+            const vidkingUrl = `https://www.vidking.net/embed/tv/${showId}/${season}/${episode}?color=d4af37&autoPlay=true&nextEpisode=true&episodeSelector=true`;
+            tvContent.innerHTML = `
+                <div class="tv-player">
+                    <div class="player-header">
+                        <h2>📺 Now Playing: ${title}</h2>
+                        <button class="player-btn" onclick="loadTVHome()">← Back to Library</button>
+                    </div>
+                    <div class="vidking-player-container">
+                        <iframe 
+                            src="${vidkingUrl}" 
+                            width="100%" 
+                            height="600" 
+                            frameborder="0" 
+                            allowfullscreen
+                            class="vidking-player"
+                            title="Vidking Player - ${title}"
+                        ></iframe>
+                    </div>
+                    <div class="player-info">
+                        <h3>${title} - S${season}E${episode}</h3>
+                        <p>TV series with episode navigation and auto-play next episode</p>
+                        <div class="season-selector">
+                            <label>Season:</label>
+                            <select id="seasonSelect" onchange="changeSeason(${showId}, this.value)">
+                                ${Array.from({length: 5}, (_, i) => `<option value="${i+1}" ${i+1 === season ? 'selected' : ''}>Season ${i+1}</option>`).join('')}
+                            </select>
+                            <label style="margin-left:20px;">Episode:</label>
+                            <select id="episodeSelect" onchange="changeEpisode(${showId}, ${season}, this.value)">
+                                ${Array.from({length: 10}, (_, i) => `<option value="${i+1}" ${i+1 === episode ? 'selected' : ''}>Episode ${i+1}</option>`).join('')}
+                            </select>
+                        </div>
+                        <div class="player-controls">
+                            <button class="player-btn primary" onclick="loadTVShows()">Browse More Shows</button>
+                            <button class="player-btn" onclick="loadTVMovies()">Switch to Movies</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function changeSeason(showId, season) {
+            const episode = document.getElementById('episodeSelect').value;
+            playTVShow(showId, 'TV Show', parseInt(season), parseInt(episode));
+        }
+
+        function changeEpisode(showId, season, episode) {
+            playTVShow(showId, 'TV Show', parseInt(season), parseInt(episode));
+        }
+
+        function resetSearch() {
+            searchQuery = '';
+            moviePage = 1;
+            tvPage = 1;
+            currentSearchType = null;
+            currentCategory = 'all';
             const searchInput = document.getElementById('tvSearchInput');
-            const searchBtn = document.getElementById('tvSearchBtn');
             const clearBtn = document.getElementById('tvClearSearch');
-
-            searchBtn.addEventListener('click', () => {
-                const query = searchInput.value.trim();
-                if (query) {
-                    searchTVContent(query);
-                }
-            });
-
-            searchInput.addEventListener('keypress', (e) => {
-                if (e.key === 'Enter') {
-                    const query = searchInput.value.trim();
-                    if (query) {
-                        searchTVContent(query);
-                    }
-                }
-            });
-
-            clearBtn.addEventListener('click', () => {
-                resetSearch();
-                searchInput.value = '';
-                clearBtn.style.display = 'none';
-                if (currentSearchType === 'movie') {
-                    loadTVMovies();
-                } else if (currentSearchType === 'tv') {
-                    loadTVShows();
-                } else {
-                    loadTVHome();
-                }
-            });
-
-            searchInput.addEventListener('input', () => {
-                clearBtn.style.display = searchInput.value.trim() ? 'inline-block' : 'none';
-            });
+            if (searchInput) searchInput.value = '';
+            if (clearBtn) clearBtn.style.display = 'none';
         }
 
         async function searchTVContent(query, type = 'multi') {
@@ -227,25 +656,18 @@
 
             } catch (error) {
                 console.error('Search error:', error);
-                tvContent.innerHTML = `<div class="error-section">...</div>`;
+                tvContent.innerHTML = `<div class="error-section"><div class="error-icon">⚠️</div><h3>Search Failed</h3><p>Unable to search TMDB. Please try again later.</p><button class="player-btn" onclick="loadTVHome()">Back to Home</button></div>`;
             }
-        }
-
-        function resetSearch() {
-            searchQuery = '';
-            moviePage = 1;
-            tvPage = 1;
-            currentSearchType = null;
-            currentCategory = 'all';
-            const searchInput = document.getElementById('tvSearchInput');
-            const clearBtn = document.getElementById('tvClearSearch');
-            if (searchInput) searchInput.value = '';
-            if (clearBtn) clearBtn.style.display = 'none';
         }
 
         async function loadTVHome() {
             const tvContent = document.getElementById('tvContent');
-            tvContent.innerHTML = `<div class="loading-section">...</div>`;
+            tvContent.innerHTML = `
+                <div class="loading-section">
+                    <div class="loading-spinner"></div>
+                    <p>Fetching trending content from TMDB...</p>
+                </div>
+            `;
             try {
                 const [trendingMovies, trendingShows, popularMovies, popularShows] = await Promise.all([
                     fetchTMDBData('trending/movie/day'),
@@ -254,36 +676,251 @@
                     fetchTMDBData('tv/popular')
                 ]);
                 tvContent.innerHTML = `
-                    <div class="tv-section"><h2>🎬 Trending Movies Today</h2><div class="tv-content-grid">${generateMovieCards(trendingMovies.results.slice(0,6))}</div></div>
-                    <div class="tv-section"><h2>📺 Trending TV Shows Today</h2><div class="tv-content-grid">${generateShowCards(trendingShows.results.slice(0,6))}</div></div>
-                    <div class="tv-section"><h2>🎥 Popular Movies</h2><div class="tv-content-grid">${generateMovieCards(popularMovies.results.slice(0,6))}</div></div>
-                    <div class="tv-section"><h2>🎞️ Popular TV Shows</h2><div class="tv-content-grid">${generateShowCards(popularShows.results.slice(0,6))}</div></div>
-                    <div class="tv-player">...</div>
+                    <div class="tv-section">
+                        <h2>🎬 Trending Movies Today</h2>
+                        <div class="tv-content-grid">${generateMovieCards(trendingMovies.results.slice(0,6))}</div>
+                    </div>
+                    <div class="tv-section">
+                        <h2>📺 Trending TV Shows Today</h2>
+                        <div class="tv-content-grid">${generateShowCards(trendingShows.results.slice(0,6))}</div>
+                    </div>
+                    <div class="tv-section">
+                        <h2>🎥 Popular Movies</h2>
+                        <div class="tv-content-grid">${generateMovieCards(popularMovies.results.slice(0,6))}</div>
+                    </div>
+                    <div class="tv-section">
+                        <h2>🎞️ Popular TV Shows</h2>
+                        <div class="tv-content-grid">${generateShowCards(popularShows.results.slice(0,6))}</div>
+                    </div>
+                    <div class="tv-player">
+                        <div class="player-placeholder">
+                            <svg width="80" height="80" viewBox="0 0 24 24" fill="#d4af37"><path d="M8 5v14l11-7z"/></svg>
+                            <p style="margin-top:20px; font-size:18px;">Ready to Stream</p>
+                            <p style="font-size:14px; opacity:0.7;">Click any movie or show to start playing</p>
+                        </div>
+                        <div class="player-info">
+                            <h3>Creamo TV Streaming</h3>
+                            <p>Powered by TMDB API + Vidking Player</p>
+                        </div>
+                    </div>
                 `;
                 setupTVCardInteractions();
-            } catch (error) { showTMDBError(tvContent, error); }
+            } catch (error) {
+                showTMDBError(tvContent, error);
+            }
         }
 
         async function loadTVMovies(page = 1) {
-            // ... similar to original implementation, omitted for brevity
-            // (full implementation would be copied from original script.js)
+            const tvContent = document.getElementById('tvContent');
+            tvContent.innerHTML = `<div class="loading-section"><div class="loading-spinner"></div><p>Loading movies...</p></div>`;
+            try {
+                const movies = await fetchTMDBData(`movie/popular?page=${page}`);
+                moviePage = page;
+                const loadMoreBtn = page > 1 ? `
+                    <div class="load-more-container">
+                        <button class="load-more-btn" id="loadMoreMoviesBtn">Load More Movies (Page ${page+1})</button>
+                        <button class="load-more-btn outline" id="backToFirstPageBtn">Back to First Page</button>
+                    </div>
+                ` : `<div class="load-more-container"><button class="load-more-btn" id="loadMoreMoviesBtn">Load More Movies</button></div>`;
+                tvContent.innerHTML = `
+                    <div class="tv-section">
+                        <h2>🎬 All Movies</h2>
+                        <p style="color:#a0a0a0; margin-bottom:20px;">Page ${page} • ${movies.total_results} movies total</p>
+                        <div class="tv-content-grid" id="moviesGrid">${generateMovieCards(movies.results)}</div>
+                        ${loadMoreBtn}
+                    </div>
+                `;
+                setTimeout(() => {
+                    const loadMore = document.getElementById('loadMoreMoviesBtn');
+                    const backFirst = document.getElementById('backToFirstPageBtn');
+                    if (loadMore) loadMore.addEventListener('click', () => loadTVMovies(page+1));
+                    if (backFirst) backFirst.addEventListener('click', () => loadTVMovies(1));
+                }, 100);
+                setupTVCardInteractions();
+            } catch (error) {
+                showTMDBError(tvContent, error);
+            }
         }
 
-        async function loadTVShows(page = 1) { /* ... */ }
-        async function loadTVTrending() { /* ... */ }
-        async function fetchTMDBData(endpoint) { /* ... */ }
-        function generateMovieCards(movies) { /* ... */ }
-        function generateShowCards(shows) { /* ... */ }
-        function generateTrendingCards(items) { /* ... */ }
-        function setupTVCardInteractions() { /* ... */ }
-        function playMovie(movieId, title) { /* ... */ }
-        function playTVShow(showId, title, season = 1, episode = 1) { /* ... */ }
-        function changeSeason(showId, season) { /* ... */ }
-        function changeEpisode(showId, season, episode) { /* ... */ }
-        function showTMDBError(container, error) { /* ... */ }
-        function generateFallbackMovies() { /* ... */ }
+        async function loadTVShows(page = 1) {
+            const tvContent = document.getElementById('tvContent');
+            tvContent.innerHTML = `<div class="loading-section"><div class="loading-spinner"></div><p>Loading TV shows...</p></div>`;
+            try {
+                const shows = await fetchTMDBData(`tv/popular?page=${page}`);
+                tvPage = page;
+                const loadMoreBtn = page > 1 ? `
+                    <div class="load-more-container">
+                        <button class="load-more-btn" id="loadMoreShowsBtn">Load More Shows (Page ${page+1})</button>
+                        <button class="load-more-btn outline" id="backToFirstShowsBtn">Back to First Page</button>
+                    </div>
+                ` : `<div class="load-more-container"><button class="load-more-btn" id="loadMoreShowsBtn">Load More Shows</button></div>`;
+                tvContent.innerHTML = `
+                    <div class="tv-section">
+                        <h2>📺 TV Shows</h2>
+                        <p style="color:#a0a0a0; margin-bottom:20px;">Page ${page} • ${shows.total_results} shows total</p>
+                        <div class="tv-content-grid" id="showsGrid">${generateShowCards(shows.results)}</div>
+                        ${loadMoreBtn}
+                    </div>
+                `;
+                setTimeout(() => {
+                    const loadMore = document.getElementById('loadMoreShowsBtn');
+                    const backFirst = document.getElementById('backToFirstShowsBtn');
+                    if (loadMore) loadMore.addEventListener('click', () => loadTVShows(page+1));
+                    if (backFirst) backFirst.addEventListener('click', () => loadTVShows(1));
+                }, 100);
+                setupTVCardInteractions();
+            } catch (error) {
+                showTMDBError(tvContent, error);
+            }
+        }
 
-        // Start the TV app
+        async function loadTVTrending() {
+            const tvContent = document.getElementById('tvContent');
+            tvContent.innerHTML = `<div class="loading-section"><div class="loading-spinner"></div><p>Loading trending...</p></div>`;
+            try {
+                const [trendingAll, trendingMovies, trendingShows] = await Promise.all([
+                    fetchTMDBData('trending/all/day'),
+                    fetchTMDBData('trending/movie/day'),
+                    fetchTMDBData('trending/tv/day')
+                ]);
+                tvContent.innerHTML = `
+                    <div class="tv-section">
+                        <h2>🔥 Trending Now</h2>
+                        <div class="tv-content-grid">${generateTrendingCards(trendingAll.results.slice(0,12))}</div>
+                    </div>
+                    <div class="tv-section">
+                        <h2>📈 Movie Trends</h2>
+                        <div class="tv-content-grid">${generateMovieCards(trendingMovies.results.slice(0,6))}</div>
+                    </div>
+                    <div class="tv-section">
+                        <h2>📊 TV Trends</h2>
+                        <div class="tv-content-grid">${generateShowCards(trendingShows.results.slice(0,6))}</div>
+                    </div>
+                `;
+                setupTVCardInteractions();
+            } catch (error) {
+                showTMDBError(tvContent, error);
+            }
+        }
+
+        function showTMDBError(container, error) {
+            container.innerHTML = `
+                <div class="error-section">
+                    <div class="error-icon">⚠️</div>
+                    <h3>TMDB API Connection Failed</h3>
+                    <p>Unable to fetch movie data. Please check your TMDB API access token.</p>
+                    <p class="error-details">Error: ${error.message}</p>
+                    <div class="fallback-content">
+                        <h4>Using Fallback Example Content:</h4>
+                        <div class="tv-content-grid">
+                            ${generateFallbackMovies()}
+                        </div>
+                    </div>
+                </div>
+            `;
+            setupTVCardInteractions();
+        }
+
+        function generateFallbackMovies() {
+            const fallbackMovies = [
+                { id: '299534', title: 'Rebel Ridge', release_date: '2024', vote_average: 8.5 },
+                { id: '1078605', title: 'Hit Man', release_date: '2024', vote_average: 9.1 },
+                { id: '693134', title: 'Dune: Part Two', release_date: '2024', vote_average: 8.3 },
+                { id: '872585', title: 'Oppenheimer', release_date: '2023', vote_average: 8.8 },
+                { id: '119051', title: 'The Boys', first_air_date: '2019', vote_average: 8.7, media_type: 'tv' },
+                { id: '66732', title: 'Stranger Things', first_air_date: '2016', vote_average: 8.7, media_type: 'tv' }
+            ];
+            return fallbackMovies.map(movie => `
+                <div class="movie-card" data-id="${movie.id}" data-type="${movie.media_type || 'movie'}">
+                    <div class="movie-poster">
+                        <div class="no-poster">${movie.title}</div>
+                        <div class="play-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="#051225"><path d="M8 5v14l11-7z"/></svg></div>
+                    </div>
+                    <div class="movie-info">
+                        <h3>${movie.title}</h3>
+                        <div class="movie-meta">
+                            <span>${movie.release_date || movie.first_air_date}</span>
+                            <span class="rating">★ ${movie.vote_average}</span>
+                        </div>
+                        <p class="movie-overview">${movie.media_type === 'tv' ? 'Popular TV Series' : 'Featured Movie'}</p>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function setupTVSearch() {
+            const searchInput = document.getElementById('tvSearchInput');
+            const searchBtn = document.getElementById('tvSearchBtn');
+            const clearBtn = document.getElementById('tvClearSearch');
+
+            searchBtn.addEventListener('click', () => {
+                const query = searchInput.value.trim();
+                if (query) searchTVContent(query);
+            });
+            searchInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    const query = searchInput.value.trim();
+                    if (query) searchTVContent(query);
+                }
+            });
+            clearBtn.addEventListener('click', () => {
+                resetSearch();
+                searchInput.value = '';
+                clearBtn.style.display = 'none';
+                if (currentSearchType === 'movie') loadTVMovies();
+                else if (currentSearchType === 'tv') loadTVShows();
+                else loadTVHome();
+            });
+            searchInput.addEventListener('input', () => {
+                clearBtn.style.display = searchInput.value.trim() ? 'inline-block' : 'none';
+            });
+        }
+
+        // ==================== Initialize TV Page ====================
+        function initTV() {
+            // Back button
+            const backBtn = document.createElement('button');
+            backBtn.className = 'back-to-creamo';
+            backBtn.textContent = '← Back to Creamo';
+            backBtn.addEventListener('click', () => {
+                window.location.href = 'index.html';
+            });
+            tvContainer.prepend(backBtn);
+
+            // TV navigation
+            const tvNav = document.createElement('div');
+            tvNav.className = 'tv-nav';
+            tvNav.innerHTML = `
+                <h1 class="tv-nav-title">Creamo TV</h1>
+                <div class="tv-search-container">
+                    <input type="text" id="tvSearchInput" class="search-input" placeholder="Search movies & shows...">
+                    <button id="tvSearchBtn" class="player-btn">Search</button>
+                    <button id="tvClearSearch" class="player-btn outline" style="display:none;">Clear</button>
+                </div>
+                <div style="margin-left: auto; display: flex; gap: 10px;">
+                    <button class="player-btn" id="tvHomeBtn">Home</button>
+                    <button class="player-btn" id="tvMoviesBtn">Movies</button>
+                    <button class="player-btn" id="tvShowsBtn">TV Shows</button>
+                    <button class="player-btn" id="tvTrendingBtn">Trending</button>
+                </div>
+            `;
+            const tvContent = document.createElement('div');
+            tvContent.id = 'tvContent';
+            tvContent.className = 'tv-content';
+            tvContainer.appendChild(tvNav);
+            tvContainer.appendChild(tvContent);
+
+            // Set up event listeners
+            document.getElementById('tvHomeBtn').addEventListener('click', () => { resetSearch(); loadTVHome(); });
+            document.getElementById('tvMoviesBtn').addEventListener('click', () => { resetSearch(); loadTVMovies(); });
+            document.getElementById('tvShowsBtn').addEventListener('click', () => { resetSearch(); loadTVShows(); });
+            document.getElementById('tvTrendingBtn').addEventListener('click', () => { resetSearch(); loadTVTrending(); });
+
+            setupTVSearch();
+            loadTVHome();
+        }
+
+        // Start
         initTV();
     </script>
 </body>
