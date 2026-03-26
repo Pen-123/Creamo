@@ -73,10 +73,10 @@ const BOSS_67 = {
     color: "#1a3c8b",
     icon: "💀",
     description: "The ultimate 67 manifestation. Defeat it to uncover the truth.",
-    moves: { punch: 60, kick: 55, special: 120 },
+    moves: { punch: 40, kick: 55, special: 120 },
     isBoss: true,
     combos: [
-        { input: ["right", "right", "punch"], name: "ULTIMATE UPPERCUT", damage: 200 },
+        { input: ["right", "right", "punch"], name: "ULTIMATE UPPERCUT", damage: 150 },
         { input: ["down", "right", "punch"], name: "MEGA FIREBALL", damage: 180 }
     ]
 };
