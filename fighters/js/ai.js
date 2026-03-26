@@ -3,7 +3,7 @@ const DIFFICULTY_SETTINGS = {
     medium: { cpuHpMultiplier: 1.0, parryChance: 0.5, aggression: 0.6, learningRate: 0.3 },
     hard: { cpuHpMultiplier: 1.3, parryChance: 0.8, aggression: 0.9, learningRate: 0.5 },
     insane: { cpuHpMultiplier: 1.5, parryChance: 1.0, aggression: 1.0, learningRate: 0.8 },
-    sixtyseven: { cpuHpMultiplier: 2.5, parryChance: 0.0, aggression: 1.2, learningRate: 0.9, isBoss: true }
+    sixtyseven: { cpuHpMultiplier: 2.5, parryChance: 0.0, aggression: 0.9, learningRate: 0.7, isBoss: true }
 };
 function updateCPUAI() {
     if (!gameState.cpu || gameState.cpu.isBoss) return;
