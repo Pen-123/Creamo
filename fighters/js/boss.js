@@ -4,6 +4,9 @@ const BOSS_CUTSCENE_TEXTS = [
     "A SECOND CHANCE AWAITS...", "WHEN ALL SEEMS LOST...", "THE LEGEND WILL PROTECT YOU...",
     "THE LEGEND OF THE BLOODROT...", "FIGHT!"
 ];
+
+let lastStunTime = 0;   // <-- ADD THIS LINE
+
 function startBossCutscene() {
     gameState.cutsceneActive = true;
     gameState.cutsceneStartTime = null;
@@ -29,6 +32,7 @@ function startBossCutscene() {
     overlay.style.display = 'flex';
     animateCutscene();
 }
+
 function animateCutscene() {
     if (!gameState.cutsceneActive) return;
     const textElem = document.getElementById('cutsceneText');
@@ -53,6 +57,7 @@ function animateCutscene() {
         requestAnimationFrame(animateCutscene);
     } else endCutscene();
 }
+
 function endCutscene() {
     gameState.cutsceneActive = false;
     gameState.cutsceneStartTime = null;
@@ -66,26 +71,21 @@ function endCutscene() {
     const disp = document.getElementById('comboDisplay');
     if (disp) { disp.textContent = "SURVIVE! Boss stuns every 40s with 1% damage!"; disp.classList.add('active'); setTimeout(() => disp.classList.remove('active'), 3000); }
 }
+
 function updateBossSurvival() {
-    // Check for stun every 5 seconds
     const now = Date.now();
     if (!gameState.isBossStunned && (now - lastStunTime) >= 5000) {
         gameState.isBossStunned = true;
         lastStunTime = now;
-        
-        // Apply stun damage (5% of max health)
         const damage = gameState.cpu.maxHealth * 0.05;
         gameState.cpu.health = Math.max(0, gameState.cpu.health - damage);
         createBossStunEffect();
-        
         const disp = document.getElementById('comboDisplay');
         if (disp) {
             disp.textContent = `67 BOSS STUNNED! -5% HP`;
             disp.classList.add('active');
             setTimeout(() => disp.classList.remove('active'), 2000);
         }
-        
-        // Clear stun after 0.5 seconds
         setTimeout(() => { gameState.isBossStunned = false; }, 500);
     }
     gameState.playerHiddenHealTimer++;
@@ -103,6 +103,7 @@ function updateBossSurvival() {
     if (gameState.playerRealHP <= 0) gameState.player.health = 0;
     if (!gameState.isBossStunned) updateBossAI();
 }
+
 function updateBossAI() {
     const dist = gameState.cpu.x - gameState.player.x;
     if (Math.abs(dist) > 2.5) {
@@ -120,6 +121,7 @@ function updateBossAI() {
         gameState.cpu.attackCooldown = 20;
     }
 }
+
 function doBossStompAttack() {
     console.log("BOSS STOMP ATTACK!");
     if (window.cpuModel) {
@@ -136,6 +138,7 @@ function doBossStompAttack() {
         applyPlayerDamage(dmg);
     }
 }
+
 function doBossDashAttack() {
     console.log("BOSS DASH ATTACK!");
     const origX = gameState.cpu.x;
@@ -152,6 +155,7 @@ function doBossDashAttack() {
     }
     setTimeout(() => { gameState.cpu.x = origX; if (window.cpuModel) window.cpuModel.position.x = origX; }, 300);
 }
+
 function checkSecondLife() {
     if (gameState.isBossFight && !gameState.secondLifeUsed && (gameState.playerRealHP <= 20 || (gameState.playerRealHP - 10 <= 0))) {
         gameState.secondLifeUsed = true;
@@ -165,6 +169,7 @@ function checkSecondLife() {
     }
     return false;
 }
+
 function createBossStunEffect() {
     const el = document.createElement('div');
     el.className = 'boss-stun-effect';
@@ -173,6 +178,7 @@ function createBossStunEffect() {
     document.getElementById('gameScreen').appendChild(el);
     setTimeout(() => el.remove(), 500);
 }
+
 function createPlayerHealEffect() {
     const el = document.createElement('div');
     el.className = 'player-heal-effect';
@@ -181,6 +187,7 @@ function createPlayerHealEffect() {
     document.getElementById('gameScreen').appendChild(el);
     setTimeout(() => el.remove(), 1000);
 }
+
 function createSecondLifeEffect() {
     const el = document.createElement('div');
     el.className = 'second-life-effect';
