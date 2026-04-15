@@ -1,4 +1,4 @@
-// game-ui.js
+// fighters/js/game-ui.js
 
 function detectDevice() {
     const ua = navigator.userAgent.toLowerCase();
@@ -7,7 +7,6 @@ function detectDevice() {
     const hasTouch = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
     gameState.deviceType = (isTablet || (isMobile && hasTouch && window.innerWidth >= 768)) ? 'tablet' : 'desktop';
     document.getElementById('deviceType').textContent = gameState.deviceType === 'tablet' ? 'TABLET MODE' : 'DESKTOP MODE';
-    // Automatically proceed to loading after a short delay
     setTimeout(() => {
         document.getElementById('deviceDetection').classList.remove('active');
         document.getElementById('loading').classList.add('active');
@@ -52,12 +51,17 @@ function showScreen(screenId) {
         setTimeout(() => { if (typeof initThreeJS === 'function') initThreeJS(); startGame(); }, 100);
     } else if (screenId === 'characterSelect') {
         renderCharacterSelect();
-        // Add boss difficulty option if unlocked and not already present
         const diffSelect = document.getElementById('difficultySelect');
         if (gameState.bossUnlocked && !Array.from(diffSelect.options).some(opt => opt.value === 'sixtyseven')) {
             const option = document.createElement('option');
             option.value = 'sixtyseven';
             option.textContent = '67 BOSS - SURVIVAL';
+            diffSelect.appendChild(option);
+        }
+        if (gameState.boss21Unlocked && !Array.from(diffSelect.options).some(opt => opt.value === 'twentyone')) {
+            const option = document.createElement('option');
+            option.value = 'twentyone';
+            option.textContent = '21 BOSS - TURN-BASED';
             diffSelect.appendChild(option);
         }
     } else if (screenId === 'shopScreen') {
@@ -152,7 +156,7 @@ function startGame() {
     gameState.playerRealHP = 100;
     gameState.survivalPhase = 0;
     gameState.secondLifeUsed = false;
-    gameState.dashCooldown = 0; // for player dash
+    gameState.dashCooldown = 0;
     const parryBtns = document.querySelectorAll('[data-action="parry"]');
     parryBtns.forEach(btn => { btn.disabled = false; btn.style.opacity = '1'; btn.style.background = 'rgba(100,255,100,0.7)'; btn.textContent = 'PARRY'; });
     gameState.player = {
@@ -237,32 +241,34 @@ function setupEventListeners() {
     document.getElementById('creditsBackBtn').addEventListener('click', () => showScreen('mainMenu'));
     document.getElementById('confirmBtn').addEventListener('click', () => startBattle('arcade'));
     document.addEventListener('keydown', (e) => {
-    if (gameState.cutsceneActive) return;
-    const key = e.key.toLowerCase();
-    gameState.keys[key] = true;
-    
-    // Handle dash key (L)
-    if (key === 'l' && gameState.gameActive && gameState.player.dashCooldown <= 0) {
-        doPlayerDash();
-        e.preventDefault();
-    }
-    
-    // Combo detection
-    if (['arrowleft','arrowright','z','x','a','s',' ','c'].includes(key)) {
-        const keyMap = { 'arrowleft':'left','arrowright':'right','z':'punch','x':'punch','a':'kick','s':'kick',' ':'parry','c':'special' };
-        const now = Date.now();
-        if (now - gameState.lastKeyTime > 1000) gameState.combo = [];
-        if (keyMap[key]) { gameState.combo.push(keyMap[key]); gameState.lastKeyTime = now; checkCombos(); }
-    }
-    
-    // Attacks
-    if (gameState.gameActive && gameState.player.attackCooldown <= 0) {
-        if (key === 'z' || key === 'x') doPlayerAttack('punch');
-        else if (key === 'a' || key === 's') doPlayerAttack('kick');
-        else if (key === ' ') doPlayerAttack('parry');
-        else if (key === 'c') doPlayerAttack('special');
-    }
-});
+        if (gameState.cutsceneActive) return;
+        const key = e.key.toLowerCase();
+        gameState.keys[key] = true;
+        if (key === 'l' && gameState.gameActive && gameState.player.dashCooldown <= 0) {
+            doPlayerDash();
+            e.preventDefault();
+        }
+        if (['arrowleft','arrowright','z','x','a','s',' ','c'].includes(key)) {
+            const keyMap = { 'arrowleft':'left','arrowright':'right','z':'punch','x':'punch','a':'kick','s':'kick',' ':'parry','c':'special' };
+            const now = Date.now();
+            if (now - gameState.lastKeyTime > 1000) gameState.combo = [];
+            if (keyMap[key]) { gameState.combo.push(keyMap[key]); gameState.lastKeyTime = now; checkCombos(); }
+        }
+        if (gameState.gameActive && gameState.player.attackCooldown <= 0) {
+            if (key === 'z' || key === 'x') doPlayerAttack('punch');
+            else if (key === 'a' || key === 's') doPlayerAttack('kick');
+            else if (key === ' ') doPlayerAttack('parry');
+            else if (key === 'c') doPlayerAttack('special');
+        }
+        if (key === ' ' && boss21Fight && boss21Fight.timingBarActive) {
+            boss21Fight.handleSpacePress();
+            e.preventDefault();
+        }
+        if (key === 'g' && boss21Fight && boss21Fight.fightActive) {
+            boss21Fight.attemptDodge();
+            e.preventDefault();
+        }
+    });
     document.addEventListener('keyup', (e) => { gameState.keys[e.key.toLowerCase()] = false; });
     window.addEventListener('resize', () => {
         if (window.camera && window.renderer) {
@@ -277,8 +283,42 @@ function setupEventListeners() {
 function startBattle(mode = 'arcade') {
     if (gameState.selectedCharacter === null) { alert('Please select a character first!'); return; }
     gameState.gameMode = mode;
-    gameState.difficulty = document.getElementById('difficultySelect').value;
-    gameState.isBossFight = (gameState.difficulty === 'sixtyseven' && CHARACTERS[gameState.selectedCharacter].id === 67);
+    const difficultySelect = document.getElementById('difficultySelect');
+    gameState.difficulty = difficultySelect.value;
+    const playerChar = CHARACTERS[gameState.selectedCharacter];
+    if (gameState.difficulty === 'twentyone' && playerChar.id === 21) {
+        console.log('STARTING 21 BOSS TURN‑BASED FIGHT!');
+        showScreen('gameScreen');
+        gameState.player = {
+            character: playerChar,
+            x: -5, z: 0,
+            health: playerChar.hp,
+            maxHealth: playerChar.hp,
+            facing: 1,
+            state: 'idle',
+            attackCooldown: 0,
+            items: gameState.playerInventory
+        };
+        gameState.cpu = {
+            character: BOSS_21,
+            x: 5, z: 0,
+            health: BOSS_21.hp,
+            maxHealth: BOSS_21.hp,
+            facing: -1,
+            isBoss: true,
+            is21Boss: true
+        };
+        document.getElementById('p1Name').textContent = playerChar.name;
+        document.getElementById('p2Name').textContent = "21 BOSS";
+        updateHealthBars();
+        if (typeof start21BossFight === 'function') {
+            start21BossFight();
+        } else {
+            console.error('boss21.js not loaded');
+        }
+        return;
+    }
+    gameState.isBossFight = (gameState.difficulty === 'sixtyseven' && playerChar.id === 67);
     if (gameState.isBossFight) console.log('STARTING 67 BOSS SURVIVAL MODE!');
     showScreen('gameScreen');
 }
@@ -293,7 +333,6 @@ function showBossDefeatedDialogue() {
 
 function exitToCreamo() { window.location.href = 'index.html'; }
 
-// Initialization
 function init() {
     console.log('Brainrot Fighters initializing...');
     detectDevice();
