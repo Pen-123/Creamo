@@ -1,4 +1,5 @@
-// Game state
+// fighters/js/game-core.js
+
 window.gameState = {
     currentScreen: 'deviceDetection',
     selectedCharacter: null,
@@ -23,7 +24,11 @@ window.gameState = {
     parryCooldownEnd: 0,
     bossUnlocked: localStorage.getItem('boss67Unlocked') === 'true',
     bossDefeated: localStorage.getItem('boss67Defeated') === 'true',
+    boss21Unlocked: localStorage.getItem('boss21Unlocked') === 'true',
+    boss21Defeated: localStorage.getItem('boss21Defeated') === 'true',
     isBossFight: false,
+    is21BossFight: false,
+    turnBased: false,
     bossSpecialAttackCooldown: 0,
     bossStunTimer: 0,
     dashCooldown: 0,
@@ -45,18 +50,12 @@ window.gameState = {
     bossStunPhase: 0,
     globalMessage: "",
     customBackground: localStorage.getItem('customBackground') || 'default',
-    customBackgroundUrl: localStorage.getItem('customBackgroundUrl') || ''
+    customBackgroundUrl: localStorage.getItem('customBackgroundUrl') || '',
+    dodgeWindow: false,
+    dodgeWarningActive: false,
+    dodgeSuccessful: false
 };
-// ADD THIS RIGHT AFTER creating the player object:
-if (isBossFight) {
-    // Increase player HP for boss fight (example: double HP)
-    gameState.player.maxHealth = playerChar.hp * 2;
-    gameState.player.health = gameState.player.maxHealth;
-    gameState.playerRealHP = 300;
-    gameState.playerFakeHP = 100;
-}
 
-// Admin panel
 function initAdminPanel() {
     console.log('Initializing admin panel...');
     let adminCode = '';
@@ -67,6 +66,7 @@ function initAdminPanel() {
         if (adminCode === '231214') { toggleAdminPanel(); adminCode = ''; }
     });
 }
+
 function toggleAdminPanel() {
     const existingPanel = document.getElementById('adminPanel');
     if (existingPanel) { existingPanel.remove(); gameState.adminMode = false; return; }
@@ -110,6 +110,7 @@ function toggleAdminPanel() {
     });
     document.getElementById('closeAdminPanel').addEventListener('click', () => { adminPanel.remove(); gameState.adminMode = false; });
 }
+
 function setCustomBackground(url) {
     gameState.customBackgroundUrl = url;
     gameState.customBackground = 'custom';
@@ -118,6 +119,7 @@ function setCustomBackground(url) {
     applyCustomBackground();
     showGlobalMessage('Custom background set!');
 }
+
 function showGlobalMessage(message) {
     gameState.globalMessage = message;
     const msgDiv = document.createElement('div');
@@ -127,6 +129,7 @@ function showGlobalMessage(message) {
     document.body.appendChild(msgDiv);
     setTimeout(() => msgDiv.remove(), 5000);
 }
+
 function applyCustomBackground() {
     const body = document.body;
     body.classList.remove('bg-space','bg-neon','bg-matrix','bg-fire','bg-ice','bg-custom');
@@ -142,7 +145,6 @@ function applyCustomBackground() {
     }
 }
 
-// Main loop
 let fightAnimRequest = null;
 function animate() {
     if (!gameState.gameActive) return;
@@ -155,6 +157,7 @@ function animate() {
         if (window.mixerCpu) window.mixerCpu.update(delta);
     } catch (error) { console.error('Game loop error:', error); }
 }
+
 function updateGame() {
     if (!gameState.player || !gameState.cpu) return;
     if (gameState.cutsceneActive) return;
@@ -184,9 +187,11 @@ function updateGame() {
     }
     if (gameState.player.health <= 0 || gameState.cpu.health <= 0 || gameState.roundTime <= 0) endRound();
 }
+
 function renderGame() {
     if (window.renderer && window.scene && window.camera) window.renderer.render(window.scene, window.camera);
 }
+
 function endRound() {
     gameState.gameActive = false;
     const bossMusic = document.getElementById('bossMusic');
@@ -202,6 +207,10 @@ function endRound() {
         gameState.coins += 50;
         if (gameState.difficulty === 'insane' && CHARACTERS[gameState.selectedCharacter].id === 67) {
             localStorage.setItem('insaneCompletedWith67', 'true');
+            checkBossUnlock();
+        }
+        if (gameState.difficulty === 'hard' && CHARACTERS[gameState.selectedCharacter].id === 21) {
+            localStorage.setItem('hardCompletedWith21', 'true');
             checkBossUnlock();
         }
         if (gameState.isBossFight) {
@@ -232,6 +241,7 @@ function endRound() {
         }
     }, 1000);
 }
+
 function spawn67() {
     for (let i = 0; i < 15; i++) {
         setTimeout(() => {
@@ -245,11 +255,16 @@ function spawn67() {
         }, i * 100);
     }
 }
+
 function checkBossUnlock() {
     if (localStorage.getItem('insaneCompletedWith67') === 'true' && !gameState.bossUnlocked) {
         gameState.bossUnlocked = true;
         localStorage.setItem('boss67Unlocked', 'true');
-        console.log('67 BOSS UNLOCKED!');
+    }
+    if (localStorage.getItem('hardCompletedWith21') === 'true' && !gameState.boss21Unlocked) {
+        gameState.boss21Unlocked = true;
+        localStorage.setItem('boss21Unlocked', 'true');
     }
 }
+
 function exitToCreamo() { window.location.href = 'index.html'; }
