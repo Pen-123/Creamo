@@ -1,3 +1,5 @@
+// fighters/js/characters.js
+
 const CHARACTERS = [
     {
         id: 67,
@@ -80,3 +82,19 @@ const BOSS_67 = {
         { input: ["down", "right", "punch"], name: "MEGA FIREBALL", damage: 180 }
     ]
 };
+
+const BOSS_21 = {
+    id: 2121,
+    name: "21 BOSS",
+    style: "Strategic Master",
+    hp: 2800,
+    color: "#00ccff",
+    icon: "21",
+    description: "Master of turn-based combat. Time your attacks perfectly!",
+    moves: { punch: 45, kick: 45, special: 90 },
+    isBoss: true,
+    is21Boss: true,
+    combos: []
+};
+
+window.BOSS_21 = BOSS_21;
