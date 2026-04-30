@@ -45,10 +45,7 @@ Creamo includes different sections and pages connected through the navbar. Users
 
 ### ▶️ Run on your own PC
 
-Option 1 (simple):  
-Open `index.html` in your browser  
-
-Option 2 (local server):
+Option 1 (local server):
 ```bash
 python -m http.server
 ```
@@ -60,6 +57,8 @@ http://localhost:8000
 ---
 
 ### ☁️ Run on Pages.dev (Cloudflare Pages)
+
+Option 2
 
 1. Go to https://pages.dev  
 2. Create a project and connect your GitHub repo (or upload files)  
