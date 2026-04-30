@@ -1,0 +1,924 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YAP LLC - Advanced Digital Solutions</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=Exo+2:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Exo 2', sans-serif;
+            background: linear-gradient(135deg, #0a0f2b 0%, #131b45 50%, #0d1133 100%);
+            color: #e0e7ff;
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+        
+        .container {
+            width: 90%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        /* Header & Navigation */
+        header {
+            padding: 20px 0;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+            background: rgba(10, 15, 43, 0.95);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(64, 156, 255, 0.2);
+            animation: slideDown 1s ease-out;
+        }
+        
+        @keyframes slideDown {
+            from { transform: translateY(-100%); }
+            to { transform: translateY(0); }
+        }
+        
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .logo-icon {
+            color: #2a7fff;
+            font-size: 2.5rem;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { text-shadow: 0 0 5px #2a7fff; }
+            50% { text-shadow: 0 0 20px #2a7fff, 0 0 30px #2a7fff; }
+        }
+        
+        .logo h1 {
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 900;
+            font-size: 1.8rem;
+            background: linear-gradient(to right, #4a9cff, #2a7fff, #6bb1ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 0 15px rgba(42, 127, 255, 0.3);
+        }
+        
+        nav ul {
+            display: flex;
+            list-style: none;
+            gap: 30px;
+        }
+        
+        nav a {
+            color: #b8d1ff;
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+            padding: 8px 12px;
+            border-radius: 5px;
+            position: relative;
+        }
+        
+        nav a:hover {
+            color: #ffffff;
+            background: rgba(42, 127, 255, 0.15);
+        }
+        
+        nav a::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            width: 0;
+            height: 2px;
+            background: #2a7fff;
+            transition: all 0.3s ease;
+            transform: translateX(-50%);
+        }
+        
+        nav a:hover::after {
+            width: 80%;
+        }
+        
+        /* Hero Section */
+        .hero {
+            padding: 180px 0 100px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at 30% 50%, rgba(42, 127, 255, 0.15) 0%, transparent 50%);
+            z-index: -1;
+        }
+        
+        .hero-content {
+            max-width: 800px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 2;
+        }
+        
+        .hero h2 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 3.5rem;
+            font-weight: 900;
+            margin-bottom: 20px;
+            background: linear-gradient(to right, #6bb1ff, #2a7fff, #4a9cff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: glow 3s infinite alternate;
+        }
+        
+        @keyframes glow {
+            from { text-shadow: 0 0 10px rgba(42, 127, 255, 0.5), 0 0 20px rgba(42, 127, 255, 0.3); }
+            to { text-shadow: 0 0 20px rgba(42, 127, 255, 0.8), 0 0 30px rgba(42, 127, 255, 0.5), 0 0 40px rgba(42, 127, 255, 0.3); }
+        }
+        
+        .hero p {
+            font-size: 1.3rem;
+            margin-bottom: 40px;
+            color: #c2d5ff;
+            max-width: 700px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        
+        .cta-button {
+            display: inline-block;
+            background: linear-gradient(to right, #2a7fff, #4a9cff);
+            color: white;
+            padding: 16px 40px;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 1.2rem;
+            text-decoration: none;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 20px rgba(42, 127, 255, 0.3);
+            position: relative;
+            overflow: hidden;
+            z-index: 1;
+        }
+        
+        .cta-button:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(42, 127, 255, 0.4);
+        }
+        
+        .cta-button::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(to right, #4a9cff, #2a7fff);
+            z-index: -1;
+            transition: opacity 0.3s ease;
+            opacity: 0;
+        }
+        
+        .cta-button:hover::after {
+            opacity: 1;
+        }
+        
+        /* Products Section */
+        .products {
+            padding: 100px 0;
+            background: rgba(13, 17, 51, 0.7);
+        }
+        
+        .section-title {
+            text-align: center;
+            margin-bottom: 70px;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: #6bb1ff;
+            position: relative;
+        }
+        
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: -15px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100px;
+            height: 4px;
+            background: linear-gradient(to right, transparent, #2a7fff, transparent);
+        }
+        
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 40px;
+            margin-top: 50px;
+        }
+        
+        .product-card {
+            background: rgba(20, 27, 70, 0.8);
+            border-radius: 15px;
+            padding: 35px;
+            box-shadow: 0 10px 30px rgba(0, 10, 60, 0.3);
+            transition: all 0.4s ease;
+            border: 1px solid rgba(42, 127, 255, 0.2);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .product-card:hover {
+            transform: translateY(-15px);
+            box-shadow: 0 20px 40px rgba(42, 127, 255, 0.2);
+            border-color: rgba(42, 127, 255, 0.5);
+        }
+        
+        .product-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 5px;
+            background: linear-gradient(to right, #2a7fff, #4a9cff);
+        }
+        
+        .product-icon {
+            font-size: 3rem;
+            color: #2a7fff;
+            margin-bottom: 25px;
+            text-align: center;
+        }
+        
+        .product-card h3 {
+            font-size: 1.8rem;
+            margin-bottom: 15px;
+            color: #8abfff;
+            text-align: center;
+            font-family: 'Orbitron', sans-serif;
+        }
+        
+        .product-card p {
+            color: #b8d1ff;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        .feature-list {
+            list-style: none;
+            margin-top: 25px;
+        }
+        
+        .feature-list li {
+            padding: 8px 0;
+            color: #c2d5ff;
+            position: relative;
+            padding-left: 30px;
+        }
+        
+        .feature-list li::before {
+            content: '✓';
+            position: absolute;
+            left: 0;
+            color: #2a7fff;
+            font-weight: bold;
+        }
+        
+        /* Tiers Price Highlight */
+        .tier-price {
+            text-align: center;
+            margin-top: 25px;
+            font-size: 2rem;
+            font-weight: 700;
+            color: #2a7fff;
+            padding: 12px 0;
+            border-top: 2px dashed rgba(42, 127, 255, 0.3);
+        }
+        
+        /* Protocol Message */
+        .protocol-message {
+            padding: 80px 0;
+            text-align: center;
+            background: rgba(42, 127, 255, 0.05);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .protocol-message::before {
+            content: '';
+            position: absolute;
+            width: 300px;
+            height: 300px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(42, 127, 255, 0.1) 0%, transparent 70%);
+            top: 50%;
+            left: 10%;
+            transform: translateY(-50%);
+        }
+        
+        .protocol-message::after {
+            content: '';
+            position: absolute;
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(42, 127, 255, 0.08) 0%, transparent 70%);
+            bottom: 10%;
+            right: 10%;
+        }
+        
+        .protocol-text {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 2.8rem;
+            font-weight: 900;
+            background: linear-gradient(to right, #ff2a6d, #2a7fff, #4a9cff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 0 20px rgba(42, 127, 255, 0.3);
+            animation: textGlow 4s infinite alternate;
+            position: relative;
+            z-index: 2;
+        }
+        
+        @keyframes textGlow {
+            0%, 100% { text-shadow: 0 0 10px rgba(42, 127, 255, 0.5), 0 0 20px rgba(42, 127, 255, 0.3); }
+            50% { text-shadow: 0 0 20px rgba(255, 42, 109, 0.5), 0 0 40px rgba(255, 42, 109, 0.3), 0 0 60px rgba(255, 42, 109, 0.1); }
+        }
+        
+        /* Application Section */
+        .application {
+            padding: 100px 0;
+            text-align: center;
+        }
+        
+        .application p {
+            max-width: 700px;
+            margin: 0 auto 40px;
+            font-size: 1.2rem;
+            color: #c2d5ff;
+        }
+        
+        .form-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 15px;
+            background: linear-gradient(to right, #2a7fff, #4a9cff);
+            color: white;
+            padding: 18px 45px;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 1.3rem;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 25px rgba(42, 127, 255, 0.3);
+            margin-top: 20px;
+        }
+        
+        .form-link:hover {
+            transform: translateY(-5px) scale(1.05);
+            box-shadow: 0 15px 35px rgba(42, 127, 255, 0.4);
+        }
+        
+        /* Footer */
+        footer {
+            background: rgba(8, 12, 38, 0.95);
+            padding: 60px 0 30px;
+            border-top: 1px solid rgba(42, 127, 255, 0.2);
+        }
+        
+        .footer-content {
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 40px;
+            margin-bottom: 40px;
+        }
+        
+        .footer-logo {
+            flex: 1;
+            min-width: 250px;
+        }
+        
+        .footer-logo h3 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.8rem;
+            margin-bottom: 15px;
+            color: #6bb1ff;
+        }
+        
+        .footer-logo p {
+            color: #b8d1ff;
+            max-width: 300px;
+        }
+        
+        .footer-contact {
+            flex: 1;
+            min-width: 250px;
+        }
+        
+        .footer-contact h4 {
+            font-size: 1.4rem;
+            margin-bottom: 20px;
+            color: #8abfff;
+        }
+        
+        .contact-info {
+            list-style: none;
+        }
+        
+        .contact-info li {
+            margin-bottom: 12px;
+            color: #b8d1ff;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .copyright {
+            text-align: center;
+            padding-top: 30px;
+            border-top: 1px solid rgba(64, 156, 255, 0.1);
+            color: #8abfff;
+            font-size: 0.9rem;
+        }
+        
+        /* Animations */
+        .floating {
+            animation: floating 3s ease-in-out infinite;
+        }
+        
+        @keyframes floating {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-15px); }
+        }
+        
+        .rotate {
+            animation: rotate 20s linear infinite;
+        }
+        
+        @keyframes rotate {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        /* Responsive Design */
+        @media (max-width: 992px) {
+            .hero h2 {
+                font-size: 2.8rem;
+            }
+            
+            .protocol-text {
+                font-size: 2.2rem;
+            }
+            
+            .nav ul {
+                gap: 15px;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+                gap: 20px;
+            }
+            
+            .hero {
+                padding: 150px 0 70px;
+            }
+            
+            .hero h2 {
+                font-size: 2.2rem;
+            }
+            
+            .hero p {
+                font-size: 1.1rem;
+            }
+            
+            .section-title {
+                font-size: 2rem;
+            }
+            
+            .protocol-text {
+                font-size: 1.8rem;
+            }
+            
+            .products-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .footer-content {
+                flex-direction: column;
+            }
+        }
+        
+        /* Network Animation */
+        .network-animation {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            z-index: -1;
+            opacity: 0.3;
+            pointer-events: none;
+        }
+        
+        .node {
+            position: absolute;
+            width: 8px;
+            height: 8px;
+            background-color: #2a7fff;
+            border-radius: 50%;
+            box-shadow: 0 0 10px #2a7fff;
+        }
+        
+        .connection {
+            position: absolute;
+            height: 2px;
+            background: linear-gradient(to right, transparent, #2a7fff, transparent);
+            transform-origin: left center;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <div class="container header-content">
+            <div class="logo">
+                <div class="logo-icon">
+                    <i class="fas fa-shield-alt"></i>
+                </div>
+                <h1>YAP LLC</h1>
+            </div>
+            <nav>
+                <ul>
+                    <li><a href="#home">Home</a></li>
+                    <li><a href="#products">Products</a></li>
+                    <li><a href="#tiers">Tiers</a></li>
+                    <li><a href="#application">Application</a></li>
+                    <li><a href="#contact">Contact</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero" id="home">
+        <div class="network-animation" id="networkCanvas"></div>
+        <div class="container hero-content">
+            <h2>Undetectable Digital Solutions</h2>
+            <p>Experience next-generation privacy and digital enhancement tools engineered with Swiss precision and hosted in ultra-secure UAE data centers. Our proprietary technology ensures unrestricted access and maximum performance.</p>
+            <a href="#application" class="cta-button floating">Apply for Services <i class="fas fa-arrow-right"></i></a>
+        </div>
+    </section>
+
+    <!-- Products Section -->
+    <section class="products" id="products">
+        <div class="container">
+            <h2 class="section-title">Our Exclusive Services</h2>
+            <div class="products-grid">
+                
+                <!-- WiFi Pass Card -->
+                <div class="product-card">
+                    <div class="product-icon">
+                        <i class="fas fa-wifi"></i>
+                    </div>
+                    <h3>WiFi Pass Services</h3>
+                    <p>Unlock premium WiFi access worldwide with our proprietary pass technology</p>
+                    <ul class="feature-list">
+                        <li>Global network access</li>
+                        <li>High-speed connections</li>
+                        <li>Secure encrypted tunnels</li>
+                        <li>Automatic network detection</li>
+                        <li>24/7 technical support</li>
+                    </ul>
+                </div>
+                
+                <!-- ReadTheory Services Card -->
+                <div class="product-card">
+                    <div class="product-icon">
+                        <i class="fas fa-graduation-cap"></i>
+                    </div>
+                    <h3>ReadTheory MAX</h3>
+                    <p>Advanced level optimization for ReadTheory educational platform</p>
+                    <ul class="feature-list">
+                        <li>Automated level maximization</li>
+                        <li>Intelligent answer algorithms</li>
+                        <li>Progress acceleration</li>
+                        <li>Stealth mode operation</li>
+                        <li>Comprehensive subject coverage</li>
+                    </ul>
+                </div>
+                
+                <!-- Homework Completion Card -->
+                <div class="product-card">
+                    <div class="product-icon">
+                        <i class="fas fa-book"></i>
+                    </div>
+                    <h3>Homework Completion Service</h3>
+                    <p>Expert AI-assisted homework completion across all subjects and academic levels</p>
+                    <ul class="feature-list">
+                        <li>Full homework solutions delivered fast</li>
+                        <li>Multi-subject expertise (Math, Science, English, etc.)</li>
+                        <li>High-accuracy intelligent algorithms</li>
+                        <li>Stealth submission & plagiarism-free guarantee</li>
+                        <li>24/7 expert review & revisions</li>
+                    </ul>
+                </div>
+                
+                <!-- Website Creation Card -->
+                <div class="product-card">
+                    <div class="product-icon">
+                        <i class="fas fa-laptop-code"></i>
+                    </div>
+                    <h3>Website Creation Service</h3>
+                    <p>Professional custom website development with secure UAE hosting</p>
+                    <ul class="feature-list">
+                        <li>Full custom design & development</li>
+                        <li>Responsive, mobile-ready & SEO optimized</li>
+                        <li>Secure UAE/Swiss-hosted infrastructure</li>
+                        <li>Fast deployment & domain setup</li>
+                        <li>Ongoing maintenance & updates</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Membership Tiers Section -->
+    <section class="products" id="tiers">
+        <div class="container">
+            <h2 class="section-title">Membership Tiers</h2>
+            <div class="products-grid">
+                
+                <!-- Free Tier -->
+                <div class="product-card">
+                    <div class="product-icon">
+                        <i class="fas fa-gift"></i>
+                    </div>
+                    <h3>Free Tier</h3>
+                    <p>Basic access — perfect for trying our services</p>
+                    <ul class="feature-list">
+                        <li>WiFi Pass Services only</li>
+                        <li>Community access</li>
+                        <li>Basic features & support</li>
+                        <li>No advanced tools</li>
+                    </ul>
+                    <div class="tier-price">Free</div>
+                    <p style="text-align:center; color:#b8d1ff; font-size:1.1rem;">0 DHS per month • No payment required</p>
+                    <p style="text-align:center; margin-top:10px; color:#ff2a6d; font-size:0.95rem;">IRL payment not needed</p>
+                </div>
+                
+                <!-- Plus Tier -->
+                <div class="product-card">
+                    <div class="product-icon">
+                        <i class="fas fa-star"></i>
+                    </div>
+                    <h3>Plus Tier</h3>
+                    <p>Unlock educational & connectivity tools</p>
+                    <ul class="feature-list">
+                        <li>WiFi Pass Services</li>
+                        <li>ReadTheory MAX</li>
+                        <li>Priority support</li>
+                        <li>Enhanced performance</li>
+                    </ul>
+                    <div class="tier-price">5 DHS</div>
+                    <p style="text-align:center; color:#b8d1ff; font-size:1.1rem;">per month</p>
+                    <p style="text-align:center; margin-top:10px; color:#ff2a6d; font-size:0.95rem;">IRL payment required upon approval</p>
+                </div>
+                
+                <!-- Pro Tier -->
+                <div class="product-card">
+                    <div class="product-icon">
+                        <i class="fas fa-crown"></i>
+                    </div>
+                    <h3>Pro Tier</h3>
+                    <p>Full access — everything unlocked</p>
+                    <ul class="feature-list">
+                        <li>WiFi Pass Services</li>
+                        <li>ReadTheory MAX</li>
+                        <li>Homework Completion Service</li>
+                        <li>Website Creation Service</li>
+                        <li>Unlimited usage & custom requests</li>
+                        <li>Premium 24/7 support</li>
+                    </ul>
+                    <div class="tier-price">10 DHS</div>
+                    <p style="text-align:center; color:#b8d1ff; font-size:1.1rem;">per month</p>
+                    <p style="text-align:center; margin-top:10px; color:#ff2a6d; font-size:0.95rem;">IRL payment required upon approval</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Protocol Message -->
+    <section class="protocol-message">
+        <div class="container">
+            <div class="protocol-text">
+                <span class="rotate">⚡</span> AGENT PEN WASN'T A PEN <span class="rotate">🔒</span><br>
+                IT WAS A PROTOCOL <span class="rotate">🌐</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- Application Section -->
+    <section class="application" id="application">
+        <div class="container">
+            <h2 class="section-title">Apply for Services</h2>
+            <p>To access YAP LLC's exclusive digital solutions, please complete our secure application form. Our team will review your submission, confirm your chosen tier, and provide access credentials within 24-48 hours. All applications undergo verification to ensure service integrity.</p>
+            
+            <a href="https://forms.gle/gv21WkAgd2ZdmBrA6" target="_blank" class="form-link">
+                <i class="fab fa-google"></i> Access Application Form
+            </a>
+            
+            <div style="margin-top: 50px; padding: 25px; background: rgba(42, 127, 255, 0.1); border-radius: 15px; border-left: 5px solid #2a7fff;">
+                <h3 style="color: #8abfff; margin-bottom: 15px;"><i class="fas fa-info-circle"></i> Application Process</h3>
+                <p style="color: #c2d5ff; text-align: left;">1. Click the button above to access our secure Google Form<br>
+                2. Complete all required fields with accurate information<br>
+                3. Specify your desired membership tier (Free / Plus / Pro) and services you're applying for<br>
+                4. Submit the form and await confirmation email<br>
+                5. Receive your access credentials within 24-48 hours<br>
+                <strong style="color:#ff2a6d;">Note: Plus & Pro tiers require IRL payment (5 DHS or 10 DHS per month) upon approval.</strong></p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer id="contact">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-logo">
+                    <h3>YAP LLC</h3>
+                    <p>Providing cutting-edge digital solutions with Swiss engineering and UAE hosting infrastructure. Your privacy and access are our top priorities.</p>
+                    <div style="margin-top: 20px; font-size: 1.5rem; color: #6bb1ff;">
+                        <i class="fab fa-usb"></i> <i class="fas fa-server"></i> <i class="fas fa-lock"></i>
+                    </div>
+                </div>
+                
+                <div class="footer-contact">
+                    <h4>Contact Information</h4>
+                    <ul class="contact-info">
+                        <li><i class="fas fa-globe"></i> Services Hosted in UAE</li>
+                        <li><i class="fas fa-cogs"></i> Technology Engineered in Switzerland</li>
+                        <li><i class="fas fa-envelope"></i> Applications via Google Form</li>
+                        <li><i class="fas fa-shield-alt"></i> 256-bit End-to-End Encryption</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="copyright">
+                <p>&copy; 2026 YAP LLC. All rights reserved. | Secure Digital Solutions</p>
+                <p style="margin-top: 10px; font-size: 0.8rem; color: #6bb1ff;">"Agent Pen" is a proprietary protocol developed by YAP LLC research division.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Network animation
+        document.addEventListener('DOMContentLoaded', function() {
+            const networkCanvas = document.getElementById('networkCanvas');
+            const nodes = [];
+            const connections = [];
+            
+            // Create nodes
+            for (let i = 0; i < 15; i++) {
+                const node = document.createElement('div');
+                node.className = 'node';
+                node.style.left = `${Math.random() * 100}%`;
+                node.style.top = `${Math.random() * 100}%`;
+                node.style.animationDelay = `${Math.random() * 2}s`;
+                networkCanvas.appendChild(node);
+                nodes.push(node);
+                
+                // Add floating animation
+                node.style.animation = `floating ${3 + Math.random() * 4}s ease-in-out infinite`;
+            }
+            
+            // Create connections between nearby nodes
+            for (let i = 0; i < nodes.length; i++) {
+                for (let j = i + 1; j < nodes.length; j++) {
+                    const node1 = nodes[i];
+                    const node2 = nodes[j];
+                    
+                    const x1 = parseFloat(node1.style.left);
+                    const y1 = parseFloat(node1.style.top);
+                    const x2 = parseFloat(node2.style.left);
+                    const y2 = parseFloat(node2.style.top);
+                    
+                    const distance = Math.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2);
+                    
+                    // Only connect nodes that are close to each other
+                    if (distance < 30) {
+                        const connection = document.createElement('div');
+                        connection.className = 'connection';
+                        
+                        const length = distance;
+                        const angle = Math.atan2(y2 - y1, x2 - x1) * 180 / Math.PI;
+                        
+                        connection.style.width = `${length}%`;
+                        connection.style.left = `${x1}%`;
+                        connection.style.top = `${y1}%`;
+                        connection.style.transform = `rotate(${angle}deg)`;
+                        connection.style.opacity = 0.3 + Math.random() * 0.5;
+                        
+                        networkCanvas.appendChild(connection);
+                        connections.push(connection);
+                    }
+                }
+            }
+            
+            // Animate the connections
+            function animateConnections() {
+                connections.forEach(conn => {
+                    const currentOpacity = parseFloat(conn.style.opacity);
+                    const newOpacity = 0.3 + 0.5 * Math.abs(Math.sin(Date.now() / 1000 + parseFloat(conn.style.left)));
+                    conn.style.opacity = newOpacity;
+                });
+                
+                requestAnimationFrame(animateConnections);
+            }
+            
+            animateConnections();
+            
+            // Smooth scrolling for navigation links
+            document.querySelectorAll('nav a').forEach(anchor => {
+                anchor.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    
+                    const targetId = this.getAttribute('href');
+                    if (targetId.startsWith('#')) {
+                        const targetElement = document.querySelector(targetId);
+                        if (targetElement) {
+                            window.scrollTo({
+                                top: targetElement.offsetTop - 80,
+                                behavior: 'smooth'
+                            });
+                        }
+                    }
+                });
+            });
+            
+            // Animate elements on scroll
+            const observerOptions = {
+                threshold: 0.1,
+                rootMargin: '0px 0px -50px 0px'
+            };
+            
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.style.opacity = '1';
+                        entry.target.style.transform = 'translateY(0)';
+                    }
+                });
+            }, observerOptions);
+            
+            // Observe product cards
+            document.querySelectorAll('.product-card').forEach(card => {
+                card.style.opacity = '0';
+                card.style.transform = 'translateY(30px)';
+                card.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+                observer.observe(card);
+            });
+            
+            // Add floating effect to protocol message
+            const protocolText = document.querySelector('.protocol-text');
+            let floatAngle = 0;
+            
+            function floatProtocolText() {
+                floatAngle += 0.01;
+                const yOffset = Math.sin(floatAngle) * 10;
+                protocolText.style.transform = `translateY(${yOffset}px)`;
+                requestAnimationFrame(floatProtocolText);
+            }
+            
+            floatProtocolText();
+        });
+    </script>
+</body>
+</html>
